@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.index')
 
 @section('title', 'Update APK')
 

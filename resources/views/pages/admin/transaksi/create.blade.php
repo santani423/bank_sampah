@@ -1,4 +1,5 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app') --}}
+@extends('layouts.index')
 
 @section('title', 'Setoran Sampah')
 
