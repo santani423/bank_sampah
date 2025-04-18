@@ -191,17 +191,35 @@
                                 <span class="text">Dashboard</span>
                             </a>
                         </li>
-                        <li class="sidebar-menu__item">
-                            <a href="{{ route('petugas.transaksi.index') }}" class="sidebar-menu__link">
-                                <span class="icon"><i class="ph ph-users-three"></i></span>
-                                <span class="text">Transaksi Setoran</span>
+
+                        <li class="sidebar-menu__item has-dropdown">
+                            <a href="javascript:void(0)" class="sidebar-menu__link">
+                                <span class="icon"><i class="ph ph-squares-four"></i></span>
+                                <span class="text">Data Master</span>
+                                {{-- <span class="link-badge">3</span> --}}
                             </a>
+                            <!-- Submenu start -->
+                            <ul class="sidebar-submenu">
+                                <li class="sidebar-submenu__item">
+                                    <a href="{{ route('petugas.nasabah.index') }}" class="sidebar-submenu__link">
+                                        Data
+                                        Nasabah </a>
+                                </li>
+                            </ul> 
                         </li>
-                        <li class="sidebar-menu__item">
-                            <a href="{{ route('petugas.pengiriman.index') }}" class="sidebar-menu__link">
-                                <span class="icon"><i class="ph ph-users-three"></i></span>
-                                <span class="text">Pengiriman Sampah</span>
+                        <li class="sidebar-menu__item has-dropdown">
+                            <a href="javascript:void(0)" class="sidebar-menu__link">
+                                <span class="icon"><i class="ph ph-squares-four"></i></span>
+                                <span class="text">Transaksi</span>
+                                {{-- <span class="link-badge">3</span> --}}
                             </a>
+                            <!-- Submenu start -->
+                            <ul class="sidebar-submenu">
+                                <li class="sidebar-submenu__item">
+                                    <a href="{{ route('petugas.transaksi.index') }}" class="sidebar-submenu__link">
+                                        Transaksi Setoran </a>
+                                </li>
+                            </ul> 
                         </li>
                     </ul>
                 @endif
@@ -491,8 +509,9 @@
                                         </a>
                                     </li>
                                     <li class="pt-8 border-top border-gray-100">
-                                        <a href="javascript:void(0)" 
-                                            class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <a href="javascript:void(0)"
+                                            class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             <span class="text-2xl text-danger-600 d-flex"><i
                                                     class="ph ph-sign-out"></i></span>
                                             <span class="text">Log Out</span>
