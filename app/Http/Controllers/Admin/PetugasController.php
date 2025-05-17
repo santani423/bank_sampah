@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class PetugasController extends Controller
 {
@@ -68,9 +69,10 @@ class PetugasController extends Controller
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil diperbarui.');
     }
 
-    public function destroy(Petugas $petugas)
+    public function destroy( $petugas)
     {
-        $petugas->delete();
+   
+       Petugas::whereId($petugas)->delete();
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil dihapus.');
     }
 }

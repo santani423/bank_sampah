@@ -47,7 +47,7 @@ class BannerController extends Controller
         ]);
 
         Alert::success('Hore!', 'Banner berhasil ditambahkan!')->autoclose(3000);
-        return redirect()->route('admin.banner.index');
+        return redirect()->route('admin.banner.index')->with('success', 'Banner berhasil ditambah.');
     }
 
     public function show(Banner $banner) {}
@@ -91,7 +91,7 @@ class BannerController extends Controller
         $banner->save();
 
         Alert::success('Hore!', 'Banner berhasil diperbarui!')->autoclose(3000);
-        return redirect()->route('admin.banner.index');
+        return redirect()->route('admin.banner.index')->with('success', 'Banner berhasil diubah.');
     }
 
 

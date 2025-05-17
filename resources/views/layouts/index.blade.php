@@ -583,6 +583,7 @@
 
     <!-- main js -->
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
+    
     @yield('script')
 
 

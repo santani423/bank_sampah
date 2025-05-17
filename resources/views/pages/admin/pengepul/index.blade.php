@@ -31,7 +31,7 @@
                                 <input type="text" class="form-control" placeholder="Cari Nama" name="name"
                                     value="{{ request('name') }}">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <button class="btn btn-primary">Search</button>
                                 </div>
                             </div>
                         </form>
@@ -40,6 +40,12 @@
             </div>
             <div class="card">
                 <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>

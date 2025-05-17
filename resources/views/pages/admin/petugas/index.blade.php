@@ -9,10 +9,10 @@
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Manajem Aplikasi</h3>
-            <h6 class="op-7 mb-2">
+            <h3 class="fw-bold mb-3">Manajem Petugas</h3>
+            {{-- <h6 class="op-7 mb-2">
                 Di sini, Anda dapat mengelola versi aplikasi Android untuk bank sampah.
-            </h6>
+            </h6> --}}
         </div>
         <div class="ms-md-auto py-2 py-md-0">
             <div class="section-header-button">
@@ -25,7 +25,12 @@
             <div class="card">
                 <div class="card-body">
                     <div class="clearfix mb-3"></div>
-
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>

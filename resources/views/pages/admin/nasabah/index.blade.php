@@ -29,7 +29,7 @@
                                 <input type="text" class="form-control" placeholder="Cari Nama" name="nama_nasabah"
                                     value="{{ request('nama_nasabah') }}">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <button class="btn btn-primary">Search</button>
                                 </div>
                             </div>
                         </form>

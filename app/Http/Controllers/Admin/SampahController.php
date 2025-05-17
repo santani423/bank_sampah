@@ -41,7 +41,7 @@ class SampahController extends Controller
 
         $sampah->save();
         Alert::success('Hore!', 'Data sampah berhasil ditambahkan!')->autoclose(3000);
-        return redirect()->route('admin.sampah.index');
+        return redirect()->route('admin.sampah.index')->with('success', 'Sampah berhasil disimpan.');
     }
 
 
@@ -80,17 +80,18 @@ class SampahController extends Controller
 
         $sampah->save();
         Alert::success('Berhasil!', 'Data sampah berhasil diperbarui.')->autoclose(3000);
-        return redirect()->route('admin.sampah.index');
+        return redirect()->route('admin.sampah.index')->with('success', 'Sampah berhasil diubah.');
     }
 
 
 
-    public function destroy(Sampah $sampah)
+    public function destroy( $sampah)
     {
+        $sampah = Sampah::findOrFail($sampah);
         if ($sampah->gambar) {
             Storage::delete($sampah->gambar);
         }
         $sampah->delete();
-        return redirect()->route('pages.admin.sampah.index')->with('success', 'Sampah berhasil dihapus.');
+        return redirect()->route('admin.sampah.index')->with('success', 'Sampah berhasil dihapus.');
     }
 }

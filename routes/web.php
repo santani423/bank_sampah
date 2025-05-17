@@ -37,7 +37,7 @@ use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 Route::middleware('guest')->group(function () {

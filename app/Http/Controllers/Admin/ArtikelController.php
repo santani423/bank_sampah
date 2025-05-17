@@ -58,7 +58,7 @@ class ArtikelController extends Controller
         }
 
         Alert::success('Berhasil!', 'Artikel berhasil ditambahkan.')->autoclose(3000);
-        return redirect()->route('admin.artikel.index');
+        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil ditambah.');
     }
 
     public function show(string $id)
@@ -124,11 +124,28 @@ class ArtikelController extends Controller
 
         Alert::success('Berhasil!', 'Artikel berhasil diperbarui.')->autoclose(3000);
 
-        return redirect()->route('admin.artikel.index');
+        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil diubah.');
     }
 
 
-    public function destroy(Artikel $artikel)
+    public function destroy( $artikel)
     {
+        $artikel = Artikel::findOrFail($artikel);
+        if ($artikel->thumbnail && Storage::exists('public/thumbnail/' . $artikel->thumbnail)) {
+            Storage::delete('public/thumbnail/' . $artikel->thumbnail);
+        }
+
+        foreach ($artikel->media as $media) {
+            if (Storage::exists('public/media/' . $media->file_gambar)) {
+                Storage::delete('public/media/' . $media->file_gambar);
+            }
+            $media->delete();
+        }
+
+        $artikel->delete();
+
+        Alert::success('Berhasil!', 'Artikel berhasil dihapus.')->autoclose(3000);
+
+        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil dihapus.');
     }
 }
