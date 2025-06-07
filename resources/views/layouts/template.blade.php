@@ -99,6 +99,10 @@
                                     <a href="{{ route('admin.pengepul.index') }}" class="sidebar-submenu__link"> Data
                                         Pengepul </a>
                                 </li>
+                                <li class="sidebar-submenu__item">
+                                    <a href="{{ route('admin.cabang.index') }}" class="sidebar-submenu__link"> Data
+                                        Cabang </a>
+                                </li>
                             </ul>
                             <!-- Submenu End -->
                         </li>
