@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Hash;
 
 class PetugasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $petugas = Petugas::paginate(10);
+        $perPage = (int) $request->get('per_page', 10);
+        $page = max(1, (int) $request->get('page', 1));
+        $petugas = Petugas::paginate($perPage, ['*'], 'page', $page);
+        // dd($petugas->hasPages());
         return view('pages.admin.petugas.index', compact('petugas'));
     }
 

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class PetugasSeeder extends Seeder
 {
@@ -14,6 +14,7 @@ class PetugasSeeder extends Seeder
      */
     public function run(): void
     {
+        // Tambahkan 2 data utama
         DB::table('petugas')->insert([
             [
                 'nama' => 'Admin User',
@@ -25,7 +26,7 @@ class PetugasSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Petugas User',
+                'nama' => 'Petugas User',
                 'email' => 'petugas@example.com',
                 'username' => 'petugas',
                 'password' => Hash::make('12345678'),
@@ -34,6 +35,7 @@ class PetugasSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+
         DB::table('users')->insert([
             [
                 'name' => 'Admin User',
@@ -54,5 +56,34 @@ class PetugasSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+
+        // Tambahkan 100 data dummy
+        $faker = Faker::create();
+
+        for ($i = 1; $i <= 100; $i++) {
+            $name = $faker->name;
+            $email = $faker->unique()->safeEmail;
+            $username = 'petugas' . $i;
+
+            DB::table('petugas')->insert([
+                'nama' => $name,
+                'email' => $email,
+                'username' => $username,
+                'password' => Hash::make('12345678'),
+                'role' => 'petugas',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('users')->insert([
+                'name' => $name,
+                'email' => $email,
+                'username' => $username,
+                'password' => Hash::make('12345678'),
+                'role' => 'petugas',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

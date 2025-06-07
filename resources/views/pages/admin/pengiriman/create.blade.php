@@ -1,12 +1,12 @@
-@extends('layouts.index')
+@extends('layouts.template')
 
 @section('title', 'Pengiriman Sampah')
 
-@push('style')
+@section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.2.0/select2-bootstrap.min.css"
         rel="stylesheet">
-@endpush
+@endsection
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
@@ -117,7 +117,7 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
     <script>
         $(document).ready(function() {
             // Tambahkan baris baru
@@ -213,4 +213,4 @@
             }
         });
     </script>
-@endpush
+@endsection

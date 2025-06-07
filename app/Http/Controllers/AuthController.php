@@ -19,7 +19,7 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-
+        // dd($request->all());
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
             if ($user->role === 'admin') {
@@ -30,7 +30,7 @@ class AuthController extends Controller
         }
 
         Alert::error('Gagal!', 'Username atau password salah');
-        return back();
+        // return back();
     }
 
     public function logout()

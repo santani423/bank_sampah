@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.template')
 
 @section('title', 'Pengepul')
 
@@ -87,10 +87,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <x-pagination :data="$pengepuls" />
                     </div>
-                    <div class="float-right">
-                        {{ $pengepuls->links() }}
-                    </div>
+                    
                 </div>
             </div>
         </div>

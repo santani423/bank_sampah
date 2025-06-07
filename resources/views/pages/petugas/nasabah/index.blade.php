@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.template')
 
 @section('title', 'Nasabah')
 
@@ -29,7 +29,7 @@
                                 <input type="text" class="form-control" placeholder="Cari Nama" name="nama_nasabah"
                                     value="{{ request('nama_nasabah') }}">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <button class="btn btn-primary">Search</button>
                                 </div>
                             </div>
                         </form>
@@ -41,7 +41,23 @@
                 <div class="card-body">
 
                     <div class="clearfix mb-3"></div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>

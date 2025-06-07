@@ -13,7 +13,7 @@
             <h6 class="op-7 mb-2">Di halaman ini Anda dapat melihat detail nasabah.</h6>
         </div>
         <div class="ms-md-auto mt-3 mt-md-0">
-            <a href="{{ route('petugas.pengepul.index') }}" class="btn btn-secondary">
+            <a href="{{ route('petugas.nasabah.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
         </div>

@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\PencairanSaldoController as AdminTarikSaldoContro
 use App\Http\Controllers\Admin\PengirimanPengepulController as AdminPengirimanPengepulController;
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
-
+use App\Http\Controllers\Admin\AdminCabangController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
@@ -52,7 +52,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
     Route::resource('/data-sampah', AdminSampahController::class)->names('admin.sampah');
-    Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
+    Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul'); 
+    Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
 
     // Manajemen Konten
     Route::resource('/data-banner', AdminBannerController::class)->names('admin.banner');

@@ -10,11 +10,21 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class PengepulController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pengepuls = Pengepul::paginate(10);
+        $perPage = (int) $request->get('per_page', 10);
+        $page = max(1, (int) $request->get('page', 1));
+        $search = $request->get('name');
 
-        return view('pages.admin.pengepul.index', compact('pengepuls'));
+        $query = Pengepul::query();
+
+        if ($search) {
+            $query->where('nama', 'like', '%' . $search . '%');
+        }
+
+        $pengepuls = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return view('pages.admin.pengepul.index', compact('pengepuls', 'search'));
     }
 
     public function create()

@@ -21,12 +21,13 @@ class NasabahController extends Controller
     public function index(Request $request)
     {
         $query = Nasabah::with('saldo');
-
+        $perPage = (int) $request->get('per_page', 10);
+        $page = max(1, (int) $request->get('page', 1));
         if ($request->filled('nama_nasabah')) {
             $query->where('nama_lengkap', 'like', '%' . $request->input('nama_nasabah') . '%');
         }
 
-        $nasabahs = $query->paginate(10);
+        $nasabahs = $query->paginate($perPage, ['*'], 'page', $page);
 
         return view('pages.admin.nasabah.index', compact('nasabahs'));
     }

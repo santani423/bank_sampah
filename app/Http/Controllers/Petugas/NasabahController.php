@@ -83,7 +83,7 @@ class NasabahController extends Controller
         ]);
 
         Alert::success('Berhasil!', 'Nasabah berhasil ditambahkan!')->autoclose(3000);
-        return redirect()->route('petugas.nasabah.index');
+        return redirect()->route('petugas.nasabah.index')->with('success', 'Nasabah berhasil ditambah.');
     }
 
 
@@ -163,7 +163,7 @@ class NasabahController extends Controller
         }
 
         Alert::success('Berhasil!', 'Nasabah berhasil diperbarui!')->autoclose(3000);
-        return redirect()->route('petugas.nasabah.index');
+        return redirect()->route('petugas.nasabah.index')->with('success', 'Nasabah berhasil diubah.');
     }
 
 

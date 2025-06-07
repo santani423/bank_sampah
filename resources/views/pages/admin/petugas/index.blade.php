@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.template')
 
 @section('title', 'Petugas')
 
@@ -77,10 +77,13 @@
                                 @endforelse
                             </tbody>
                         </table>
+              
+                       <x-pagination :data="$petugas" />
 
-                        <div class="float-right">
-                            {{ $petugas->withQueryString()->links() }}
-                        </div>
+
+
+
+
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-@extends('layouts.index')
+@extends('layouts.template')
 
 @section('title', 'Detail Pengepul')
 
