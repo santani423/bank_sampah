@@ -34,20 +34,20 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             cursor: grab;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease;
         }
 
         .drag-item:hover {
             background-color: #f0f8ff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
         .drag-item.dragging {
             opacity: 0.6;
             border-color: #007bff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             cursor: grabbing;
         }
 
@@ -79,7 +79,7 @@
         <!-- Anggota Luar Cabang -->
         <div class="drag-card" id="anggota-luar">
             <h5>Anggota Luar Cabang</h5>
-            @foreach($anggotaLuar as $anggota)
+            @foreach ($anggotaLuar as $anggota)
                 <div class="drag-item" id="anggota-luar-{{ $anggota->id }}" draggable="true" data-id="{{ $anggota->id }}">
                     {{ $anggota->nama }}
                 </div>
@@ -89,8 +89,9 @@
         <!-- Anggota Cabang -->
         <div class="drag-card" id="anggota-cabang">
             <h5>Anggota Cabang</h5>
-            @foreach($anggotaCabang as $anggota)
-                <div class="drag-item" id="anggota-cabang-{{ $anggota->id }}" draggable="true" data-id="{{ $anggota->id }}">
+            @foreach ($anggotaCabang as $anggota)
+                <div class="drag-item" id="anggota-cabang-{{ $anggota->id }}" draggable="true"
+                    data-id="{{ $anggota->id }}">
                     {{ $anggota->nama }}
                 </div>
             @endforeach
@@ -102,7 +103,7 @@
 
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const dragStatusMessage = document.getElementById('drag-status-message');
 
             function drag(ev) {
@@ -110,7 +111,8 @@
                 ev.dataTransfer.effectAllowed = "move";
                 ev.target.classList.add('dragging');
                 if (dragStatusMessage) {
-                    dragStatusMessage.innerHTML = `Mulai menyeret: <strong>${ev.target.innerText}</strong>. Lepaskan untuk memindahkan.`;
+                    dragStatusMessage.innerHTML =
+                        `Mulai menyeret: <strong>${ev.target.innerText}</strong>. Lepaskan untuk memindahkan.`;
                 }
             }
 
@@ -127,7 +129,8 @@
             function dragEnd(ev) {
                 ev.target.classList.remove('dragging');
                 if (dragStatusMessage && ev.dataTransfer.dropEffect === "none") {
-                    dragStatusMessage.innerHTML = `Seretan dibatalkan untuk <strong>${ev.target.innerText}</strong>.`;
+                    dragStatusMessage.innerHTML =
+                        `Seretan dibatalkan untuk <strong>${ev.target.innerText}</strong>.`;
                 }
             }
 
@@ -140,13 +143,53 @@
 
                 if (draggableElement && dropZone !== draggableElement.parentNode) {
                     dropZone.appendChild(draggableElement);
+                    // Ambil informasi anggota
+                    const anggotaId = draggableElement.getAttribute('data-id');
+                    const anggotaNama = draggableElement.innerText;
+                    const targetArea = dropZone.querySelector('h5').innerText;
+
+                    // Log ke konsol
+                    console.log(`Dipindahkan: ID=${anggotaId}, Nama=${anggotaNama}, Ke=${targetArea}`);
+                    // Kirim AJAX ke server untuk update status anggota
+                    fetch("{{ route('admin.cabang.updateAanggotaCabang') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                anggota_id: anggotaId,
+                                cabang_id: "{{$id}}",
+                                target: targetArea === 'Anggota Cabang' ? true : false
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("updateAanggotaCabang",data);
+                            
+                            // if (data.success) {
+                            //     dragStatusMessage.innerHTML +=
+                            //         "<br><span style='color:green'>Status anggota berhasil diperbarui.</span>";
+                            // } else {
+                            //     dragStatusMessage.innerHTML +=
+                            //         "<br><span style='color:red'>Gagal memperbarui status anggota.</span>";
+                            // }
+                        })
+                        .catch(error => {
+                            dragStatusMessage.innerHTML +=
+                                "<br><span style='color:red'>Terjadi kesalahan AJAX.</span>";
+                            console.error(error);
+                        });
+
                     if (dragStatusMessage) {
-                        console.log("draggableElement",draggableElement);
-                        
-                        dragStatusMessage.innerHTML = `<strong>${draggableElement.innerText}</strong> berhasil dipindahkan ke <strong>${dropZone.querySelector('h5').innerText}</strong>.`;
+                        console.log("draggableElement", draggableElement);
+
+                        dragStatusMessage.innerHTML =
+                            `<strong>${draggableElement.innerText}</strong> berhasil dipindahkan ke <strong>${dropZone.querySelector('h5').innerText}</strong>.`;
                     }
                 } else if (draggableElement && dragStatusMessage) {
-                    dragStatusMessage.innerHTML = `<strong>${draggableElement.innerText}</strong> dijatuhkan di lokasi yang sama.`;
+                    dragStatusMessage.innerHTML =
+                        `<strong>${draggableElement.innerText}</strong> dijatuhkan di lokasi yang sama.`;
                 }
 
                 draggableElement.classList.remove('dragging');
@@ -170,7 +213,7 @@
 
             document.querySelectorAll('.drag-card').forEach(card => {
                 card.addEventListener('dragover', allowDrop);
-                card.addEventListener('drop', function (ev) {
+                card.addEventListener('drop', function(ev) {
                     drop(ev);
                     refreshListeners(); // Pastikan listener tetap aktif setelah elemen dipindahkan
                 });

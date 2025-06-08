@@ -52,8 +52,9 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
     Route::resource('/data-sampah', AdminSampahController::class)->names('admin.sampah');
-    Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul'); 
+    Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
     Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
+    Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten
     Route::resource('/data-banner', AdminBannerController::class)->names('admin.banner');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\cabang;
+use App\Models\petugasCabang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -93,7 +94,7 @@ class AdminCabangController extends Controller
             ->orderBy('petugas.nama', 'asc')
             ->get();
 
-        return view('pages.admin.cabang.show', compact('cabang', 'anggotaCabang', 'anggotaLuar'));
+        return view('pages.admin.cabang.show', compact('cabang', 'anggotaCabang', 'anggotaLuar', 'id'));
     }
 
 
@@ -123,5 +124,19 @@ class AdminCabangController extends Controller
         $cabang->delete();
 
         return redirect()->route('admin.cabang.index')->with('success', 'Cabang berhasil dihapus.');
+    }
+
+    public function updateAanggotaCabang(Request $request)
+    {
+        if ($request->target) { 
+            $petugas = new petugasCabang();
+            $petugas->cabang_id  =   $request->cabang_id;
+            $petugas->petugas_id  =   $request->anggota_id;
+            $petugas->save();
+        }else{
+            petugasCabang::where('cabang_id', $request->cabang_id)->where('petugas_id',$request->anggota_id)->delete();
+        }
+
+        return $request->all();
     }
 }
