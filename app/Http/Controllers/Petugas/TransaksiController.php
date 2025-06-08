@@ -170,4 +170,10 @@ class TransaksiController extends Controller
 
         return redirect()->route('petugas.transaksi.index');
     }
+
+
+    public function topUp()
+    {
+        return view('pages.petugas.transaksi.topUp',);
+    }
 }

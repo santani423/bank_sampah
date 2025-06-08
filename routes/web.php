@@ -96,6 +96,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');
+    Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');  
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
