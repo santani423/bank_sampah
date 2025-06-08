@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\cabang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminCabangController extends Controller
 {
@@ -64,17 +65,38 @@ class AdminCabangController extends Controller
         return view('pages.admin.cabang.edit', compact('cabang'));
     }
 
+
     public function show($id)
     {
-        $cabang = cabang::findOrFail($id);
+        $cabang = Cabang::findOrFail($id);
 
-        // Convert tanggal_berdiri to Carbon instance if not null
         if ($cabang->tanggal_berdiri) {
             $cabang->tanggal_berdiri = \Carbon\Carbon::parse($cabang->tanggal_berdiri);
         }
 
-        return view('pages.admin.cabang.show', compact('cabang'));
+        // Petugas yang tergabung dalam cabang ini (diurutkan berdasarkan nama)
+        $anggotaCabang = DB::table('petugas')
+            ->join('petugas_cabangs', 'petugas.id', '=', 'petugas_cabangs.petugas_id')
+            ->where('petugas_cabangs.cabang_id', $id)
+            ->select('petugas.*')
+            ->orderBy('petugas.nama', 'asc')
+            ->get();
+
+        // Petugas yang tidak tergabung dalam cabang ini (diurutkan berdasarkan nama)
+        $anggotaLuar = DB::table('petugas')
+            ->leftJoin('petugas_cabangs', function ($join) use ($id) {
+                $join->on('petugas.id', '=', 'petugas_cabangs.petugas_id')
+                    ->where('petugas_cabangs.cabang_id', '=', $id);
+            })
+            ->whereNull('petugas_cabangs.id')
+            ->select('petugas.*')
+            ->orderBy('petugas.nama', 'asc')
+            ->get();
+
+        return view('pages.admin.cabang.show', compact('cabang', 'anggotaCabang', 'anggotaLuar'));
     }
+
+
 
     public function update(Request $request, $id)
     {
@@ -102,5 +124,4 @@ class AdminCabangController extends Controller
 
         return redirect()->route('admin.cabang.index')->with('success', 'Cabang berhasil dihapus.');
     }
-
 }

@@ -11,7 +11,7 @@
         <div>
             <h3 class="fw-bold mb-3">Form Tambah Pengepul</h3>
             <h6 class="op-7 mb-2">
-                Di halaman ini Anda dapat menambah pengepul baru.
+                 Di halaman ini Anda dapat menambah pengepul baru.
             </h6>
         </div>
     </div>
