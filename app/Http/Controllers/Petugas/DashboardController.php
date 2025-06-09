@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
 use App\Models\DetailTransaksi;
+use App\Models\saldoPetugas;
 use App\Models\Transaksi;
 use Carbon\Carbon;
 
@@ -14,7 +15,10 @@ class DashboardController extends Controller
     public function index()
     {
         // Total Nasabah
+
+        $auth = auth()->user();
         $totalNasabah = Nasabah::count();
+        $saldoPetugas = saldoPetugas::where('petugas_id', $auth->id)->first();
 
         // Total Transaksi Hari Ini
         $totalTransaksiHariIni = Transaksi::whereDate('tanggal_transaksi', Carbon::today())->count();
@@ -59,7 +63,8 @@ class DashboardController extends Controller
             'totalTransaksiHariIni',
             'totalSampahHariIni',
             'totalOmzetHariIni',
-            'nasabahTerbaik'
+            'nasabahTerbaik',
+            'saldoPetugas'
         ));
     }
 }
