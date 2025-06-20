@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\countConttroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,3 +20,5 @@ use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiControll
 //     return $request->user();
 // });
  Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
+
+ Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');

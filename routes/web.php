@@ -39,10 +39,15 @@ use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
 Route::get('/', function () {
     return view('index');
 });
+ 
+ 
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
+    
+    Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [AuthController::class, 'register'])->name('register.post');
 });
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
