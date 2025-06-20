@@ -28,7 +28,7 @@
     <!--Main Slider End-->
 
     <!--Feature One Start-->
-    <section class="feature-one">
+    {{-- <section class="feature-one">
         <div class="container">
             <div class="feature-one__inner">
                 <ul class="list-unstyled feature-one__list">
@@ -67,7 +67,7 @@
                 </ul>
             </div>
         </div>
-    </section>
+    </section> --}}
     <!--Feature One End-->
     <!--Why Choose Two Start-->
     <section class="why-choose-two">
