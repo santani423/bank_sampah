@@ -11,10 +11,7 @@
         <div class="container">
             <div class="page-header__inner">
                 <h2>About Us</h2>
-                <ul class="thm-breadcrumb list-unstyled">
-                    <li><a href="{{ url('/') }}">Home</a></li>
-                    <li>About</li>
-                </ul>
+                
             </div>
         </div>
     </section>

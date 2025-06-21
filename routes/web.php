@@ -43,6 +43,9 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('landingPage.about');
 })->name('about');
+Route::get('/kegiatan', function () {
+    return view('landingPage.kegiatan');
+})->name('kegiatan');
  
  
 
