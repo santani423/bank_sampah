@@ -39,6 +39,10 @@ use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
 Route::get('/', function () {
     return view('index');
 });
+
+Route::get('/about', function () {
+    return view('landingPage.about');
+})->name('about');
  
  
 

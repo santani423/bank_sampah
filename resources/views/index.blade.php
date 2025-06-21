@@ -9,17 +9,17 @@
                 <div class="mySlide">
                     <img src="{{ asset('assets/img/banner/1.jpg') }}" alt="Nature"
                         style="width:100vw; max-width:100vw;">
-                    <div class="text">Caption One</div>
+                    {{-- <div class="text">Caption One</div> --}}
                 </div>
                 <div class="mySlide">
                     <img src="{{ asset('assets/img/banner/2.jpg') }}" alt="Nature"
                         style="width:100vw; max-width:100vw;">
-                    <div class="text">Caption Two</div>
+                    {{-- <div class="text">Caption Two</div> --}}
                 </div>
                 <div class="mySlide">
                     <img src="{{ asset('assets/img/banner/1.jpg') }}" alt="Nature"
                         style="width:100vw; max-width:100vw;">
-                    <div class="text">Caption Three</div>
+                    {{-- <div class="text">Caption Three</div> --}}
                 </div>
             </div>
         </div>

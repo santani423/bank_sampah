@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home One || Wostin || Wostin HTML Template For Business</title>
+    <title>@yield('title')</title>
     <!-- favicons Icons -->
     <link rel="apple-touch-icon" sizes="180x180"
         href="{{ asset('wostin/files/assets/images/favicons/apple-touch-icon.png') }}" />
@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" sizes="16x16"
         href="{{ asset('wostin/files/assets/images/favicons/favicon-16x16.png') }}" />
     <link rel="manifest" href="{{ asset('wostin/files/assets/images/favicons/site.webmanifest') }}" />
-    <meta name="description" content="Wostin HTML Template For Business" />
+    <meta name="description" content="@yield('description')" />
 
     <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -90,7 +90,7 @@
                                         <div class="navbar-nav d-flex flex-row gap-0 justify-content-center flex-lg-row flex-column align-items-center w-100">
                                             <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="#">Beranda</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="#">Profil Perusahaan</a>
+                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('about')}}">Profil Perusahaan</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
                                             <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="#">Kegiatan</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>

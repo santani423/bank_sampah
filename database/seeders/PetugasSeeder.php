@@ -60,7 +60,7 @@ class PetugasSeeder extends Seeder
         // Tambahkan 100 data dummy
         $faker = Faker::create();
 
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             $name = $faker->name;
             $email = $faker->unique()->safeEmail;
             $username = 'petugas' . $i;
