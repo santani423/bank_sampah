@@ -94,7 +94,7 @@
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
                                             <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('kegiatan')}}">Kegiatan</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="#">Tukar Botol</a>
+                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('berita')}}">Berita</a>
                                         </div>
                                         <style>
                                             @media (max-width: 991.98px) {

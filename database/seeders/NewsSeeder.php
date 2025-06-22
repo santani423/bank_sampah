@@ -20,12 +20,13 @@ class NewsSeeder extends Seeder
 
         // Jika belum ada kategori, buat dummy kategori
         if (empty($kategoriIds)) {
-            for ($k = 0; $k < 3; $k++) {
-                $kategoriIds[] = DB::table('kategori_news')->insertGetId([
-                    'name' => $faker->word,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            $kategoriNames = ['Kebersihan', 'Pengelolaan Sampah'];
+            foreach ($kategoriNames as $name) {
+            $kategoriIds[] = DB::table('kategori_news')->insertGetId([
+                'name' => $name,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
             }
         }
 
@@ -34,7 +35,7 @@ class NewsSeeder extends Seeder
                 'kategori_news_id' => $faker->randomElement($kategoriIds),
                 'title' => $faker->sentence,
                 'content' => $faker->paragraphs(3, true),
-                'thumbnail' => $faker->imageUrl(640, 480, 'nature', true, 'Environment'),
+                'thumbnail' => 'wostin\files\assets\images\blog\news-1-1.jpg',
                 'author' => $faker->name,
                 'published_at' => $faker->dateTimeBetween('-1 year', 'now'),
                 'is_published' => $faker->boolean(80),

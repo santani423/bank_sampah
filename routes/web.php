@@ -43,6 +43,8 @@ Route::controller(landingPageController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('kegiatan', 'kegiatan')->name('kegiatan');
     Route::get('about', 'about')->name('about');
+    Route::get('berita', 'berita')->name('berita');
+    Route::get('berita/kategori', 'beritaKategori')->name('berita.kategori');
 });
 
 

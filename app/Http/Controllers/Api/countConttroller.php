@@ -12,16 +12,14 @@ class countConttroller extends Controller
 {
     public function counts(Request $request)
     {
-        // Implement your logic to count and return the summary data
-        // For example, you might want to return counts of users, transactions, etc.
+         
         $nasabah = Nasabah::count();
         $petugas = User::where('role', 'petugas')->count();
-        $cabang = cabang::count(); // Assuming you have a Cabang model for branches
+        $cabang = cabang::count();  
         $data = [
             'count_nasabah' => $nasabah,
-            'count_petugas' =>  $petugas, // Example data
-            'count_cabang' => $cabang, // Example data
-            // Add more counts as needed
+            'count_petugas' =>  $petugas,  
+            'count_cabang' => $cabang, 
         ];
 
         return response()->json($data);
