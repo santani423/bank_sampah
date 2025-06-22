@@ -28,6 +28,25 @@ class landingPageController extends Controller
         $kategoriNews = kategoriNews::all();
         $news = news::all()->where('is_published', true)->sortByDesc('published_at');
         // dd($kategoriNews);
-        return view('landingPage.berita.index', compact('kategoriNews','news'));
+        $title = 'Berita';
+        return view('landingPage.berita.index', compact('kategoriNews', 'news', 'title'));
+  
+    }
+    public function beritaKategori($id)
+    {
+        $kategoriNews = kategoriNews::all();
+        $kategori = kategoriNews::where('id', $id)->first();
+        $news = news::all()->where('is_published', true)->where('kategori_news_id',$id)->sortByDesc('published_at');
+        // dd($kategoriNews);
+        $title = $kategori->name;
+        return view('landingPage.berita.index', compact('kategoriNews', 'news', 'title'));
+  
+    }
+
+    public function beritaDetail($id)
+    {
+        $berita = news::findOrFail($id);
+        $kategoriNews = kategoriNews::all();
+        return view('landingPage.berita.detail', compact('berita', 'kategoriNews'));
     }
 }

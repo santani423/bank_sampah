@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
+use App\Http\Controllers\SettingController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,3 +24,4 @@ use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiControll
  Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
 
  Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
+ Route::get('/setting', [SettingController::class, 'index'])->name('api.setting');

@@ -75,8 +75,8 @@
                         <nav class="navbar navbar-expand-lg navbar-light w-100" style="background-color: transparent !important;">
                             <div class="container-fluid px-0">
                                 <!-- Logo kiri -->
-                                <a class="navbar-brand d-flex align-items-center" href="#">
-                                    <img src="{{ asset('wostin/files/assets/images/resources/logo-1.png') }}" width="155" alt="" />
+                                <a class="navbar-brand d-flex align-items-center" href="/">
+                                    <img src=" " width="155" alt="" />
                                 </a>
                                 <!-- Toggle untuk mobile di kanan -->
                                 <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
@@ -88,7 +88,7 @@
                                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                                     <div class="mx-auto order-0">
                                         <div class="navbar-nav d-flex flex-row gap-0 justify-content-center flex-lg-row flex-column align-items-center w-100">
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="#">Beranda</a>
+                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="/">Beranda</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
                                             <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('about')}}">Profil Perusahaan</a>
                                             <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
@@ -355,6 +355,7 @@
 
     <a href="#" data-target="html" class="scroll-to-target scroll-to-top"><i class="fa fa-angle-up"></i></a>
 
+    <script src="https://code-jquery-com.translate.goog/jquery-3.7.1.js?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=id&_x_tr_pto=tc"></script>
     <script src="{{ asset('wostin/files/assets/vendors/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('wostin/files/assets/vendors/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('wostin/files/assets/vendors/jarallax/jarallax.min.js') }}"></script>
@@ -381,6 +382,27 @@
     <!-- template js -->
     <script src="{{ asset('wostin/files/assets/js/wostin.js') }}"></script>
     @yield('scripts')
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+            url: `{{ route('api.setting') }}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                // Ganti logo utama di navbar
+                if(response.logo){
+                $('a.navbar-brand img').attr('src', '{{ asset('') }}' + response.logo);
+                // Ganti logo footer
+                $('.site-footer__top-logo img, .mobile-nav__content .logo-box img').attr('src', '{{ asset('') }}' + response.logo);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Gagal memanggil API setting:', error);
+            }
+            });
+        });
+    </script>
 </body>
 
 </html>

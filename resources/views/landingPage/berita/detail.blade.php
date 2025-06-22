@@ -1,17 +1,9 @@
 @extends('layouts.landingPage')
 
-@section('title', $title)
+@section('title', $berita->judul ?? 'Detail Berita')
 
 @section('content')
- <section class="page-header">
-    <div class="page-header-bg"
-        style="background-image: url({{ asset('assets/images/backgrounds/page-header-bg.jpg') }});"></div>
-    <div class="container">
-        <div class="page-header__inner">
-            <h2>{{$title}}</h2>
-        </div>
-    </div>
-</section>
+  
      <!--News Sidebar Start-->
         <section class="news-sidebar">
             <div class="container">
@@ -20,32 +12,24 @@
                         <div class="news-sidebar__left">
                             <div class="news-sidebar__content">
                                 <!--News Sidebar Single-->
-                                @foreach($news as $item)
+                               
                                 <div class="news-sidebar__single">
                                     <div class="news-sidebar__img">
-                                        <img src="{{ asset($item->thumbnail) }}" alt="">
+                                        <img src="{{ asset($berita->thumbnail) }}" alt="">
                                         <div class="news-sidebar__date">
-                                            <p>{{ \Carbon\Carbon::parse($item->published_at)->format('M d') }}</p>
+                                            <p>{{ \Carbon\Carbon::parse($berita->published_at)->format('M d') }}</p>
                                         </div>
                                     </div>
                                     <div class="news-sidebar__content-box">
                                         <ul class="list-unstyled news-one__meta">
-                                            <li><span class="fa fa-user"></span>By  {{ $item->author }} 
+                                            <li><span class="fa fa-user"></span>By  {{ $berita->author }} 
                                              
                                         </ul>
-                                        <h3 class="news-sidebar__title"><a href="{{ route('berita.detail', ['id' => $item->id]) }}">{{$item->title}}</a></h3>
-                                        {{-- <p class="news-sidebar__text">There are many variations of passages of Lorem
-                                            Ipsum available, but majority have suffered alteration in some form, by
-                                            injected humour, or randomised words which don't look even slightly
-                                            believable. If you are going to use a passage of Lorem Ipsum.</p>
-                                        <div class="news-sidebar__bottom">
-                                            <a href="news-details.html" class="news-sidebar__arrow"><span
-                                                    class="fa fa-arrow-right"></span></a>
-                                            <a href="news-details.html" class="news-sidebar__read-more">Read More</a>
-                                        </div> --}}
+                                        <h3 class="news-sidebar__title"><a href="{{ route('berita.detail', ['id' => $berita->id]) }}">{{$berita->title}}</a></h3>
+                                        <p class="news-sidebar__text">{!!$berita->content!!}</p>
+                                         
                                     </div>
-                                </div> 
-                                @endforeach
+                                </div>  
                             </div>
                           
                           
