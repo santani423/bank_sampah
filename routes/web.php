@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\PengirimanPengepulController as AdminPengirimanPe
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\AdminCabangController;
+use App\Http\Controllers\landingPageController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
@@ -36,23 +37,19 @@ use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
+ 
+
+Route::controller(landingPageController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('kegiatan', 'kegiatan')->name('kegiatan');
+    Route::get('about', 'about')->name('about');
 });
 
-Route::get('/about', function () {
-    return view('landingPage.about');
-})->name('about');
-Route::get('/kegiatan', function () {
-    return view('landingPage.kegiatan');
-})->name('kegiatan');
- 
- 
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
-    
+
     Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [AuthController::class, 'register'])->name('register.post');
 });
@@ -108,11 +105,10 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');
-    Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');  
+    Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');
     Route::post('/midtrans/token', [PetugasTransaksiController::class, 'createTransaction']);
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
-
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');

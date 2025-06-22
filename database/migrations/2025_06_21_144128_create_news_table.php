@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('news', function (Blueprint $table) {
-             $table->id();
+            $table->id();
+            $table->bigInteger('kategori_news_id');
             $table->string('title'); // Judul berita
             $table->text('content'); // Isi berita
             $table->string('thumbnail')->nullable(); // Gambar thumbnail (opsional)
-            $table->string('author')->nullable(); // Penulis
-            // $table->enum('category', ['lingkungan', 'kegiatan', 'pengumuman'])->default('lingkungan');
+            $table->string('author')->nullable(); // Penulis 
             $table->timestamp('published_at')->nullable(); // Tanggal terbit
             $table->boolean('is_published')->default(false); // Status tampil/tidak
             $table->timestamps(); // created_at & updated_at
