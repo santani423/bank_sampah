@@ -200,7 +200,7 @@
                             <a href="javascript:void(0)" class="sidebar-menu__link">
                                 <span class="icon"><i class="ph ph-squares-four"></i></span>
                                 <span class="text">Data Master</span>
-                                {{-- <span class="link-badge">3</span> --}}b
+                                {{-- <span class="link-badge">3</span> --}}
                             </a>
                             <!-- Submenu start -->
                             <ul class="sidebar-submenu">

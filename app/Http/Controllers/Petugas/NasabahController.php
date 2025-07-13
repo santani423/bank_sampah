@@ -22,11 +22,17 @@ class NasabahController extends Controller
     {
         $query = Nasabah::with('saldo');
 
+        $query->join('cabangs', 'nasabah.cabang_id', '=', 'cabangs.id')
+            ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
+            ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id')
+            ->where('petugas.id', auth()->user()->id);
+
         if ($request->filled('nama_nasabah')) {
             $query->where('nama_lengkap', 'like', '%' . $request->input('nama_nasabah') . '%');
         }
 
         $nasabahs = $query->paginate(10);
+
 
         return view('pages.petugas.nasabah.index', compact('nasabahs'));
     }

@@ -29,6 +29,8 @@ class NasabahController extends Controller
 
         $nasabahs = $query->paginate($perPage, ['*'], 'page', $page);
 
+        // dd($nasabahs);
+
         return view('pages.admin.nasabah.index', compact('nasabahs'));
     }
 

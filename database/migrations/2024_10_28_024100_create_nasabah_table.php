@@ -13,18 +13,19 @@ return new class extends Migration
     {
         Schema::create('nasabah', function (Blueprint $table) {
             $table->id();
-            $table->string('no_registrasi');
-            $table->string('nik');
-            $table->string('nama_lengkap');
+            $table->unsignedBigInteger('cabang_id'); 
+            $table->string('no_registrasi', 50)->unique();
+            $table->string('nik', 20)->unique();
+            $table->string('nama_lengkap', 100);
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
-            $table->string('tempat_lahir');
+            $table->string('tempat_lahir', 50);
             $table->date('tanggal_lahir');
-            $table->string('no_hp');
-            $table->string('email')->unique();
-            $table->string('username')->unique();
-            $table->string('password');
+            $table->string('no_hp', 20);
+            $table->string('email', 100)->unique();
+            $table->string('username', 50)->unique();
+            $table->string('password', 255);
             $table->text('alamat_lengkap');
-            $table->string('foto')->default('profil.png');
+            $table->string('foto', 100)->default('profil.png');
             $table->enum('status', ['aktif', 'tidak_aktif'])->default('aktif');
             $table->timestamps();
         });

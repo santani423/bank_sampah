@@ -85,5 +85,27 @@ class PetugasSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+
+         // Ambil semua id petugas
+        $petugasIds = DB::table('petugas')->pluck('id')->toArray();
+
+ 
+
+        foreach ($petugasIds as $petugasId) {
+            DB::table('petugas_cabangs')->insert([
+                'cabang_id' => rand(1, 3),
+                'petugas_id' => $petugasId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            DB::table('saldo_petugas')->insert([
+                'saldo' => rand(100000000, 3000000000),
+                'petugas_id' => $petugasId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+
+        }
     }
 }

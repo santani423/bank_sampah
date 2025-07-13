@@ -64,8 +64,22 @@ class TransaksiController extends Controller
     public function create()
     {
         $kodeTransaksi = $this->generateUniqueTransactionCode();
-        $nasabahList = Nasabah::all();
         $stokSampah = Sampah::all();
+        // Ambil daftar nasabah yang terkait dengan petugas yang sedang login
+        // Menggunakan join untuk mendapatkan nasabah yang dikelola oleh petugas cabang
+        // Pastikan petugas yang sedang login memiliki akses ke cabang yang sesuai
+
+
+
+        $query = Nasabah::with('saldo');
+
+        $query->join('cabangs', 'nasabah.cabang_id', '=', 'cabangs.id')
+            ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
+            ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id');
+
+        // Hindari data nasabah dobel dengan distinct
+        $nasabahList = $query->select('nasabah.*')->distinct()->paginate(10);
+
         return view('pages.petugas.transaksi.create', compact('nasabahList', 'stokSampah', 'kodeTransaksi'));
     }
 

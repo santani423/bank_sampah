@@ -108,6 +108,19 @@
                     <div class="text-danger mt-1">{{ $message }}</div>
                 @enderror
             </div>
+            <div class="mb-24">
+                <label for="alamat_lengkap" class="form-label mb-8 h6">Cabang</label>
+                <select class="form-control @error('cabang_id') is-invalid @enderror" name="cabang_id" id="cabang_id">
+                    <option value="">Pilih Cabang</option>
+                    @foreach($cabangs as $cabang)
+                        <option value="{{ $cabang->id }}" {{ old('cabang_id') == $cabang->id ? 'selected' : '' }}>{{ $cabang->nama_cabang }}</option>
+                    @endforeach
+                </select>
+                @error('cabang_id')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+       
 
             <button type="submit" class="btn btn-main rounded-pill w-100">Register</button>
             <p class="mt-32 text-gray-600 text-center">Sudah punya akun?

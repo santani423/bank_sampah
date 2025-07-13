@@ -20,6 +20,7 @@ class NasabahSeeder extends Seeder
         for ($i = 0; $i < 20; $i++) {
             $nasabah = Nasabah::create([
                 'no_registrasi' => 'REG' . $faker->unique()->numberBetween(100, 999),
+                'cabang_id' => $faker->randomElement([1, 2, 3]), // Assuming you have 3 cabang
                 'nik' => $faker->numerify('################'),
                 'nama_lengkap' => $faker->name,
                 'jenis_kelamin' => $faker->randomElement(['Laki-laki', 'Perempuan']),

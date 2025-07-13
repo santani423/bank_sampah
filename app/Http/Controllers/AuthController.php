@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\cabang;
 use App\Models\Nasabah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,12 +46,14 @@ class AuthController extends Controller
 
     public function showRegistrationForm()
     {
-        return view('pages.auth.register');
+        $cabangs = cabang::all();
+        return view('pages.auth.register', compact('cabangs'));
     }
 
     public function register(Request $request)
     {
         $request->validate([
+            'cabang_id'   => 'required|string',
             'nama_lengkap'   => 'required|string',
             'jenis_kelamin'  => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir'   => 'required|string',
