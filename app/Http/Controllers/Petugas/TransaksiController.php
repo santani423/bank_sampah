@@ -21,9 +21,28 @@ use Midtrans\Snap;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Illuminate\Support\Facades\Log;
+use Xendit\Configuration;
+use Xendit\Invoice\InvoiceApi;
+use Illuminate\Support\Str;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class TransaksiController extends Controller
 {
+    protected InvoiceApi $invoiceApi;
+
+    public function __construct()
+    {
+        $apiKey = config('xendit.api_key');
+
+        if (empty($apiKey)) {
+            Log::error('Xendit API Key not set in config.');
+            abort(500, 'Xendit API Key tidak tersedia.');
+        }
+
+        Configuration::setXenditKey($apiKey);
+        $this->invoiceApi = new InvoiceApi();
+    }
 
     public function index()
     {
@@ -201,52 +220,41 @@ class TransaksiController extends Controller
 
     public function createTransaction(Request $request)
     {
+        $validated = $request->validate([
+            'jumlah' => 'required|numeric|min:1000',
+        ]);
+
+        $user = Auth::user(); // Ambil user yang sedang login
+        $order_id = 'invoice-' . time() . '-' . Str::random(9);
+        $params = [
+            'external_id' => $order_id,
+            'amount' => (int) $validated['jumlah'],
+            'payer_email' => $user->email,
+            'description' => 'Pembayaran oleh ' . $user->name,
+        ];
+
         try {
+            $invoice = $this->invoiceApi->createInvoice(create_invoice_request: $params);
             $auth = auth()->user();
             petugasLog::create([
                 'petugas_id' => $auth->id,
                 'activity' => 'Top Up Create Transaction',
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
-                'description' => 'Membuat transaksi top up dengan nominal: ' . $request->nominal,
+                'description' => 'Membuat transaksi top up dengan nominal: ' . $validated['jumlah'],
             ]);
-            // Konfigurasi Midtrans
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production');
-            Config::$isSanitized = config('midtrans.is_sanitized');
-            Config::$is3ds = config('midtrans.is_3ds');
-            $order_id  = "TOPUP-" . uniqid();
-
-            // Buat transaksi
-            $auth = auth()->user();
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $order_id,
-                    'gross_amount' => $request->nominal,
-                ],
-                'customer_details' => [
-                    'first_name' => $auth->name ?? '',
-                    'email' => $auth->email ?? '',
-                    'phone' => $auth->phone ?? '',
-                ]
-            ];
 
             $data = new petugasTopUp();
             $data->petugas_id = $auth->id;
             $data->order_id = $order_id;
-            $data->amount = $request->nominal;
+            $data->amount = $validated['jumlah'];
             $data->save();
-
-            $snapToken = Snap::getSnapToken($params);
-
-            return response()->json(['snap_token' => $snapToken]);
-        } catch (\Exception $e) {
-            // Log error jika perlu
-            Log::error('Create Transaction Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan saat membuat transaksi.'], 500);
+            return redirect()->away($invoice['invoice_url'] ?? '/');
+        } catch (Exception $e) {
+            Log::error('Xendit error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withErrors(['xendit_error' => 'Gagal membuat invoice: ' . $e->getMessage()]);
         }
     }
-
     public function handleNotification(Request $request)
     {
         // Konfigurasi Midtrans
@@ -313,97 +321,58 @@ class TransaksiController extends Controller
         return response()->json(['message' => 'Notification processed successfully']);
     }
 
+
     public function callback(Request $request)
     {
-        // Ambil data dari request (Midtrans akan mengirim sebagai JSON body)
-        $transaction_id     = $request->input('transaction_id');
-        $transactionStatus  = $request->input('transaction_status');
-        $paymentType        = $request->input('payment_type');
-        $fraudStatus        = $request->input('fraud_status');
-        $orderId            = $request->input('order_id');
+        try {
+            // Log seluruh data callback dari Xendit
+            Log::info('Xendit Callback Received:', $request->all());
 
-        // Temukan transaksi berdasarkan order_id
-        $transaction = petugasTopUp::where('order_id', $orderId)->where('transaction_id', $transaction_id)->first();
+            $data = $request->all();
 
-        if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
-        }
-        // Cegah proses callback jika transaksi sudah sukses
-        if ($transaction->status === 'success') {
-            return response()->json(['message' => 'Transaction already processed'], 200);
-        }
-        // Update data dasar transaksi
-        $transaction->transaction_id = $transaction_id;
-        $transaction->payment_type   = $paymentType;
+            // Validasi field penting
+            if (empty($data['external_id']) || empty($data['status'])) {
+                Log::warning('Xendit Callback Missing Fields', $data);
+                return response()->json(['message' => 'Invalid data'], 400);
+            }
 
-        // Log aktivitas callback        
-        petugasLog::create([
-            'petugas_id' => $transaction->petugas_id,
-            'activity' => 'Top Up Callback',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent'),
-            'description' => "Callback Midtrans untuk order_id: $orderId, status: $transactionStatus",
-        ]);
+            // Cari transaksi dari tabel petugasTopUp
+            $transaction = petugasTopUp::where('order_id', $data['external_id'])->first();
 
-        // Penanganan status dari Midtrans
-        switch ($transactionStatus) {
-            case 'capture':
-                if ($paymentType === 'credit_card' && $fraudStatus === 'challenge') {
-                    $transaction->status = 'pending';
+            if (!$transaction) {
+                Log::warning('Transaksi tidak ditemukan untuk order_id: ' . $data['external_id']);
+                return response()->json(['message' => 'Transaction not found'], 404);
+            }
+
+            // Update status transaksi sesuai status dari Xendit
+            $transaction->status = $data['status'];
+
+
+
+            $transaction->save();
+
+            if (strtolower($data['status']) === 'completed') {
+                $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
+
+                if ($saldo) {
+                    $saldo->saldo += $transaction->amount;
+                    $saldo->save();
+
+                    Log::info('Saldo petugas berhasil ditambahkan. Petugas ID: ' . $transaction->petugas_id . ', Jumlah: ' . $transaction->amount);
                 } else {
-                    $transaction->status = 'success';
+                    Log::warning('Saldo petugas tidak ditemukan untuk Petugas ID: ' . $transaction->petugas_id);
                 }
-                break;
+            }
 
-            case 'settlement':
-                $transaction->status = 'success';
+            Log::info('Transaksi berhasil diperbarui. order_id: ' . $transaction->order_id . ', status: ' . $transaction->status);
 
-                // Update saldo petugas
-                $saldo = saldoPetugas::firstOrCreate(
-                    ['petugas_id' => $transaction->petugas_id],
-                    ['saldo' => 0]
-                );
+            return response()->json(['message' => 'Callback processed'], 200);
+        } catch (\Exception $e) {
+            Log::error('Callback Xendit error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
 
-                $saldo->increment('saldo', $transaction->amount);
-
-                petugasBalaceMutation::create([
-                    'petugas_id'   =>  $transaction->petugas_id,
-                    'amount'   =>  $transaction->amount,
-                    'type'   =>  'credit',
-                    'source'   =>  'topup',
-                    'description' => "Callback Midtrans untuk order_id: $orderId, status: $transactionStatus",
-                ]);
-                break;
-
-            case 'pending':
-                $transaction->status = 'pending';
-                break;
-
-            case 'deny':
-            case 'expire':
-            case 'cancel':
-                $transaction->status = 'failed';
-                break;
-
-            case 'refund':
-                $transaction->status = 'refund';
-                break;
-
-            case 'partial_refund':
-                $transaction->status = 'partial_refund';
-                break;
-
-            case 'authorize':
-                $transaction->status = 'authorize';
-                break;
-
-            default:
-                $transaction->status = $transactionStatus;
-                break;
+            return response()->json(['message' => 'Internal server error'], 500);
         }
-
-        $transaction->save();
-
-        return response()->json(['message' => 'Callback processed successfully']);
     }
 }

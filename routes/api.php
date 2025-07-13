@@ -21,7 +21,7 @@ use App\Http\Controllers\SettingController;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
- Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
+ Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
  Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
  Route::get('/setting', [SettingController::class, 'index'])->name('api.setting');

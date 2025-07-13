@@ -19,7 +19,8 @@ return new class extends Migration
             // Informasi transaksi
             $table->string('order_id')->unique(); // ID unik dari Midtrans
             $table->bigInteger('amount');          // Nominal topup
-            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            // $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->string('status')->default('pending');
             $table->string('payment_type')->nullable();   // credit_card, bank_transfer, dll
             $table->string('transaction_id')->nullable(); // ID dari Midtrans
 
