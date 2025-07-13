@@ -116,4 +116,4 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/bayar', [TessController::class, 'proses']);
+

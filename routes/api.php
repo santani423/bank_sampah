@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TessController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,4 @@ use App\Http\Controllers\SettingController;
 
  Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
  Route::get('/setting', [SettingController::class, 'index'])->name('api.setting');
+ Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
