@@ -70,7 +70,7 @@
                     @include('layouts.menu.admin')
                 @endif
                 @if (auth()->user()->role == 'petugas')
-                   @include('layouts.menu.petugas')
+                    @include('layouts.menu.petugas')
                 @endif
                 @if (auth()->user()->role == 'nasabah')
                     @include('layouts.menu.nasabah')
@@ -316,8 +316,8 @@
                                     <img src="{{ asset('edmate/assets/images/thumbs/user-img.png') }}" alt=""
                                         class="w-54 h-54 rounded-circle">
                                     <div class="">
-                                        <h4 class="mb-0">Michel John</h4>
-                                        <p class="fw-medium text-13 text-gray-200">examplemail@mail.com</p>
+                                        <h4 class="mb-0">{{ Auth::user()->name }}</h4>
+                                        <p class="fw-medium text-13 text-gray-200">{{ Auth::user()->email }}</p>
                                     </div>
                                 </div>
                                 <ul class="max-h-270 overflow-y-auto scroll-sm pe-4">
@@ -406,7 +406,7 @@
             </div>
         </div>
     </div>
-   <!-- jQuery Scrollbar -->
+    <!-- jQuery Scrollbar -->
     <script src="{{ asset('assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
     <!-- Jquery js -->
     <script src="{{ asset('edmate/assets/js/jquery-3.7.1.min.js') }}"></script>
@@ -437,7 +437,7 @@
 
     <!-- main js -->
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
-    
+
     @yield('scripts')
 
 

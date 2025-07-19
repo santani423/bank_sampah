@@ -11,4 +11,10 @@
              <span class="text">Transaksi</span>
          </a>
      </li>  
+     <li class="sidebar-menu__item">
+         <a href="{{ route('nasabah.cabang.index') }}" class="sidebar-menu__link">
+             <span class="icon"><i class="ph ph-users-three"></i></span>
+             <span class="text">Cabang</span>
+         </a>
+     </li>  
  </ul>

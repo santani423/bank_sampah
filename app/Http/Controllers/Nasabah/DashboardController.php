@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Nasabah;
 
 use App\Http\Controllers\Controller;
+use App\Models\cabang;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Can;
 
 class DashboardController extends Controller
 {
@@ -21,4 +23,5 @@ class DashboardController extends Controller
         // Logic for displaying the profile
         return view('pages.nasabah.profile');
     }
+    
 }

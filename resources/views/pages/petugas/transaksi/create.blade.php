@@ -23,7 +23,6 @@
                 @csrf
                 <div class="card">
                     <div class="card-body">
-
                         <div class="form-group">
                             <label>Kode Setoran</label>
                             <input class="form-control" type="text" name="kode_transaksi" value="{{ $kodeTransaksi }}"
@@ -32,10 +31,12 @@
 
                         <div class="form-group">
                             <label>Pilih Nasabah</label>
-                            <select name="nasabah_id" class="form-control select2" required>
+                            <select name="nasabah_id" class="form-control select2-nasabah" required>
                                 <option value="">-- Pilih Nasabah --</option>
                                 @foreach ($nasabahList as $nasabah)
-                                    <option value="{{ $nasabah->id }}">{{ $nasabah->nama_lengkap }}</option>
+                                    <option value="{{ $nasabah->id }}">
+                                        {{ $nasabah->id }} - {{ $nasabah->nama_lengkap }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -47,6 +48,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card">
                     <div class="card-body">
 
@@ -90,8 +92,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <button type="button" class="btn btn-success" id="add-row">Tambah
-                                Sampah</button>
+                            <button type="button" class="btn btn-success" id="add-row">Tambah Sampah</button>
                         </div>
 
                         <div class="form-group">
@@ -104,13 +105,13 @@
                         <button type="submit" class="btn btn-primary">Simpan Setoran</button>
                     </div>
             </form>
+
             @if (session('success'))
                 <script>
                     alert('{{ session('success') }}');
                     window.open("{{ route('petugas.transaksi.print', session('transaksi_id')) }}", '_blank');
                 </script>
             @endif
-
         </div>
     </div>
 @endsection
@@ -119,7 +120,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.select2').select2();
+            // Inisialisasi Select2 untuk Nasabah
+            $('.select2-nasabah').select2({
+                theme: 'bootstrap-5',
+                placeholder: '-- Pilih Nasabah --',
+                allowClear: true
+            });
 
             let rowIndex = 1;
 
@@ -142,7 +148,6 @@
                         <td><button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button></td>
                     </tr>`;
                 $('#setoran-details').append(newRow);
-                $('.select2').select2();
                 rowIndex++;
             });
 
