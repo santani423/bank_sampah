@@ -80,7 +80,7 @@ class TransaksiController extends Controller
     }
 
 
-    public function create()
+    public function create(Request $request)
     {
         $kodeTransaksi = $this->generateUniqueTransactionCode();
         $stokSampah = Sampah::all();
@@ -88,7 +88,7 @@ class TransaksiController extends Controller
         // Menggunakan join untuk mendapatkan nasabah yang dikelola oleh petugas cabang
         // Pastikan petugas yang sedang login memiliki akses ke cabang yang sesuai
 
-
+        $nasabah =  Nasabah::where('no_registrasi', $request->no_registrasi)->first();
 
         $query = Nasabah::with('saldo');
 
@@ -100,7 +100,7 @@ class TransaksiController extends Controller
         $nasabahList = $query->select('nasabah.*')->get();
         // dd($nasabahList);
 
-        return view('pages.petugas.transaksi.create', compact('nasabahList', 'stokSampah', 'kodeTransaksi'));
+        return view('pages.petugas.transaksi.create', compact('nasabahList', 'stokSampah', 'kodeTransaksi', 'nasabah'));
     }
 
     public function store(Request $request)
@@ -115,7 +115,21 @@ class TransaksiController extends Controller
             'detail_transaksi.*.berat_kg' => 'required|numeric|min:0',
             'detail_transaksi.*.harga_per_kg' => 'required|numeric|min:0',
         ]);
+        $totalTransaksi = 0; // Untuk menghitung total nilai transaksi
 
+        // Iterasi detail transaksi
+        foreach ($request->detail_transaksi as $detail) {
+            $hargaTotal = $detail['berat_kg'] * $detail['harga_per_kg'];
+            $totalTransaksi += $hargaTotal;
+        }
+        $saldoPetugas = SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
+            ->where('petugas.email', auth()->user()->email)
+            ->select('saldo_petugas.*')
+            ->first();
+
+        if ($saldoPetugas->saldo < $totalTransaksi) {
+            return back()->with('error', 'Saldo petugas tidak mencukupi untuk melakukan transaksi ini.');
+        }
         // Ambil ID petugas dari sesi pengguna yang sedang login
         $petugas_id = auth()->user()->id;
 
@@ -155,8 +169,18 @@ class TransaksiController extends Controller
             ]);
         }
 
+
+        $sldPtgs = SaldoPetugas::where('id', $saldoPetugas->id)->first();
+        $sldPtgs->saldo = $sldPtgs->saldo - $totalTransaksi;
+        $sldPtgs->save();
+
         // Redirect ke halaman cetak nota transaksi
-        return redirect()->route('petugas.transaksi.print', ['transaksi' => $transaksi->id])
+        // return redirect()->route('petugas.transaksi.print', ['transaksi' => $transaksi->id])
+        //     ->with([
+        //         'success' => 'Transaksi berhasil disimpan',
+        //         'transaksi_id' => $transaksi->id,
+        //     ]);
+        return redirect()->route('petugas.nasabah.index', ['transaksi' => $transaksi->id])
             ->with([
                 'success' => 'Transaksi berhasil disimpan',
                 'transaksi_id' => $transaksi->id,

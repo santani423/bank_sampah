@@ -18,7 +18,9 @@ class DashboardController extends Controller
 
         $auth = auth()->user();
         $totalNasabah = Nasabah::count();
-        $saldoPetugas = saldoPetugas::where('petugas_id', $auth->id)->first();
+        $saldoPetugas =  SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
+            ->where('petugas.email', auth()->user()->email)
+            ->first();
 
         // Total Transaksi Hari Ini
         $totalTransaksiHariIni = Transaksi::whereDate('tanggal_transaksi', Carbon::today())->count();

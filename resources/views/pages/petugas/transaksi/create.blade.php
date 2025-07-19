@@ -19,6 +19,22 @@
     </div>
     <div class="row">
         <div class="col-12">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
             <form action="{{ route('petugas.transaksi.store') }}" method="POST">
                 @csrf
                 <div class="card">
@@ -28,18 +44,20 @@
                             <input class="form-control" type="text" name="kode_transaksi" value="{{ $kodeTransaksi }}"
                                 readonly>
                         </div>
-
                         <div class="form-group">
-                            <label>Pilih Nasabah</label>
-                            <select name="nasabah_id" class="form-control select2-nasabah" required>
-                                <option value="">-- Pilih Nasabah --</option>
-                                @foreach ($nasabahList as $nasabah)
-                                    <option value="{{ $nasabah->id }}">
-                                        {{ $nasabah->id }} - {{ $nasabah->nama_lengkap }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label>Nasabah</label>
+                            <input class="form-control" type="text" name="nasabah" value="{{ $nasabah->nama_lengkap ?? '' }}"
+                                readonly>
                         </div>
+                        <div class="form-group">
+                            <label>No. Registrasi</label>
+                            <input class="form-control" type="text" name="no_registrasi"
+                                value="{{ $nasabah->no_registrasi ?? '' }}" readonly>
+                        </div>
+                        <input type="hidden" name="nasabah_id" value="{{ $nasabah->id ?? '' }}">
+                        <input type="hidden" name="no_registrasi" value="{{ $nasabah->no_registrasi ?? '' }}">
+
+
 
                         <div class="form-group">
                             <label>Tanggal Setoran</label>

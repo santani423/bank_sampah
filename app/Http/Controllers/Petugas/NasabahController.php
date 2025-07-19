@@ -10,6 +10,7 @@ use App\Models\PencairanSaldo;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,12 +21,21 @@ class NasabahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Nasabah::with('saldo');
-
-        $query->join('cabangs', 'nasabah.cabang_id', '=', 'cabangs.id')
+        $query = Nasabah::join('user_nasabahs', 'nasabah.id', '=', 'user_nasabahs.nasabah_id')
+            ->join('cabang_users', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
+            ->join('cabangs', 'cabang_users.cabang_id', '=', 'cabangs.id')
             ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
             ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id')
-            ->where('petugas.id', auth()->user()->id);
+            ->select(
+                'nasabah.id',
+                DB::raw('MAX(nasabah.nama_lengkap) as nama_lengkap'),
+                DB::raw('MAX(nasabah.no_registrasi) as no_registrasi'),
+                DB::raw('MAX(nasabah.no_hp) as no_hp'),
+                DB::raw('MAX(nasabah.cabang_id) as cabang_id'),
+                DB::raw('GROUP_CONCAT(DISTINCT cabangs.nama_cabang) as nama_cabang')
+            )
+            ->where('petugas.id', auth()->user()->id)
+            ->groupBy('nasabah.id');
 
         if ($request->filled('nama_nasabah')) {
             $query->where('nama_lengkap', 'like', '%' . $request->input('nama_nasabah') . '%');

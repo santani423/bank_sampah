@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Nasabah;
 
 use App\Http\Controllers\Controller;
 use App\Models\cabang;
+use App\Models\Saldo;
+use App\Models\UserNasabah;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Can;
 
@@ -11,11 +13,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $saldo = 100;
+        
         $topup = 50;
         $penarikan = 25;
         // Logic for displaying the dashboard
-        return view('pages.nasabah.dashboard', compact('saldo', 'topup', 'penarikan'));
+        $userNasabah =  UserNasabah::where('user_id', auth()->id())->first();
+        $saldo  =  Saldo::where('nasabah_id', $userNasabah->nasabah_id)->first();
+        return view('pages.nasabah.dashboard', compact('saldo', 'topup', 'penarikan', 'userNasabah'));
     }
 
     public function profile()

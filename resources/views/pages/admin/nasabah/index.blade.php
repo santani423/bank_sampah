@@ -62,7 +62,7 @@
                                         <td>{{ $nasabah->nama_lengkap }}</td>
                                         <td>{{ $nasabah->no_registrasi }}</td>
                                         <td>{{ $nasabah->no_hp }}</td>
-                                        <td>Rp{{ number_format($nasabah->saldo->saldo, 0, ',', '.') }}</td>
+                                        <td>Rp </td>
                                         <td>
                                             @if ($nasabah->status === 'aktif')
                                                 <span class="badge bg-success text-white">Aktif</span>

@@ -65,8 +65,7 @@
                                     <th>#</th>
                                     <th>Nama</th>
                                     <th>No. Registrasi</th>
-                                    <th>No. HP</th>
-                                    <th>Saldo</th>
+                                    <th>No. HP</th> 
                                     <th>Status</th>
                                     <th style="width: 250px">Aksi</th>
                                 </tr>
@@ -78,7 +77,7 @@
                                         <td>{{ $nasabah->nama_lengkap }}</td>
                                         <td>{{ $nasabah->no_registrasi }}</td>
                                         <td>{{ $nasabah->no_hp }}</td>
-                                        <td>Rp{{ number_format($nasabah->saldo->saldo, 0, ',', '.') }}</td>
+                                         
                                         <td>
                                             @if ($nasabah->status === 'aktif')
                                                 <span class="badge bg-success text-white">Aktif</span>
@@ -91,6 +90,10 @@
                                                 <a href="{{ route('petugas.nasabah.show', $nasabah->id) }}"
                                                     class="btn btn-sm btn-info me-2">
                                                     <i class="fas fa-info-circle"></i> Detail
+                                                </a>
+                                                <a href="{{ route('petugas.transaksi.create', ) }}?no_registrasi={{ $nasabah->no_registrasi }}"
+                                                    class="btn btn-sm btn-warning me-2">
+                                                    <i class="fas fa-info-circle"></i> Setoran
                                                 </a>
                                             </div>
                                         </td>

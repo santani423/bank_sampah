@@ -55,7 +55,7 @@
                         <div class="col col-stats ms-3 ms-sm-0">
                             <div class="numbers">
                                 <p class="card-category">Total Nasabah</p>
-                                <h4 class="card-title">Rp {{ number_format($saldo ?? 0, 0, ',', '.') }}</h4>
+                                <h4 class="card-title">Rp {{ number_format($saldo->saldo ?? 0, 0, ',', '.') }}</h4>
                             </div>
                         </div>
                     </div>
