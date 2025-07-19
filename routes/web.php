@@ -27,6 +27,8 @@ use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiControll
 use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
 use App\Http\Controllers\TessController;
 
+use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardController;
+use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -113,6 +115,16 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::post('/midtrans/token', [PetugasTransaksiController::class, 'createTransaction'])->name('bayar.proses');
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
+});
+
+Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
+    Route::get('/dashboard', [NasabahDashboardController::class, 'index'])->name('nasabah.dashboard');
+    Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('nasabah.profile');
+    // Data Master
+     
+    // Transaksi
+    Route::resource('/transaksi', NasabahTransaksiController::class)->names('nasabah.transaksi');
+    Route::get('/transaksi/print/{transaksi}', [NasabahTransaksiController::class, 'print'])->name('nasabah.transaksi.print'); 
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');

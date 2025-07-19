@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\cabang;
 use App\Models\Nasabah;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,17 +23,24 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
+        // dd($request->all());
+        // dd((Auth::attempt(['username' => $request->username, 'password' => $request->password]) ? 'Login Berhasil' : 'Login Gagal'));
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'petugas') {
                 return redirect()->route('petugas.dashboard');
+            } elseif ($user->role === 'nasabah') {
+                return redirect()->route('nasabah.dashboard');
+            } else {
+                
+                return redirect()->route('login')->with('error', 'Role tidak dikenali');
             }
         }
 
-        Alert::error('Gagal!', 'Username atau password salah');
-        return back();
+        
+        return back()->with('error', 'Username atau password salah.');
     }
 
     public function logout()
@@ -77,8 +85,21 @@ class AuthController extends Controller
         $nasabah->nik = '-';
         $nasabah->status = 'aktif';
         $nasabah->fill($data);
-        $nasabah->save(); 
-     
+        $nasabah->save();
+
+        $user = new User();
+        $user->name = $nasabah->nama_lengkap;
+        $user->username = $nasabah->username;
+        $user->email = $nasabah->email;
+        $user->password = bcrypt($request->password);
+        $user->role = 'nasabah';
+        $user->save();
+
+        $userNasabah = new \App\Models\UserNasabah();
+        $userNasabah->user_id = $user->id;
+        $userNasabah->nasabah_id = $nasabah->id;
+        $userNasabah->save();
+
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 }

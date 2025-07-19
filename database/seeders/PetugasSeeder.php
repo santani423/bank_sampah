@@ -55,12 +55,23 @@ class PetugasSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+       
+             
+            [
+                'name' => 'Nasabah User',
+                'email' => 'nasabah@example.com',
+                'username' => 'nasabah', 
+                'password' => Hash::make('12345678'),
+                'role' => 'nasabah',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         // Tambahkan 100 data dummy
         $faker = Faker::create();
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 11; $i++) {
             $name = $faker->name;
             $email = $faker->unique()->safeEmail;
             $username = 'petugas' . $i;
@@ -85,6 +96,7 @@ class PetugasSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+         
 
          // Ambil semua id petugas
         $petugasIds = DB::table('petugas')->pluck('id')->toArray();
