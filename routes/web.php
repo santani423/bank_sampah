@@ -30,6 +30,7 @@ use App\Http\Controllers\TessController;
 use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardController;
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
+use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -125,8 +126,13 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
     // Data Cabang
     Route::resource('/cabang', NasabahCabangController::class)->names('nasabah.cabang');
     // Transaksi
-    Route::resource('/transaksi', NasabahTransaksiController::class)->names('nasabah.transaksi');
-    Route::get('/transaksi/print/{transaksi}', [NasabahTransaksiController::class, 'print'])->name('nasabah.transaksi.print'); 
+    Route::resource('/transaksi', NasabahTransaksiController::class)->names('nasabah.transaksi')->except(['show']);
+    Route::get('/transaksi/setoran', [NasabahTransaksiController::class, 'setoran'])->name('nasabah.transaksi.setoran');
+    Route::get('/transaksi/penarikan', [NasabahTransaksiController::class, 'penarikan'])->name('nasabah.transaksi.penarikan');
+    Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('nasabah.transaksi.print');
+
+    Route::resource('/metode-penarikan', NasabahMetodePenarikanController::class)->names('nasabah.metode-penarikan');
+
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');

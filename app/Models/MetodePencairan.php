@@ -20,4 +20,9 @@ class MetodePencairan extends Model
         return $this->belongsTo(Nasabah::class, 'nasabah_id');
     }
 
+    public function jenisMetodePenarikan()
+    {
+        return $this->belongsTo(JenisMetodePenarikan::class, 'jenis_metode_penarikan_id');
+    }
+
 }

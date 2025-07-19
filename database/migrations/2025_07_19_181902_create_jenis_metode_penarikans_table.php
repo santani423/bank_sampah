@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('metode_pencairan', function (Blueprint $table) {
+        Schema::create('jenis_metode_penarikans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('nasabah_id')->constrained('nasabah')->onDelete('cascade');
-            $table->foreignId('jenis_metode_penarikan_id');
-            $table->string('nama_metode_pencairan');
-            $table->string('no_rek');
+            $table->string('nama')->nullable(); 
+            $table->string('keterangan')->nullable(); 
+            $table->string('code')->nullable(); 
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('metode_pencairan');
+        Schema::dropIfExists('jenis_metode_penarikans');
     }
 };
