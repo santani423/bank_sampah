@@ -9,8 +9,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $saldo = 100;
+        $topup = 50;
+        $penarikan = 25;
         // Logic for displaying the dashboard
-        return view('pages.nasabah.dashboard');
+        return view('pages.nasabah.dashboard', compact('saldo', 'topup', 'penarikan'));
     }
 
     public function profile()

@@ -97,7 +97,8 @@ class TransaksiController extends Controller
             ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id');
 
         // Hindari data nasabah dobel dengan distinct
-        $nasabahList = $query->select('nasabah.*')->distinct()->paginate(10);
+        $nasabahList = $query->select('nasabah.*')->get();
+        // dd($nasabahList);
 
         return view('pages.petugas.transaksi.create', compact('nasabahList', 'stokSampah', 'kodeTransaksi'));
     }
