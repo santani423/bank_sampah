@@ -39,11 +39,10 @@
                         <th>Kota</th>
                         <th>Provinsi</th>
                         <th>Telepon</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($cabangList as $cabang)
+                    @foreach ($userCabang as $cabang)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $cabang->nama_cabang }}</td>
@@ -51,10 +50,7 @@
                             <td>{{ $cabang->kota }}</td>
                             <td>{{ $cabang->provinsi }}</td>
                             <td>{{ $cabang->telepon }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Hapus</button>
-                            </td>
+                             
                         </tr>
                     @endforeach
                 </tbody>
@@ -100,10 +96,10 @@
                                                 <input type="hidden" name="id" value="{{ $cabang->id }}">
                                                 <button type="submit" class="btn btn-sm btn-primary">Join</button>
                                             </form>
-                                              
+
                                         </td>
                                     </tr>
-                                @endforeach 
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

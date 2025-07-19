@@ -15,7 +15,12 @@ class CabangController extends Controller
         // Logic for displaying the cabang
         $cabangList = cabang::get();
         // dd($cabangList[0]);
-        return view('pages.nasabah.cabang', compact('cabangList'));
+        $userCabang = CabangUser::join('user_nasabahs', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
+            ->join('cabangs', 'cabangs.id', '=', 'cabang_users.cabang_id')
+            ->select('cabangs.*')
+            ->where('user_nasabahs.user_id', auth()->id())
+            ->get();
+        return view('pages.nasabah.cabang', compact('cabangList', 'userCabang'));
     }
 
     public function store(Request $request)
