@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Http;
 class TessController extends Controller
 {
     protected InvoiceApi $invoiceApi;
- 
+
 
     public function __construct()
     {
@@ -37,8 +37,6 @@ class TessController extends Controller
 
         // Initialize the InvoiceApi (from previous context)
         $this->invoiceApi = new InvoiceApi();
-
-     
     }
 
     /**
@@ -74,50 +72,76 @@ class TessController extends Controller
                 Log::error('Invoice URL not found in Xendit response.', ['response' => $invoice]);
                 return back()->withErrors(['xendit_error' => 'Gagal mendapatkan URL pembayaran dari Xendit. Respons tidak mengandung invoice_url.']);
             }
-        }  catch (Exception $e) {
+        } catch (Exception $e) {
             Log::error('General error during Xendit invoice creation: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withErrors(['error' => 'Terjadi kesalahan umum saat membuat invoice: ' . $e->getMessage()]);
         }
     }
 
-    /**
-     * Creates a DANA disbursement using Xendit.
-     *
-     * @param Request $request The incoming HTTP request with disbursement details.
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function createDanaDisbursement(Request $request)
     {
+        // Validasi input
         $request->validate([
             'amount' => 'required|numeric|min:10000',
-            'phone_number' => 'required|string|regex:/^628[0-9]{7,11}$/'
+            'phone_number' => 'required|string|regex:/^628[0-9]{7,11}$/',
+            'account_holder_name' => 'required|string|max:255',
+            'remark' => 'nullable|string|max:255'
         ]);
 
-        $referenceId = 'dana-ewallet-' . time() . '-' . Str::random(5);
+        // Generate external_id unik
+        $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
 
-        $response = Http::withBasicAuth(config('xendit.api_key'), '')
-            ->post('https://api.xendit.co/ewallets/charges', [
-                'reference_id' => $referenceId,
-                'currency' => 'IDR',
-                'amount' => (int) $request->amount,
-                'checkout_method' => 'ONE_TIME_PAYMENT',
-                'channel_code' => 'ID_DANA',
-                'channel_properties' => [
-                    'mobile_number' => $request->phone_number,
-                    'success_redirect_url' => url('/dana/success')
-                ]
+        // Buat payload sesuai format disbursement Xendit
+        $payload = [
+            'external_id' => $externalId,
+            'amount' => (int) $request->amount,
+            'bank_code' => 'DANA', // ✅ HARUS: gunakan DANA sebagai bank_code
+            'account_holder_name' => $request->account_holder_name,
+            'account_number' => $request->phone_number, // ✅ HARUS: ini nomor telepon penerima
+            'description' => $request->remark ?? 'Disbursement ke DANA'
+        ];
+
+        try {
+            $response = Http::withBasicAuth(config('xendit.api_key'), '')
+                ->post('https://api.xendit.co/disbursements', $payload);
+
+            if ($response->successful()) {
+                Log::info('DANA Disbursement berhasil', [
+                    'external_id' => $externalId,
+                    'response' => $response->json()
+                ]);
+
+                return response()->json([
+                    'message' => 'Disbursement DANA berhasil dikirim',
+                    'data' => $response->json()
+                ]);
+            } else {
+                Log::error('Gagal kirim DANA Disbursement', [
+                    'payload' => $payload,
+                    'response' => $response->json()
+                ]);
+
+                return response()->json([
+                    'message' => 'Gagal kirim DANA Disbursement',
+                    'error' => $response->json()
+                ], $response->status());
+            }
+        } catch (\Exception $e) {
+            Log::error('Exception saat kirim DANA Disbursement: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
             ]);
 
-        if ($response->successful()) {
             return response()->json([
-                'message' => 'Disbursement DANA berhasil dikirim',
-                'data' => $response->json()
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Gagal kirim DANA',
-                'error' => $response->json()
+                'message' => 'Gagal kirim DANA Disbursement',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 }
+
+// {
+//   "amount": 100000,
+//   "phone_number": "6285778674418",
+//   "account_holder_name": "Santani"
+// }
+
