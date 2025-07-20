@@ -19,6 +19,12 @@ class DashboardController extends Controller
         // Logic for displaying the dashboard
         $userNasabah =  UserNasabah::where('user_id', auth()->id())->first();
         $saldo  =  Saldo::where('nasabah_id', $userNasabah->nasabah_id)->first();
+        if (!$saldo) {
+            $saldo   =  new Saldo();
+            $saldo->saldo = 0; 
+            $saldo->nasabah_id = $userNasabah->nasabah_id; 
+            $saldo->save(); 
+        }
         return view('pages.nasabah.dashboard', compact('saldo', 'topup', 'penarikan', 'userNasabah'));
     }
 

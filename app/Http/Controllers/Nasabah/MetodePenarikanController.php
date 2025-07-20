@@ -17,7 +17,7 @@ class MetodePenarikanController extends Controller
         $userNasabah = UserNasabah::where('user_id', auth()->id())->first();
         $metodePenarikan = MetodePencairan::where('nasabah_id', $userNasabah->nasabah_id)
             ->with('jenisMetodePenarikan')
-            ->get();
+            ->get(); 
         return view('pages.nasabah.metode-penarikan.index', compact('jenisMetodePenarikan','metodePenarikan'));
     }
 

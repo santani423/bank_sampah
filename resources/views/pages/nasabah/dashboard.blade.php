@@ -24,7 +24,7 @@
         }
 
         .card-title {
-            font-size: 1.25rem;
+            font-size: 1.25rem;         
             font-weight: 600;
         }
 
@@ -43,7 +43,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-6 col-md-5">
             <div class="card card-stats card-round">
                 <div class="card-body">
                     <div class="row align-items-center">

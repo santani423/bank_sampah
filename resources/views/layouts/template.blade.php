@@ -439,6 +439,7 @@
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
 
     @yield('scripts')
+    @stack('scripts')
 
 
 </body>

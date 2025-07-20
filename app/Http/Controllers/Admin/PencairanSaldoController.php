@@ -52,7 +52,7 @@ class PencairanSaldoController extends Controller
         $pencairan->updated_at = now();
         $pencairan->save();
 
-        return redirect()->route('pages.admin.pencairan_saldo.index')->with('success', 'Permintaan pencairan saldo telah disetujui.');
+        return back()->with('success', 'Permintaan pencairan saldo telah disetujui.');
     }
 
     /**

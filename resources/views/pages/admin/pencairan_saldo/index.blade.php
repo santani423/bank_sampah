@@ -2,10 +2,10 @@
 
 @section('title', 'Pengajuan Tarik Saldo')
 
-@push('style')
+@section('style')
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
-@endpush
+@endsection
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
@@ -39,7 +39,7 @@
                                 @foreach ($pencairanSaldo as $index => $pencairan)
                                     <tr>
                                         <td>{{ $pencairanSaldo->firstItem() + $index }}</td>
-                                        <td>{{ $pencairan->tanggal_pengajuan->format('d-m-Y H:i') }}</td>
+                                        <td>{{ $pencairan->tanggal_pengajuan }}</td>
                                         <td>{{ $pencairan->nasabah->nama_lengkap }}</td>
                                         <td>{{ number_format($pencairan->jumlah_pencairan, 0, ',', '.') }}</td>
                                         <td>{{ $pencairan->metode->nama_metode }}</td>
@@ -48,6 +48,8 @@
                                             <form action="{{ route('admin.tarik-saldo.setujui', $pencairan->id) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
+                                                <input type="hidden" name=""
+                                                    value="{{ $pencairan->jumlah_pencairan }}">
                                                 <button type="submit" class="btn btn-success"
                                                     onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan ini?')">Setujui</button>
                                             </form>
@@ -98,10 +100,6 @@
             </div>
         </div>
     </div>
-
-@endsection
-
-@push('scripts')
     <script>
         // Fungsi untuk mengisi ID pengajuan ke dalam modal
         function setRejectData(id) {
@@ -110,4 +108,6 @@
             document.getElementById('tolakId').value = id;
         }
     </script>
-@endpush
+@endsection
+
+ 
