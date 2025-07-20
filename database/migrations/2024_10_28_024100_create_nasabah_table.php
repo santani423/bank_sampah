@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nasabah', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cabang_id'); 
+            $table->unsignedBigInteger('cabang_id')->nullable();
             $table->string('no_registrasi', 50)->unique();
             $table->string('nik', 20)->unique();
             $table->string('nama_lengkap', 100);

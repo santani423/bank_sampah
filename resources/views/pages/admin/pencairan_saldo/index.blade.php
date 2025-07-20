@@ -14,12 +14,11 @@
             <h6 class="op-7 mb-2">Anda dapat mengelola permintaan penarikan saldo yang masuk.</h6>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
-
                 <div class="card-body">
-
                     <div class="clearfix mb-3"></div>
 
                     <div class="table-responsive">
@@ -45,18 +44,16 @@
                                         <td>{{ $pencairan->metode->nama_metode }}</td>
                                         <td>{{ $pencairan->no_rek }}</td>
                                         <td>
-                                            <form action="{{ route('admin.tarik-saldo.setujui', $pencairan->id) }}"
-                                                method="POST" style="display:inline;">
+                                            <form action="{{ route('admin.tarik-saldo.setujui', $pencairan->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <input type="hidden" name=""
-                                                    value="{{ $pencairan->jumlah_pencairan }}">
-                                                <button type="submit" class="btn btn-success"
-                                                    onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan ini?')">Setujui</button>
+                                                <input type="hidden"  name="jumlah_pencairan"  value="{{$pencairan->jumlah_pencairan}}">
+                                                <button type="submit" class="btn btn-success" onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan ini?')">
+                                                    Setujui
+                                                </button>
                                             </form>
 
                                             <!-- Tombol untuk memicu modal -->
-                                            <button type="button" class="btn btn-danger" data-toggle="modal"
-                                                data-target="#modalTolak" onclick="setRejectData({{ $pencairan->id }})">
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalTolak" onclick="setRejectData({{ $pencairan->id }})">
                                                 Tolak
                                             </button>
                                         </td>
@@ -64,8 +61,8 @@
                                 @endforeach
                             </tbody>
                         </table>
-
                     </div>
+
                     <div class="float-right">
                         {{ $pencairanSaldo->withQueryString()->links() }}
                     </div>
@@ -73,15 +70,16 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-labelledby="modalTolakLabel"
-        aria-hidden="true">
+
+    <!-- Modal Tolak -->
+    <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-labelledby="modalTolakLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form id="formTolak" method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTolakLabel">Tolak Pengajuan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -89,7 +87,7 @@
                         <input type="hidden" name="id" id="tolakId">
                         <div class="form-group">
                             <label for="keterangan">Keterangan Penolakan</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required></textarea>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -100,8 +98,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Script -->
     <script>
-        // Fungsi untuk mengisi ID pengajuan ke dalam modal
         function setRejectData(id) {
             const url = "{{ route('admin.tarik-saldo.tolak', ':id') }}".replace(':id', id);
             document.getElementById('formTolak').action = url;
@@ -109,5 +108,3 @@
         }
     </script>
 @endsection
-
- 
