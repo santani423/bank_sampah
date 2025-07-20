@@ -82,7 +82,7 @@ class AuthController extends Controller
 
         $nasabah  =    new  Nasabah();
         $nasabah->no_registrasi   = 'REG-' . strtoupper(uniqid());
-        $nasabah->nik = '-';
+        // $nasabah->nik = '-';
         $nasabah->status = 'aktif';
         $nasabah->fill($data);
         $nasabah->save();

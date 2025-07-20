@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('cabang_id')->nullable();
             $table->string('no_registrasi', 50)->unique();
-            $table->string('nik', 20)->unique();
+            $table->string('nik', 20)->unique()->nullable();
             $table->string('nama_lengkap', 100);
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('tempat_lahir', 50);
