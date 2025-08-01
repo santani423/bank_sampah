@@ -8,7 +8,7 @@
     <!-- Title -->
     <title> @yield('title')</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('edmate/assets/images/logo/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('wostin/files/assets/images/resources/logo.png') }}">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/bootstrap.min.css') }}">
     <!-- file upload -->
@@ -60,7 +60,7 @@
 
         <a href="index.html"
             class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10">
-            <img src="{{ asset('edmate/assets/images/logo/logo.png') }}" alt="Logo">
+            <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo">
         </a>
 
         <div class="sidebar-menu-wrapper overflow-y-auto scroll-sm">
