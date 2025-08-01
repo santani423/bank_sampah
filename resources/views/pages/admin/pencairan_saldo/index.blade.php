@@ -29,8 +29,8 @@
                                     <th>Tanggal Pengajuan</th>
                                     <th>Nama Nasabah</th>
                                     <th>Jumlah Penarikan</th>
-                                    <th>Metode Pencairan</th>
-                                    <th>No Rekening</th>
+                                    {{-- <th>Metode Pencairan</th> --}}
+                                    {{-- <th>No Rekening</th> --}}
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -38,11 +38,11 @@
                                 @foreach ($pencairanSaldo as $index => $pencairan)
                                     <tr>
                                         <td>{{ $pencairanSaldo->firstItem() + $index }}</td>
-                                        <td>{{ $pencairan->tanggal_pengajuan }}</td>
+                                        <td>{{ $pencairan->created_at->format('d-m-Y H:i') }}</td>
                                         <td>{{ $pencairan->nasabah->nama_lengkap }}</td>
                                         <td>{{ number_format($pencairan->jumlah_pencairan, 0, ',', '.') }}</td>
-                                        <td>{{ $pencairan->metode->nama_metode }}</td>
-                                        <td>{{ $pencairan->no_rek }}</td>
+                                        {{-- <td>{{ $pencairan->metode->nama_metode }}</td> --}}
+                                        {{-- <td>{{ $pencairan->no_rek }}</td> --}}
                                         <td>
                                             <form action="{{ route('admin.tarik-saldo.setujui', $pencairan->id) }}" method="POST" style="display:inline;">
                                                 @csrf
