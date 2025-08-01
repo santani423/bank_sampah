@@ -376,7 +376,7 @@ class TransaksiController extends Controller
 
             $transaction->save();
 
-            if (strtolower($data['status']) === 'completed') {
+            if (strtolower($data['status']) === 'PAID') {
                 $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
 
                 if ($saldo) {
