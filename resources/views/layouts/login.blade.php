@@ -44,14 +44,8 @@
 <div class="side-overlay"></div>
 <!--==================== Sidebar Overlay End ====================-->
 
-    <section class="auth d-flex">
-        <div class="auth-left bg-main-50 flex-center p-24">
-            <img src="{{ asset('edmate/assets/images/thumbs/auth-img1.png') }}" alt="">
-        </div>
-        <div class="auth-right py-40 px-24 flex-center flex-column">
-           @yield('main') 
-        </div>
-    </section>
+  
+    @yield('main') 
 
         <!-- Jquery js -->
     <script src="{{ asset('edmate/assets/js/jquery-3.7.1.min.js') }}"></script>

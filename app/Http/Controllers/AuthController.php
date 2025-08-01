@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\cabang;
+use App\Models\CabangUser;
 use App\Models\Nasabah;
+use App\Models\setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +16,8 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('pages.auth.login');
+        $setting  =  setting::first();
+        return view('pages.auth.login',compact('setting'));
     }
 
     public function login(Request $request)
@@ -55,7 +58,8 @@ class AuthController extends Controller
     public function showRegistrationForm()
     {
         $cabangs = cabang::all();
-        return view('pages.auth.register', compact('cabangs'));
+        $setting  =  setting::first();   
+        return view('pages.auth.register', compact('cabangs','setting'));
     }
 
     public function register(Request $request)
@@ -99,6 +103,11 @@ class AuthController extends Controller
         $userNasabah->user_id = $user->id;
         $userNasabah->nasabah_id = $nasabah->id;
         $userNasabah->save();
+
+        $cabangUser  =  new CabangUser();
+        $cabangUser->cabang_id = $request->cabang_id;
+        $cabangUser->user_nasabah_id = $user->id;
+        $cabangUser->save();
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
