@@ -69,230 +69,245 @@
     <div class="page-wrapper">
         <header class="main-header clearfix">
             <div class="main-header__inner clearfix">
-             
-             
-                    <div class="main-menu__menu-bottom">
-                        <nav class="navbar navbar-expand-lg navbar-light w-100" style="background-color: transparent !important;">
-                            <div class="container-fluid px-0">
-                                <!-- Logo kiri -->
-                                <a class="navbar-brand d-flex align-items-center" href="/">
-                                    <img src=" " width="155" alt="" />
-                                </a>
-                                <!-- Toggle untuk mobile di kanan -->
-                                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
-                                    aria-expanded="false" aria-label="Toggle navigation">
-                                    <span class="navbar-toggler-icon"></span>
-                                </button>
-                                <!-- Menu dan tombol login -->
-                                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                                    <div class="mx-auto order-0">
-                                        <div class="navbar-nav d-flex flex-row gap-0 justify-content-center flex-lg-row flex-column align-items-center w-100">
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="/">Beranda</a>
-                                            <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('about')}}">Profil Perusahaan</a>
-                                            <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('kegiatan')}}">Kegiatan</a>
-                                            <span class="d-none d-lg-block" style="height: 24px; border-left: 1px solid #ccc;"></span>
-                                            <a class="nav-item nav-link px-3 py-2 flex-fill text-center" href="{{route('berita')}}">Berita</a>
-                                        </div>
-                                        <style>
-                                            @media (max-width: 991.98px) {
-                                                .navbar-nav {
-                                                    width: 100% !important;
-                                                }
-                                                .navbar-nav .nav-link {
-                                                    border-bottom: 1px solid #ccc;
-                                                    border-left: none !important;
-                                                    width: 100%;
-                                                    text-align: left;
-                                                }
-                                                .navbar-nav span {
-                                                    display: none !important;
-                                                }
-                                                .navbar-nav .nav-link:last-child {
-                                                    border-bottom: none;
-                                                }
+
+
+                <div class="main-menu__menu-bottom">
+                    <nav class="navbar navbar-expand-lg navbar-light w-100"
+                        style="background-color: transparent !important;">
+                        <div class="container-fluid px-0">
+                            <!-- Logo kiri -->
+                            <a class="navbar-brand d-flex align-items-center" style="height: 60px; max-width: 200px;"
+                                href="/">
+                                <img src="logo.png" alt="Logo" style="max-height: 100%; width: auto;" />
+                            </a>
+
+                            <!-- Toggle untuk mobile di kanan -->
+                            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <!-- Menu dan tombol login -->
+                            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                                <div class="mx-auto order-0">
+                                    <div
+                                        class="navbar-nav d-flex flex-row gap-0 justify-content-center flex-lg-row flex-column align-items-center w-100">
+                                        <a class="nav-item nav-link px-3 py-2 flex-fill text-center"
+                                            href="/">Beranda</a>
+                                        <span class="d-none d-lg-block"
+                                            style="height: 24px; border-left: 1px solid #ccc;"></span>
+                                        <a class="nav-item nav-link px-3 py-2 flex-fill text-center"
+                                            href="{{ route('about') }}">Profil Perusahaan</a>
+                                        <span class="d-none d-lg-block"
+                                            style="height: 24px; border-left: 1px solid #ccc;"></span>
+                                        <a class="nav-item nav-link px-3 py-2 flex-fill text-center"
+                                            href="{{ route('kegiatan') }}">Kegiatan</a>
+                                        <span class="d-none d-lg-block"
+                                            style="height: 24px; border-left: 1px solid #ccc;"></span>
+                                        <a class="nav-item nav-link px-3 py-2 flex-fill text-center"
+                                            href="{{ route('berita') }}">Berita</a>
+                                    </div>
+                                    <style>
+                                        @media (max-width: 991.98px) {
+                                            .navbar-nav {
+                                                width: 100% !important;
                                             }
-                                        </style>
-                                    </div>
-                                    <!-- Tombol login di bawah menu saat mobile, di kanan saat desktop -->
-                                    <div class="d-flex justify-content-lg-end justify-content-start w-100 mt-3 mt-lg-0">
-                                        <a href="{{ route('login') }}" class="btn btn-success px-4">Login</a>
-                                    </div>
+
+                                            .navbar-nav .nav-link {
+                                                border-bottom: 1px solid #ccc;
+                                                border-left: none !important;
+                                                width: 100%;
+                                                text-align: left;
+                                            }
+
+                                            .navbar-nav span {
+                                                display: none !important;
+                                            }
+
+                                            .navbar-nav .nav-link:last-child {
+                                                border-bottom: none;
+                                            }
+                                        }
+                                    </style>
+                                </div>
+                                <!-- Tombol login di bawah menu saat mobile, di kanan saat desktop -->
+                                <div class="d-flex justify-content-lg-end justify-content-start w-100 mt-3 mt-lg-0">
+                                    <a href="{{ route('login') }}" class="btn btn-success px-4">Login</a>
                                 </div>
                             </div>
-                        </nav>
-                        <style>
-                            @media (max-width: 991.98px) {
-                                .navbar-nav {
-                                    flex-direction: column !important;
-                                    gap: 0.5rem !important;
-                                    align-items: flex-start !important;
-                                }
-                                .navbar .btn-success {
-                                    width: 100% !important;
-                                }
+                        </div>
+                    </nav>
+                    <style>
+                        @media (max-width: 991.98px) {
+                            .navbar-nav {
+                                flex-direction: column !important;
+                                gap: 0.5rem !important;
+                                align-items: flex-start !important;
                             }
-                        </style>
-                    </div>
+
+                            .navbar .btn-success {
+                                width: 100% !important;
+                            }
+                        }
+                    </style>
                 </div>
-                {{-- <div class="main-header__right">
+            </div>
+            {{-- <div class="main-header__right">
                         <a href="{{ route('login') }}" class="btn btn-success"> Login</a>
                     </div> --}}
-            </div>
-        </header>
+    </div>
+    </header>
 
-        <div class="stricky-header stricked-menu main-menu">
-            <div class="sticky-header__content"></div>
-            <!-- /.sticky-header__content -->
-        </div>
-        <!-- /.stricky-header -->
-        @yield('content')
-
-
+    <div class="stricky-header stricked-menu main-menu">
+        <div class="sticky-header__content"></div>
+        <!-- /.sticky-header__content -->
+    </div>
+    <!-- /.stricky-header -->
+    @yield('content')
 
 
-        <!--Site Footer Start-->
-        <footer class="site-footer">
-            <div class="site-footer-bg"
-                style="
+
+
+    <!--Site Footer Start-->
+    <footer class="site-footer">
+        <div class="site-footer-bg"
+            style="
                         background-image: url(assets/images/backgrounds/site-footer-bg.jpg);
                     ">
-            </div>
-            <div class="site-footer__top">
-                <div class="container">
-                    <div class="site-footer__top-inner">
-                        <div class="site-footer__top-logo">
-                            <a href="index.html"><img
-                                    src="{{ asset('wostin/files/assets/images/resources/footer-logo.png') }}"
-                                    alt="" /></a>
-                        </div>
-                        <div class="site-footer__top-right">
-                            <p class="site-footer__top-right-text">
-                                Waste Disposal Management & Pickup Services
-                            </p>
-                            <div class="site-footer__social">
-                                <a href="#"><i class="fab fa-twitter"></i></a>
-                                <a href="#"><i class="fab fa-facebook"></i></a>
-                                <a href="#"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                            </div>
+        </div>
+        <div class="site-footer__top">
+            <div class="container">
+                <div class="site-footer__top-inner">
+                    <div class="site-footer__top-logo">
+                        <a href="index.html"><img
+                                src="{{ asset('wostin/files/assets/images/resources/footer-logo.png') }}"
+                                alt="" /></a>
+                    </div>
+                    <div class="site-footer__top-right">
+                        <p class="site-footer__top-right-text">
+                            Waste Disposal Management & Pickup Services
+                        </p>
+                        <div class="site-footer__social">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-pinterest-p"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="site-footer__middle">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-4 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="100ms">
-                            <div class="footer-widget__column footer-widget__about">
-                                <h3 class="footer-widget__title">About</h3>
-                                <div class="footer-widget__about-text-box">
-                                    <p class="footer-widget__about-text">
-                                        Lorem ipsum dolor sited ame etur adi
-                                        pisicing elit tempor labore.
+        </div>
+        <div class="site-footer__middle">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-4 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="100ms">
+                        <div class="footer-widget__column footer-widget__about">
+                            <h3 class="footer-widget__title">About</h3>
+                            <div class="footer-widget__about-text-box">
+                                <p class="footer-widget__about-text">
+                                    Lorem ipsum dolor sited ame etur adi
+                                    pisicing elit tempor labore.
+                                </p>
+                            </div>
+                            <form class="footer-widget__newsletter-form">
+                                <div class="footer-widget__newsletter-input-box">
+                                    <input type="email" placeholder="Email Address" name="email" />
+                                    <button type="submit" class="footer-widget__newsletter-btn">
+                                        <i class="far fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="200ms">
+                        <div class="footer-widget__column footer-widget__links clearfix">
+                            <h3 class="footer-widget__title">Links</h3>
+                            <ul class="footer-widget__links-list list-unstyled clearfix">
+                                <li><a href="about.html">About</a></li>
+                                <li>
+                                    <a href="request-pickup.html">Request Pickup</a>
+                                </li>
+                                <li>
+                                    <a href="about.html">Management</a>
+                                </li>
+                                <li>
+                                    <a href="services.html">Start Service</a>
+                                </li>
+                                <li>
+                                    <a href="contact.html">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="300ms">
+                        <div class="footer-widget__column footer-widget__services clearfix">
+                            <h3 class="footer-widget__title">
+                                Services
+                            </h3>
+                            <ul class="footer-widget__services-list list-unstyled clearfix">
+                                <li>
+                                    <a href="dumpster-rental.html">Dumpster Rentals</a>
+                                </li>
+                                <li>
+                                    <a href="about.html">Bulk Trash Pickup</a>
+                                </li>
+                                <li>
+                                    <a href="about.html">Waste Removal</a>
+                                </li>
+                                <li>
+                                    <a href="zero-waste.html">Zero Waste</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="400ms">
+                        <div class="footer-widget__column footer-widget__contact clearfix">
+                            <h3 class="footer-widget__title">
+                                Contact
+                            </h3>
+                            <p class="footer-widget__contact-text">
+                                880 Broklyn Road Street, New Town DC
+                                5002, New York. USA
+                            </p>
+                            <div class="footer-widget__contact-info">
+                                <div class="footer-widget__contact-icon">
+                                    <span class="icon-contact"></span>
+                                </div>
+                                <div class="footer-widget__contact-content">
+                                    <p class="footer-widget__contact-mail-phone">
+                                        <a href="mailto:needhelp@wostin.com"
+                                            class="footer-widget__contact-mail">needhelp@wostin.com</a>
+                                        <a href="tel:2463330088" class="footer-widget__contact-phone">+ 1- (246)
+                                            333-0088</a>
                                     </p>
                                 </div>
-                                <form class="footer-widget__newsletter-form">
-                                    <div class="footer-widget__newsletter-input-box">
-                                        <input type="email" placeholder="Email Address" name="email" />
-                                        <button type="submit" class="footer-widget__newsletter-btn">
-                                            <i class="far fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="col-xl-2 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="200ms">
-                            <div class="footer-widget__column footer-widget__links clearfix">
-                                <h3 class="footer-widget__title">Links</h3>
-                                <ul class="footer-widget__links-list list-unstyled clearfix">
-                                    <li><a href="about.html">About</a></li>
-                                    <li>
-                                        <a href="request-pickup.html">Request Pickup</a>
-                                    </li>
-                                    <li>
-                                        <a href="about.html">Management</a>
-                                    </li>
-                                    <li>
-                                        <a href="services.html">Start Service</a>
-                                    </li>
-                                    <li>
-                                        <a href="contact.html">Contact</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="300ms">
-                            <div class="footer-widget__column footer-widget__services clearfix">
-                                <h3 class="footer-widget__title">
-                                    Services
-                                </h3>
-                                <ul class="footer-widget__services-list list-unstyled clearfix">
-                                    <li>
-                                        <a href="dumpster-rental.html">Dumpster Rentals</a>
-                                    </li>
-                                    <li>
-                                        <a href="about.html">Bulk Trash Pickup</a>
-                                    </li>
-                                    <li>
-                                        <a href="about.html">Waste Removal</a>
-                                    </li>
-                                    <li>
-                                        <a href="zero-waste.html">Zero Waste</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="400ms">
-                            <div class="footer-widget__column footer-widget__contact clearfix">
-                                <h3 class="footer-widget__title">
-                                    Contact
-                                </h3>
-                                <p class="footer-widget__contact-text">
-                                    880 Broklyn Road Street, New Town DC
-                                    5002, New York. USA
-                                </p>
-                                <div class="footer-widget__contact-info">
-                                    <div class="footer-widget__contact-icon">
-                                        <span class="icon-contact"></span>
-                                    </div>
-                                    <div class="footer-widget__contact-content">
-                                        <p class="footer-widget__contact-mail-phone">
-                                            <a href="mailto:needhelp@wostin.com"
-                                                class="footer-widget__contact-mail">needhelp@wostin.com</a>
-                                            <a href="tel:2463330088" class="footer-widget__contact-phone">+ 1- (246)
-                                                333-0088</a>
-                                        </p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="site-footer__bottom">
-                <div class="site-footer-bottom-shape"
-                    style="
+        </div>
+        <div class="site-footer__bottom">
+            <div class="site-footer-bottom-shape"
+                style="
                             background-image: url(assets/images/shapes/site-footer-bottom-shape.png);
                         ">
-                </div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-12">
-                            <div class="site-footer__bottom-inner">
-                                <p class="site-footer__bottom-text">
-                                    © Copyright 2022 by
-                                    <a href="#">Layerdrops.com</a>
-                                </p>
-                            </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="site-footer__bottom-inner">
+                            <p class="site-footer__bottom-text">
+                                © Copyright 2022 by
+                                <a href="#">Layerdrops.com</a>
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-        </footer>
-        <!--Site Footer End-->
+        </div>
+    </footer>
+    <!--Site Footer End-->
     </div>
     <!-- /.page-wrapper -->
 
@@ -355,7 +370,8 @@
 
     <a href="#" data-target="html" class="scroll-to-target scroll-to-top"><i class="fa fa-angle-up"></i></a>
 
-    <script src="https://code-jquery-com.translate.goog/jquery-3.7.1.js?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=id&_x_tr_pto=tc"></script>
+    <script src="https://code-jquery-com.translate.goog/jquery-3.7.1.js?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=id&_x_tr_pto=tc">
+    </script>
     <script src="{{ asset('wostin/files/assets/vendors/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('wostin/files/assets/vendors/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('wostin/files/assets/vendors/jarallax/jarallax.min.js') }}"></script>
@@ -386,20 +402,21 @@
     <script>
         $(document).ready(function() {
             $.ajax({
-            url: `{{ route('api.setting') }}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Ganti logo utama di navbar
-                if(response.logo){
-                $('a.navbar-brand img').attr('src', '{{ asset('') }}' + response.logo);
-                // Ganti logo footer
-                $('.site-footer__top-logo img, .mobile-nav__content .logo-box img').attr('src', '{{ asset('') }}' + response.logo);
+                url: `{{ route('api.setting') }}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Ganti logo utama di navbar
+                    if (response.logo) {
+                        $('a.navbar-brand img').attr('src', '{{ asset('') }}' + response.logo);
+                        // Ganti logo footer
+                        $('.site-footer__top-logo img, .mobile-nav__content .logo-box img').attr('src',
+                            '{{ asset('') }}' + response.logo);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Gagal memanggil API setting:', error);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Gagal memanggil API setting:', error);
-            }
             });
         });
     </script>
