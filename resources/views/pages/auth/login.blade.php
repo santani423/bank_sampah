@@ -12,7 +12,7 @@
         <a href="index.html" class="auth-right__logo">
             <img src="{{ asset('edmate/assets/images/logo/logo.png') }}" alt="">
         </a>
-        <h2 class="mb-8">Welcome Back! !👋</h2>
+        <h2 class="mb-8">Welcome Back! 👋</h2>
         <p class="text-gray-600 text-15 mb-32">Please sign in to your account and start the adventure</p>
 
         @if(session('error'))
