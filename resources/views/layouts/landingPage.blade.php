@@ -170,18 +170,18 @@
 
     <!--Site Footer Start-->
     <footer class="site-footer">
-        <div class="site-footer-bg"
+        {{-- <div class="site-footer-bg"
             style="
                         background-image: url(assets/images/backgrounds/site-footer-bg.jpg);
                     ">
-        </div>
+        </div> --}}
         <div class="site-footer__top">
             <div class="container">
                 <div class="site-footer__top-inner">
                     <div class="site-footer__top-logo">
-                        <a href="index.html"><img
+                        {{-- <a href="index.html"><img
                                 src="{{ asset('wostin/files/assets/images/resources/footer-logo.png') }}"
-                                alt="" /></a>
+                                alt="" /></a> --}}
                     </div>
                     <div class="site-footer__top-right">
                         <p class="site-footer__top-right-text">
