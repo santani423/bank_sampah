@@ -262,15 +262,15 @@ class TransaksiController extends Controller
         try {
             $invoice = $this->invoiceApi->createInvoice(create_invoice_request: $params);
             $auth = auth()->user();
+            $petugas  = Petugas::where('email', $auth->email)->first();
             petugasLog::create([
-                'petugas_id' => $auth->id,
+                'petugas_id' =>  $petugas->id,
                 'activity' => 'Top Up Create Transaction',
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
                 'description' => 'Membuat transaksi top up dengan nominal: ' . $validated['jumlah'],
             ]);
 
-            $petugas  = Petugas::where('email', $auth->email)->first();
 
             $data = new petugasTopUp();
             $data->petugas_id = $petugas->id;
@@ -383,7 +383,7 @@ class TransaksiController extends Controller
                 $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
 
                 if ($saldo) {
-                    $saldo->saldo += $transaction->amount;
+                    $saldo->saldo ==$saldo->saldo + $transaction->amount;
                     $saldo->save();
 
                     Log::info('Saldo petugas berhasil ditambahkan. Petugas ID: ' . $transaction->petugas_id . ', Jumlah: ' . $transaction->amount);
