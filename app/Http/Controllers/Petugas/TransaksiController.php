@@ -53,7 +53,7 @@ class TransaksiController extends Controller
             $transaksi->total_transaksi = $transaksi->detailTransaksi->sum('harga_total');
         }
 
-        return view('pages.petugas.transaksi.index', compact('transaksis'));
+        // return view('pages.petugas.transaksi.index', compact('transaksis'));
     }
 
     public function generateUniqueTransactionCode()
