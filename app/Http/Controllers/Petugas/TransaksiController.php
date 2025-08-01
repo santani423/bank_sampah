@@ -31,29 +31,29 @@ class TransaksiController extends Controller
 {
     protected InvoiceApi $invoiceApi;
 
-    public function __construct()
-    {
-        $apiKey = config('xendit.api_key');
+    // public function __construct()
+    // {
+    //     $apiKey = config('xendit.api_key');
 
-        if (empty($apiKey)) {
-            Log::error('Xendit API Key not set in config.');
-            abort(500, 'Xendit API Key tidak tersedia.');
-        }
+    //     if (empty($apiKey)) {
+    //         Log::error('Xendit API Key not set in config.');
+    //         abort(500, 'Xendit API Key tidak tersedia.');
+    //     }
 
-        Configuration::setXenditKey($apiKey);
-        $this->invoiceApi = new InvoiceApi();
-    }
+    //     Configuration::setXenditKey($apiKey);
+    //     $this->invoiceApi = new InvoiceApi();
+    // }
 
     public function index()
     {
-        // $transaksis = Transaksi::with(['nasabah', 'detailTransaksi.sampah'])->paginate(10);
+        $transaksis = Transaksi::with(['nasabah', 'detailTransaksi.sampah'])->paginate(10);
 
-        // foreach ($transaksis as $transaksi) {
-        //     $transaksi->total_berat = $transaksi->detailTransaksi->sum('berat_kg');
-        //     $transaksi->total_transaksi = $transaksi->detailTransaksi->sum('harga_total');
-        // }
+        foreach ($transaksis as $transaksi) {
+            $transaksi->total_berat = $transaksi->detailTransaksi->sum('berat_kg');
+            $transaksi->total_transaksi = $transaksi->detailTransaksi->sum('harga_total');
+        }
 
-        // return view('pages.petugas.transaksi.index', compact('transaksis'));
+        return view('pages.petugas.transaksi.index', compact('transaksis'));
     }
 
     public function generateUniqueTransactionCode()
