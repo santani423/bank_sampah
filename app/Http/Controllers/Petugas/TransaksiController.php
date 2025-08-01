@@ -10,6 +10,7 @@ use App\Models\Nasabah;
 use App\Models\Sampah;
 use App\Models\Saldo;
 use App\Models\DetailTransaksi;
+use App\Models\Petugas;
 use App\Models\petugasBalaceMutation;
 use App\Models\petugasLog;
 use App\Models\petugasTopUp;
@@ -269,8 +270,10 @@ class TransaksiController extends Controller
                 'description' => 'Membuat transaksi top up dengan nominal: ' . $validated['jumlah'],
             ]);
 
+            $petugas  = Petugas::where('email', $auth->email)->first();
+
             $data = new petugasTopUp();
-            $data->petugas_id = $auth->id;
+            $data->petugas_id = $petugas->id;
             $data->order_id = $order_id;
             $data->amount = $validated['jumlah'];
             $data->save();
