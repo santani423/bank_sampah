@@ -81,17 +81,7 @@
         <form action="{{ route('bayar.proses') }}" method="POST">
             @csrf
 
-            <div class="form-group">
-                <label for="nama">Nama Lengkap:</label>
-                <input type="text" id="nama" name="nama" value="{{ old('nama', 'Contoh Nama') }}" required maxlength="255"
-                    placeholder="Masukkan nama lengkap">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="{{ old('email', 'user@example.com') }}" required maxlength="255"
-                    placeholder="contoh@email.com">
-            </div>
+          
 
             <div class="form-group">
                 <label>Pilih Jumlah Pembayaran:</label>
