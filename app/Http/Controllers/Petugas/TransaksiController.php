@@ -31,18 +31,18 @@ class TransaksiController extends Controller
 {
     protected InvoiceApi $invoiceApi;
 
-    // public function __construct()
-    // {
-    //     $apiKey = config('xendit.api_key');
+    public function __construct()
+    {
+        $apiKey = config('xendit.api_key');
 
-    //     if (empty($apiKey)) {
-    //         Log::error('Xendit API Key not set in config.');
-    //         abort(500, 'Xendit API Key tidak tersedia.');
-    //     }
+        if (empty($apiKey)) {
+            Log::error('Xendit API Key not set in config.');
+            abort(500, 'Xendit API Key tidak tersedia.');
+        }
 
-    //     Configuration::setXenditKey($apiKey);
-    //     $this->invoiceApi = new InvoiceApi();
-    // }
+        Configuration::setXenditKey($apiKey);
+        $this->invoiceApi = new InvoiceApi();
+    }
 
     public function index()
     {
