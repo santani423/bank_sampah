@@ -58,10 +58,12 @@
                 class="ph ph-x"></i></button>
         <!-- sidebar close btn -->
 
-        <a href="index.html"
-            class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10">
-            <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo">
-        </a>
+        <div style="display: flex; justify-content: center;">
+            <a href="#"
+                class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10">
+                <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo" style="width: 100%; height: auto;">
+            </a>
+        </div>
 
         <div class="sidebar-menu-wrapper overflow-y-auto scroll-sm">
             <div class="p-20 pt-10">
