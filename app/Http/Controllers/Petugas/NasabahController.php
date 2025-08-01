@@ -34,7 +34,7 @@ class NasabahController extends Controller
                 DB::raw('MAX(nasabah.cabang_id) as cabang_id'),
                 DB::raw('GROUP_CONCAT(DISTINCT cabangs.nama_cabang) as nama_cabang')
             )
-            ->where('petugas.id', auth()->user()->id)
+            ->where('petugas.email', auth()->user()->email)
             ->groupBy('nasabah.id');
 
         if ($request->filled('nama_nasabah')) {
@@ -42,7 +42,7 @@ class NasabahController extends Controller
         }
 
         $nasabahs = $query->paginate(10);
-
+        
 
         return view('pages.petugas.nasabah.index', compact('nasabahs'));
     }
