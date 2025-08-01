@@ -379,6 +379,7 @@ class TransaksiController extends Controller
 
             $transaction->save();
 
+            return response()->json(['message' => $transaction], 200);
             if (strtolower($data['status']) === 'PAID') {
                 $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
 
