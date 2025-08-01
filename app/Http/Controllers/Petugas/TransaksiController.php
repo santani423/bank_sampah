@@ -46,12 +46,12 @@ class TransaksiController extends Controller
 
     public function index()
     {
-        $transaksis = Transaksi::with(['nasabah', 'detailTransaksi.sampah'])->paginate(10);
+        // $transaksis = Transaksi::with(['nasabah', 'detailTransaksi.sampah'])->paginate(10);
 
-        foreach ($transaksis as $transaksi) {
-            $transaksi->total_berat = $transaksi->detailTransaksi->sum('berat_kg');
-            $transaksi->total_transaksi = $transaksi->detailTransaksi->sum('harga_total');
-        }
+        // foreach ($transaksis as $transaksi) {
+        //     $transaksi->total_berat = $transaksi->detailTransaksi->sum('berat_kg');
+        //     $transaksi->total_transaksi = $transaksi->detailTransaksi->sum('harga_total');
+        // }
 
         // return view('pages.petugas.transaksi.index', compact('transaksis'));
     }
