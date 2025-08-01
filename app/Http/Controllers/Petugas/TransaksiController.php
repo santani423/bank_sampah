@@ -381,10 +381,10 @@ class TransaksiController extends Controller
 
             if (strtolower($data['status']) === 'paid') {
                 $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
-                return response()->json(['message' => $transaction], 200);
+                // return response()->json(['message' => $transaction], 200);
 
                 if ($saldo) {
-                    $saldo->saldo ==$saldo->saldo + $transaction->amount;
+                    $saldo->saldo = $saldo->saldo + $transaction->amount;
                     $saldo->save();
 
                     Log::info('Saldo petugas berhasil ditambahkan. Petugas ID: ' . $transaction->petugas_id . ', Jumlah: ' . $transaction->amount);
