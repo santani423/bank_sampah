@@ -280,8 +280,8 @@
                     <div class="col-xl-12">
                         <div class="site-footer__bottom-inner">
                             <p class="site-footer__bottom-text">
-                                © Copyright 2022 by
-                                <a href="#">Layerdrops.com</a>
+                                © Copyright 2025 by
+                                <a href="undesia.com">undesia.com</a>
                             </p>
                         </div>
                     </div>
