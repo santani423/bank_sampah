@@ -184,9 +184,9 @@
                                 alt="" /></a> --}}
                     </div>
                     <div class="site-footer__top-right">
-                        <p class="site-footer__top-right-text">
+                        {{-- <p class="site-footer__top-right-text">
                             Waste Disposal Management & Pickup Services
-                        </p>
+                        </p> --}}
                         <div class="site-footer__social">
                             <a href="#"><i class="fab fa-twitter"></i></a>
                             <a href="#"><i class="fab fa-facebook"></i></a>
@@ -199,26 +199,8 @@
         </div>
         <div class="site-footer__middle">
             <div class="container">
-                <div class="row">
-                    <div class="col-xl-4 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="100ms">
-                        <div class="footer-widget__column footer-widget__about">
-                            <h3 class="footer-widget__title">About</h3>
-                            <div class="footer-widget__about-text-box">
-                                <p class="footer-widget__about-text">
-                                    Lorem ipsum dolor sited ame etur adi
-                                    pisicing elit tempor labore.
-                                </p>
-                            </div>
-                            <form class="footer-widget__newsletter-form">
-                                <div class="footer-widget__newsletter-input-box">
-                                    <input type="email" placeholder="Email Address" name="email" />
-                                    <button type="submit" class="footer-widget__newsletter-btn">
-                                        <i class="far fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                {{-- <div class="row">
+                   
                     <div class="col-xl-2 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="200ms">
                         <div class="footer-widget__column footer-widget__links clearfix">
                             <h3 class="footer-widget__title">Links</h3>
@@ -284,7 +266,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
         <div class="site-footer__bottom">
