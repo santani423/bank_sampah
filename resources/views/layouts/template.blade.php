@@ -61,7 +61,8 @@
         <div style="display: flex; justify-content: center;">
             <a href="#"
                 class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10">
-                <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo" style="width: 100%; height: auto;">
+                <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo"
+                    style="width: 100%; height: auto;">
             </a>
         </div>
 
@@ -100,7 +101,7 @@
             <div class="flex-align gap-16">
                 <div class="flex-align gap-8">
                     <!-- Notification Start -->
-                    <div class="dropdown">
+                    {{-- <div class="dropdown">
                         <button
                             class="dropdown-btn shaking-animation text-gray-500 w-40 h-40 bg-main-50 hover-bg-main-100 transition-2 rounded-circle text-xl flex-center"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -212,11 +213,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <!-- Notification Start -->
 
                     <!-- Language Start -->
-                    <div class="dropdown">
+                    {{-- <div class="dropdown">
                         <button
                             class="text-gray-500 w-40 h-40 bg-main-50 hover-bg-main-100 transition-2 rounded-circle text-xl flex-center"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -294,7 +295,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <!-- Language Start -->
                 </div>
 
@@ -305,8 +306,8 @@
                         class="users arrow-down-icon border border-gray-200 rounded-pill p-4 d-inline-block pe-40 position-relative"
                         type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="position-relative">
-                            <img src="{{ asset('edmate/assets/images/thumbs/user-img.png') }}" alt="Image"
-                                class="h-32 w-32 rounded-circle">
+                            <img src="{{ Auth::user()->foto ? asset('storage/foto/' . Auth::user()->foto) : asset('images/default-user.png') }}"
+                                alt="Image" class="h-32 w-32 rounded-circle">
                             <span
                                 class="activation-badge w-8 h-8 position-absolute inset-block-end-0 inset-inline-end-0"></span>
                         </span>
@@ -315,8 +316,8 @@
                         <div class="card border border-gray-100 rounded-12 box-shadow-custom">
                             <div class="card-body">
                                 <div class="flex-align gap-8 mb-20 pb-20 border-bottom border-gray-100">
-                                    <img src="{{ asset('edmate/assets/images/thumbs/user-img.png') }}" alt=""
-                                        class="w-54 h-54 rounded-circle">
+                                    <img src="{{ Auth::user()->foto ? asset('storage/foto/' . Auth::user()->foto) : asset('images/default-user.png') }}"
+                                        alt="" class="w-54 h-54 rounded-circle">
                                     <div class="">
                                         <h4 class="mb-0">{{ Auth::user()->name }}</h4>
                                         <p class="fw-medium text-13 text-gray-200">{{ Auth::user()->email }}</p>
@@ -324,14 +325,19 @@
                                 </div>
                                 <ul class="max-h-270 overflow-y-auto scroll-sm pe-4">
                                     <li class="mb-4">
-                                        <a href="setting.html"
+                                        <a href="{{ route('nasabah.profile') }}"
                                             class="py-12 text-15 px-20 hover-bg-gray-50 text-gray-300 rounded-8 flex-align gap-8 fw-medium text-15">
-                                            <span class="text-2xl text-primary-600 d-flex"><i
-                                                    class="ph ph-gear"></i></span>
-                                            <span class="text">Account Settings</span>
+                                            <span class="text-2xl text-primary-600 d-flex"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-person-fill"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                                </svg></span>
+                                            <span class="text">Profile</span>
                                         </a>
                                     </li>
-                                     
+
                                     <li class="pt-8 border-top border-gray-100">
                                         <a href="javascript:void(0)"
                                             class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
