@@ -366,7 +366,7 @@
         <div class="dashboard-body">
             @yield('main')
         </div>
-        <div class="dashboard-footer">
+        {{-- <div class="dashboard-footer">
             <div class="flex-between flex-wrap gap-16">
                 <p class="text-gray-300 text-13 fw-normal"> &copy; Copyright Edmate 2024, All Right Reserverd</p>
                 <div class="flex-align flex-wrap gap-16">
@@ -381,7 +381,7 @@
                         class="text-gray-300 text-13 fw-normal hover-text-main-600 hover-text-decoration-underline">Support</a>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
     <!-- jQuery Scrollbar -->
     <script src="{{ asset('assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>

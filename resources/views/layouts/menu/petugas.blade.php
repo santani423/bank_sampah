@@ -37,6 +37,10 @@
                  <a href="{{ route('petugas.transaksi.top-up') }}" class="sidebar-submenu__link">
                      Top Up </a>
              </li>
+             <li class="sidebar-submenu__item">
+                 <a href="{{ route('petugas.pengiriman.index') }}" class="sidebar-submenu__link">
+                     Pengiriman Sampah </a>
+             </li>
          </ul>
      </li>
  </ul>

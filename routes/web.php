@@ -117,6 +117,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::post('/midtrans/token', [PetugasTransaksiController::class, 'createTransaction'])->name('bayar.proses');
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
+    Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('petugas.pengiriman');
 });
 
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {

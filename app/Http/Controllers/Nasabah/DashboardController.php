@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Nasabah;
 
 use App\Http\Controllers\Controller;
 use App\Models\cabang;
+use App\Models\Nasabah;
 use App\Models\Saldo;
 use App\Models\User;
 use App\Models\UserNasabah;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Can;
@@ -34,9 +35,9 @@ class DashboardController extends Controller
     public function profile()
     {
         // Logic for displaying the profile
-        $nasabah =  UserNasabah::where('user_id', auth()->id())->first();
+        $userNasabah =  UserNasabah::where('user_id', auth()->id())->first();
+        $nasabah =  Nasabah::where('id', $userNasabah->nasabah_id)->first();
         $user =  User::where('id', auth()->id())->first();
-        // dd($user);
         return view('pages.nasabah.profile.index', compact('nasabah', 'user'));
     }
 
@@ -44,29 +45,40 @@ class DashboardController extends Controller
     {
         $user = User::findOrFail($id);
 
+        // Ambil data nasabah terkait user ini
+        $userNasabah = UserNasabah::where('user_id', $user->id)->firstOrFail();
+        $nasabah = Nasabah::findOrFail($userNasabah->nasabah_id);
+
         // Validasi input
         $validated = $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email,' . $user->id,
-            'username'  => 'required|string|max:255|unique:users,username,' . $user->id,
-            'password'  => 'nullable|string|min:6',
-            'foto'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // User
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email,' . $user->id,
+            'username'      => 'required|string|max:50|unique:users,username,' . $user->id,
+            'password'      => 'nullable|string|min:6',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            // Nasabah
+            'nama_lengkap'  => 'required|string|max:100',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'tempat_lahir'  => 'required|string|max:50',
+            'tanggal_lahir' => 'required|date',
+            'no_hp'         => 'required|string|max:20',
+            'alamat_lengkap' => 'required|string',
         ]);
 
-        // Update field biasa
+        // Update User
         $user->name     = $validated['name'];
         $user->email    = $validated['email'];
         $user->username = $validated['username'];
 
-        // Update password jika diisi
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
-        // Update foto jika ada upload baru
+        // Foto user
         if ($request->hasFile('foto')) {
-            // Hapus foto lama kecuali default
-            if ($user->foto && $user->foto != 'default.png') {
+            if ($user->foto && $user->foto !== 'default.png') {
                 Storage::delete('public/foto/' . $user->foto);
             }
 
@@ -76,6 +88,15 @@ class DashboardController extends Controller
         }
 
         $user->save();
+
+        // Update Nasabah
+        $nasabah->nama_lengkap   = $validated['nama_lengkap'];
+        $nasabah->jenis_kelamin  = $validated['jenis_kelamin'];
+        $nasabah->tempat_lahir   = $validated['tempat_lahir'];
+        $nasabah->tanggal_lahir  = $validated['tanggal_lahir'];
+        $nasabah->no_hp          = $validated['no_hp'];
+        $nasabah->alamat_lengkap = $validated['alamat_lengkap'];
+        $nasabah->save();
 
         return redirect()->route('nasabah.profile', $user->id)
             ->with('success', 'Profile berhasil diperbarui.');

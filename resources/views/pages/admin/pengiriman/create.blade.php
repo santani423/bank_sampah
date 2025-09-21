@@ -19,7 +19,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <form action="{{ route('admin.pengiriman.store') }}" method="POST">
+            <form action="{{ route('petugas.pengiriman.store') }}" method="POST">
                 @csrf
                 <div class="card">
                     <div class="card-body">
