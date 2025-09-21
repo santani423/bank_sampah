@@ -31,7 +31,8 @@ class DashboardController extends Controller
     public function profile()
     {
         // Logic for displaying the profile
-        return view('pages.nasabah.profile');
+        $nasabah =  UserNasabah::where('user_id', auth()->id())->first();
+        return view('pages.nasabah.profile.index', compact('nasabah'));
     }
     
 }

@@ -122,6 +122,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
     Route::get('/dashboard', [NasabahDashboardController::class, 'index'])->name('nasabah.dashboard');
     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('nasabah.profile');
+    Route::get('/update', [NasabahDashboardController::class, 'update'])->name('nasabah.update');
      
     // Data Cabang
     Route::resource('/cabang', NasabahCabangController::class)->names('nasabah.cabang');
