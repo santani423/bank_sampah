@@ -1,6 +1,7 @@
 @extends('layouts.login')
 
 @section('title', 'Register')
+@section('favicon', asset($setting->logo))
 
 @push('style')
     <!-- CSS Libraries -->
@@ -130,7 +131,7 @@
                         @enderror
                     </div>
                     <div class="mb-24">
-                        <label for="alamat_lengkap" class="form-label mb-8 h6">Cabang</label>
+                        <label for="cabang_id" class="form-label mb-8 h6">Cabang</label>
                         <select class="form-control @error('cabang_id') is-invalid @enderror" name="cabang_id"
                             id="cabang_id">
                             <option value="">Pilih Cabang</option>

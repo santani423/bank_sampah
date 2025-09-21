@@ -7,7 +7,7 @@
     <!-- Title -->
     <title>@yield('title')</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('edmate/assets/images/logo/favicon.png') }}">
+    <link rel="shortcut icon" href="@yield('favicon')">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/bootstrap.min.css') }}">
     <!-- file upload -->

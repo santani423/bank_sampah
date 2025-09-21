@@ -34,21 +34,12 @@ class CabangController extends Controller
         if ($cabangNasabah) {
             return redirect()->route('nasabah.cabang.index')->with('error', 'Anda sudah bergabung dengan cabang ' . $cbg->nama_cabang);
         }
-
-
+ 
         $cabang = new CabangUser;
 
         $cabang->cabang_id = $request->id;
-        $cabang->user_nasabah_id = $nasabah->id;
-
-
-
-
-
-        $cabang->save();
-
-
-
+        $cabang->user_nasabah_id = $nasabah->id; 
+        $cabang->save(); 
         return redirect()->route('nasabah.cabang.index')->with('success', 'Anda telah bergabung dengan cabang ' . $cbg->nama_cabang);
     }
 }

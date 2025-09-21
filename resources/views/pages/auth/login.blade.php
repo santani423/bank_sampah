@@ -1,6 +1,7 @@
 @extends('layouts.login')
 
 @section('title', 'Login')
+@section('favicon', asset($setting->logo))
 
 @push('style')
     <!-- CSS Libraries -->
@@ -65,10 +66,9 @@
                         <a href=" " class="text-main-600 hover-text-decoration-underline text-15 fw-medium">Forgot
                             Password?</a>
                     </div>
-                    <button type="submit" class="btn btn-main rounded-pill w-100">Sign In</button>
-                    <p class="mt-32 text-gray-600 text-center">New on our platform?
-                        <a href="{{ route('register') }}" class="text-main-600 hover-text-decoration-underline">Create an
-                            account</a>
+                    <button type="submit" class="btn btn-main rounded-pill w-100">Masuk</button>
+                    <p class="mt-32 text-gray-600 text-center">Belum punya akun?
+                        <a href="{{ route('register') }}" class="text-main-600 hover-text-decoration-underline">Daftar</a>
                     </p>
 
                     <div class="divider my-32 position-relative text-center">

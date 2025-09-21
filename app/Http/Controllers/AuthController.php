@@ -106,7 +106,7 @@ class AuthController extends Controller
 
         $cabangUser  =  new CabangUser();
         $cabangUser->cabang_id = $request->cabang_id;
-        $cabangUser->user_nasabah_id = $user->id;
+        $cabangUser->user_nasabah_id = $userNasabah->id;
         $cabangUser->save();
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
