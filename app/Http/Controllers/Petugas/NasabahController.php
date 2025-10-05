@@ -124,7 +124,7 @@ class NasabahController extends Controller
             ->where('nasabah_id', $id)
             ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
-
+        dd($riwayatPenarikan);
         return view('pages.petugas.nasabah.show', compact('nasabah', 'riwayatSetoran', 'riwayatPenarikan'));
     }
 

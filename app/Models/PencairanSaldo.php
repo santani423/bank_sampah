@@ -21,7 +21,7 @@ class PencairanSaldo extends Model
         return $this->belongsTo(Nasabah::class, 'nasabah_id');
     }
 
-    public function metode()
+    public function metodePencairan()
     {
         return $this->belongsTo(MetodePencairan::class, 'metode_id');
     }

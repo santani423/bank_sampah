@@ -58,7 +58,7 @@
                         @enderror
                     </div>
 
-                    <div class="mb-24">
+                    {{-- <div class="mb-24">
                         <label for="tempat_lahir" class="form-label mb-8 h6">Tempat Lahir</label>
                         <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror"
                             id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}"
@@ -66,16 +66,16 @@
                         @error('tempat_lahir')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div> --}}
 
-                    <div class="mb-24">
+                    {{-- <div class="mb-24">
                         <label for="tanggal_lahir" class="form-label mb-8 h6">Tanggal Lahir</label>
                         <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror"
                             id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
                         @error('tanggal_lahir')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div> --}}
 
                     <div class="mb-24">
                         <label for="no_hp" class="form-label mb-8 h6">No HP</label>
