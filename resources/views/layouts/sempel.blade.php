@@ -34,7 +34,7 @@
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
 
     @stack('style')
-    {{-- <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.trendy.min.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.trendy.min.css') }}">
 </head>
 
 <body>

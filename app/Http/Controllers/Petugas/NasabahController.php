@@ -27,7 +27,8 @@ class NasabahController extends Controller
             ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
             ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id')
             ->select(
-                'nasabah.id',
+                'nasabah.id', 
+                DB::raw('MAX(nasabah.status) as status'),
                 DB::raw('MAX(nasabah.nama_lengkap) as nama_lengkap'),
                 DB::raw('MAX(nasabah.no_registrasi) as no_registrasi'),
                 DB::raw('MAX(nasabah.no_hp) as no_hp'),
@@ -43,7 +44,7 @@ class NasabahController extends Controller
 
         $nasabahs = $query->paginate(10);
         
-
+        // dd($nasabahs);
         return view('pages.petugas.nasabah.index', compact('nasabahs'));
     }
 

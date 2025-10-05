@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\PengirimanPengepulController as AdminPengirimanPe
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\AdminCabangController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\landingPageController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
     // Feedback
     Route::resource('/data-feedback', AdminFeedbackController::class)->names('admin.feedback');
+    Route::resource('/settings', SettingController::class)->names('admin.settings');
 });
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {

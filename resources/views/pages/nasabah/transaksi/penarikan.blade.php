@@ -2,9 +2,6 @@
 
 @section('title', 'Metode Penarikan Nasabah')
 
-@push('style')
-@endpush
-
 @section('main')
 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
     <div>
@@ -12,10 +9,12 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card mb-5">
     <div class="card-body">
         <h5 class="card-title">Metode Penarikan</h5>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPenarikan">+ Tambah Penarikan</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPenarikan">
+            + Tambah Penarikan
+        </button>
     </div>
 </div>
 
@@ -25,16 +24,18 @@
             <div class="card-header">
                 <h4 class="card-title">Riwayat Penarikan</h4>
             </div>
+
+            {{-- Alert messages --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if ($errors->any())
@@ -44,10 +45,11 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
+            {{-- Tabel Riwayat --}}
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-head-bg-primary">
@@ -69,19 +71,20 @@
                                     <td>{{ $penarikan->metode->nama_metode_pencairan ?? 'N/A' }}</td>
                                     <td>
                                         @if($penarikan->status == 'pending')
-                                            <span class="badge text-bg-info">Menunggu</span>
+                                            <span class="badge bg-info">Menunggu</span>
                                         @elseif($penarikan->status == 'disetujui')
-                                            <span class="badge text-bg-success">Berhasil</span>
+                                            <span class="badge bg-success">Berhasil</span>
                                         @elseif($penarikan->status == 'failed')
-                                            <span class="badge text-bg-danger">Gagal</span>
+                                            <span class="badge bg-danger">Gagal</span>
                                         @else
-                                            <span class="badge text-bg-secondary">Gagal</span>
+                                            <span class="badge bg-secondary">Tidak Diketahui</span>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+
                     @if ($riwayatPenarikan->isEmpty())
                         <div class="text-center mt-3">Belum ada riwayat penarikan.</div>
                     @endif
@@ -94,12 +97,12 @@
 <!-- Modal Penarikan -->
 <div class="modal fade" id="modalPenarikan" tabindex="-1" aria-labelledby="modalPenarikanLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="{{ route('nasabah.transaksi.store') }}" method="POST">
+        <form id="formPenarikan" action="{{ route('nasabah.transaksi.store') }}" method="POST">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalPenarikanLabel">Tambah Metode Penarikan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     {{-- Tombol pilihan jumlah --}}
@@ -107,22 +110,23 @@
                         <label class="form-label d-block">Pilih Jumlah Penarikan</label>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ([10000, 20000, 50000, 100000, 150000] as $jumlah)
-                                <button type="button" class="btn btn-outline-primary btn-primary btn-jumlah" data-jumlah="{{ $jumlah }}">
-                                    {{ number_format($jumlah, 0, ',', '.') }}
+                                <button type="button" class="btn btn-primary btn-jumlah" data-jumlah="{{ $jumlah }}">
+                                    Rp {{ number_format($jumlah, 0, ',', '.') }}
                                 </button>
                             @endforeach
                         </div>
                     </div>
 
-                    {{-- Input manual --}}
+                    {{-- Input manual dengan format Rupiah --}}
                     <div class="mb-3">
                         <label for="manual_jumlah" class="form-label">Atau masukkan jumlah secara manual</label>
-                        <input type="number" name="jumlah" class="form-control" id="manual_jumlah"
-                            placeholder="Masukkan jumlah manual (contoh: 75000)" autocomplete="off">
+                        <input type="text" class="form-control" id="manual_jumlah"
+                            placeholder="Masukkan jumlah manual (contoh: 75.000)" autocomplete="off">
+                        <input type="hidden" name="jumlah_pencairan" id="jumlah_pencairan" required>
+                        <small class="text-muted">
+                            Minimal penarikan: <strong>Rp {{ number_format($minPenarikan, 0, ',', '.') }}</strong>
+                        </small>
                     </div>
-
-                    {{-- Input hidden --}}
-                    <input type="hidden" name="jumlah_pencairan" id="jumlah_pencairan" required>
 
                     {{-- Pilihan metode --}}
                     <div class="mb-3 mt-3">
@@ -137,54 +141,56 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Kirim Penarikan</button>
+                    <button type="submit" class="btn btn-primary w-100">Kirim Penarikan</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
+{{-- Validasi & Format Rupiah --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('.btn-jumlah');
-        const inputJumlahHidden = document.getElementById('jumlah_pencairan');
-        const manualInput = document.getElementById('manual_jumlah');
+document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.btn-jumlah');
+    const inputHidden = document.getElementById('jumlah_pencairan');
+    const inputManual = document.getElementById('manual_jumlah');
+    const form = document.getElementById('formPenarikan');
+    const minPenarikan = {{ $minPenarikan ?? 0 }};
 
-        // Saat tombol jumlah diklik
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const selectedValue = button.dataset.jumlah;
+    // Fungsi format Rupiah
+    function formatRupiah(angka) {
+        return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
 
-                // Reset semua tombol
-                // buttons.forEach(btn => {
-                //     btn.classList.remove('active', 'btn-primary');
-                //     btn.classList.add('btn-outline-primary');
-                // });
-
-                // Aktifkan tombol terpilih
-                // button.classList.remove('btn-outline-primary');
-                // button.classList.add('btn-primary', 'active');
-
-                // Set hidden input dan input manual
-                inputJumlahHidden.value = selectedValue;
-                manualInput.value = selectedValue;
-            });
-        });
-
-        // Saat input manual berubah
-        manualInput.addEventListener('input', function () {
-            // Reset tombol
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'btn-primary');
-                btn.classList.add('btn-outline-primary');
-            });
-
-            // Set hidden input dari manual
-            inputJumlahHidden.value = this.value;
+    // Saat klik tombol preset jumlah
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const val = parseInt(button.dataset.jumlah);
+            inputHidden.value = val;
+            inputManual.value = formatRupiah(val);
         });
     });
+
+    // Saat input manual diketik
+    inputManual.addEventListener('input', function () {
+        let val = this.value.replace(/[^\d]/g, ''); // hapus semua non-digit
+        if (val) {
+            this.value = formatRupiah(val);
+            inputHidden.value = val;
+        } else {
+            this.value = '';
+            inputHidden.value = '';
+        }
+    });
+
+    // Validasi sebelum submit
+    form.addEventListener('submit', function (e) {
+        const jumlah = parseFloat(inputHidden.value || 0);
+        if (jumlah < minPenarikan) {
+            e.preventDefault();
+            alert(`Jumlah penarikan minimal adalah Rp ${minPenarikan.toLocaleString('id-ID')}`);
+        }
+    });
+});
 </script>
 @endsection
-
-@push('scripts')
-@endpush
