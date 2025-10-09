@@ -20,6 +20,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
@@ -28,64 +29,83 @@
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width: 50px;">No</th>
                                     <th>Tanggal Pengiriman</th>
                                     <th>Kode Pengiriman</th>
-                                    <th>Nama Pengepul</th>
-                                    <th>Total Berat (kg)</th>
-                                    <th>Jumlah Jenis Sampah</th>
-                                    {{-- <th>Aksi</th> --}}
+                                    <th>Cabang</th>
+                                    <th>Gudang</th>
+                                    <th>Status</th>
+                                    <th style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($pengirimanSampah as $index => $pengiriman)
                                     <tr>
-                                        <td>{{ $pengirimanSampah->firstItem() + $index }}</td>
-                                        <td>{{ $pengiriman->tanggal_pengiriman }}</td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($pengiriman->tanggal_pengiriman)->format('d-m-Y') }}
+                                        </td>
                                         <td>{{ $pengiriman->kode_pengiriman }}</td>
-                                        <td>{{ $pengiriman->pengepul->nama }}</td>
-                                        <td>{{ $pengiriman->total_berat }}</td>
-                                        <td>{{ $pengiriman->jumlah_jenis_sampah }}</td>
-                                        {{-- <td>
-                                        <form onsubmit="return confirm('Apakah Anda yakin?');"
-                                                action="{{ route('pengiriman.destroy', $pengiriman->id) }}" method="POST">
-                                                <a href="{{ route('pengiriman.edit', $pengiriman->id) }}"
-                                                    class="btn btn-sm btn-primary">
-                                                    <i class="fa-solid fa-pencil"></i> Edit
-                                                </a>
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    <i class="fa-solid fa-trash"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </td> --}}
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="text-center">
-                                                Belum ada pengiriman sampah.
+                                        <td>{{ $pengiriman->cabang->nama_cabang ?? '-' }}</td>
+                                        <td>{{ $pengiriman->gudang->nama_gudang ?? '-' }}</td>
+                                        <td>
+                                            @switch($pengiriman->status_pengiriman)
+                                                @case('draft')
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                @break
+
+                                                @case('dikirim')
+                                                    <span class="badge bg-info text-white">Dikirim</span>
+                                                @break
+
+                                                @case('diterima')
+                                                    <span class="badge bg-success">Diterima</span>
+                                                @break
+
+                                                @case('batal')
+                                                    <span class="badge bg-danger">Batal</span>
+                                                @break
+
+                                                @default
+                                                    <span class="badge bg-light text-dark">Tidak Diketahui</span>
+                                            @endswitch
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <a href="{{ route('petugas.pengiriman.show', $pengiriman->kode_pengiriman) }}"
+                                                        class="btn btn-sm btn-info">
+                                                        Detail
+                                                    </a>
+                                                </div>
+                                                <div class="col">
+                                                    <a href="{{ route('petugas.pengiriman.edit', $pengiriman->kode_pengiriman) }}"
+                                                        class="btn btn-sm btn-primary">
+                                                        Edit
+                                                    </a>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">
+                                                Belum ada pengiriman sampah.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
 
-                        <div class="float-right">
-                            {{ $pengirimanSampah->withQueryString()->links() }}
+                            <div class="float-right">
+                                {{-- {{ $pengirimanSampah->withQueryString()->links() }} --}}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endsection
 
-@endsection
-
-@push('scripts')
-    <!-- JS Libraies -->
-
-    <!-- Page Specific JS File -->
-@endpush
+    @push('scripts')
+        <!-- JS Libraries -->
+    @endpush

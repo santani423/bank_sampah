@@ -3,36 +3,46 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\cabang;
 use Illuminate\Http\Request;
 use App\Models\Pengepul;
 use App\Models\Sampah;
 use App\Models\PengirimanPengepul;
 use App\Models\DetailPengiriman;
+use App\Models\Gudang;
+use App\Models\PengirimanPetugas;
+use App\Models\Petugas;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PengirimanPengepulController extends Controller
 {
     public function index()
     {
-        // Ambil data pengiriman sampah dengan relasi ke pengepul
-        $pengirimanSampah = PengirimanPengepul::with('pengepul')
-            ->paginate(10);
+        // // Ambil data pengiriman sampah dengan relasi ke pengepul
+        // $pengirimanSampah = PengirimanPengepul::with('pengepul')
+        //     ->paginate(10);
 
-        // Transformasi data langsung pada koleksi paginator
-        $pengirimanSampah->getCollection()->transform(function ($pengiriman) {
-            // Hitung total berat sampah dalam pengiriman ini
-            $pengiriman->total_berat = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
-                ->sum('berat_kg');
+        // // Transformasi data langsung pada koleksi paginator
+        // $pengirimanSampah->getCollection()->transform(function ($pengiriman) {
+        //     // Hitung total berat sampah dalam pengiriman ini
+        //     $pengiriman->total_berat = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
+        //         ->sum('berat_kg');
 
-            // Hitung jumlah jenis sampah yang berbeda dalam pengiriman ini
-            $pengiriman->jumlah_jenis_sampah = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
-                ->distinct('sampah_id')
-                ->count('sampah_id');
+        //     // Hitung jumlah jenis sampah yang berbeda dalam pengiriman ini
+        //     $pengiriman->jumlah_jenis_sampah = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
+        //         ->distinct('sampah_id')
+        //         ->count('sampah_id');
 
-            return $pengiriman;
-        });
+        //     return $pengiriman;
+        // });
 
-        // Tampilkan ke view
+        // // Tampilkan ke view
+
+
+        $pengirimanSampah = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas')->get();
+        // dd($pengirimanSampah);
         return view('pages.admin.pengiriman.index', compact('pengirimanSampah'));
     }
 
@@ -43,7 +53,7 @@ class PengirimanPengepulController extends Controller
         $prefix = "BSR-{$today}-PENG-";
 
         // Cari kode pengiriman terakhir hari ini
-        $lastShipping = PengirimanPengepul::where('kode_pengiriman', 'like', $prefix . '%')
+        $lastShipping = PengirimanPetugas::where('kode_pengiriman', 'like', $prefix . '%')
             ->orderBy('kode_pengiriman', 'desc')
             ->first();
 
@@ -74,35 +84,56 @@ class PengirimanPengepulController extends Controller
                 return $sampah;
             });
 
-        return view('pages.admin.pengiriman.create', compact('pengepulList', 'stokSampah', 'kodePengiriman'));
+
+        $cabang = cabang::join('petugas_cabangs as pc', 'pc.cabang_id', '=', 'cabangs.id')
+            ->join('petugas as p', 'p.id', '=', 'pc.petugas_id')
+            ->join('users as u', 'u.email', '=', 'p.email')
+            ->where('u.id', Auth::id()) // filter berdasarkan user login
+            ->select('cabangs.*')
+            ->distinct() // hindari duplikat data cabang
+            ->get();
+
+
+        $gudang = Gudang::all();
+
+
+
+
+
+        return view('pages.admin.pengiriman.create', compact('pengepulList', 'stokSampah', 'kodePengiriman', 'cabang', 'gudang'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'pengepul_id' => 'required|exists:pengepul,id',
+            'cabang_id' => 'required|exists:cabangs,id',
+            'gudang_id' => 'required|exists:gudangs,id',
             'tanggal_pengiriman' => 'required|date',
             'sampah_id' => 'required|array',
             'sampah_id.*' => 'exists:sampah,id',
             'berat_kg' => 'required|array',
             'berat_kg.*' => 'numeric|min:0',
-            'harga_per_kg' => 'required|array',
-            'harga_per_kg.*' => 'numeric|min:1',
         ]);
-
+        // dd($request->all());
         try {
+            $user = User::whereId(Auth::id())->first();
+            $petugas = Petugas::where('email', $user->email)->first();
+            // dd($request->sampah_id);
             // Buat data pengiriman utama
-            $pengiriman = PengirimanPengepul::create([
+            $pengiriman = PengirimanPetugas::create([
                 'kode_pengiriman' => $request->kode_pengiriman,
-                'pengepul_id' => $request->pengepul_id,
+                'cabang_id' => $request->cabang_id,
+                'gudang_id' => $request->gudang_id,
+                'petugas_id' => $petugas->id,
                 'tanggal_pengiriman' => $request->tanggal_pengiriman,
             ]);
 
             $totalHargaKeseluruhan = 0;
 
+
             foreach ($request->sampah_id as $index => $sampahId) {
                 $beratPengiriman = $request->berat_kg[$index];
-                $hargaPerKg = $request->harga_per_kg[$index];
+                // $hargaPerKg = $request->harga_per_kg[$index];
 
                 // Ambil data stok dinamis
                 $stokSampah = Sampah::with(['detailTransaksi', 'detailPengiriman'])->find($sampahId);
@@ -116,23 +147,23 @@ class PengirimanPengepulController extends Controller
                 }
 
                 // Hitung harga total
-                $hargaTotal = $beratPengiriman * $hargaPerKg;
-                $totalHargaKeseluruhan += $hargaTotal;
+                // $hargaTotal = $beratPengiriman * $hargaPerKg;
+                // $totalHargaKeseluruhan += $hargaTotal;
 
                 // Simpan detail pengiriman
                 DetailPengiriman::create([
                     'pengiriman_id' => $pengiriman->id,
                     'sampah_id' => $sampahId,
                     'berat_kg' => $beratPengiriman,
-                    'harga_per_kg' => $hargaPerKg,
-                    'harga_total' => $hargaTotal,
+                    // 'harga_per_kg' => $hargaPerKg,
+                    // 'harga_total' => $hargaTotal,
                 ]);
             }
 
             // Update total harga keseluruhan di tabel pengiriman jika diperlukan
-            $pengiriman->update(['total_harga' => $totalHargaKeseluruhan]);
+            // $pengiriman->update(['total_harga' => $totalHargaKeseluruhan]);
 
-            return redirect()->route('admin.pengiriman.index')->with('success', 'Pengiriman berhasil ditambahkan.');
+            return redirect()->route('petugas.pengiriman.index')->with('success', 'Pengiriman berhasil ditambahkan.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data pengiriman: ' . $e->getMessage()])->withInput();
         }
@@ -154,5 +185,37 @@ class PengirimanPengepulController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus data pengiriman: ' . $e->getMessage());
         }
+    }
+
+    public function show($code)
+    {
+        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas')->where('kode_pengiriman', $code)->first();
+        return view('pages.admin.pengiriman.show', compact('pengiriman'));
+    }
+
+    public function edit($code)
+    {
+        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas')->where('kode_pengiriman', $code)->first();
+        $cabang = cabang::join('petugas_cabangs as pc', 'pc.cabang_id', '=', 'cabangs.id')
+            ->join('petugas as p', 'p.id', '=', 'pc.petugas_id')
+            ->join('users as u', 'u.email', '=', 'p.email')
+            ->where('u.id', Auth::id()) // filter berdasarkan user login
+            ->select('cabangs.*')
+            ->distinct() // hindari duplikat data cabang
+            ->get();
+
+        $stokSampah = Sampah::with(['detailTransaksi', 'detailPengiriman'])
+            ->get()
+            ->map(function ($sampah) {
+                $totalSetoran = $sampah->detailTransaksi->sum('berat_kg');
+                $totalPengiriman = $sampah->detailPengiriman->sum('berat_kg');
+                $sampah->stok = $totalSetoran - $totalPengiriman;
+                return $sampah;
+            });
+
+
+        $gudang = Gudang::all();
+        // dd($pengiriman->detail_pengiriman);
+        return view('pages.admin.pengiriman.edit', compact('pengiriman', 'cabang', 'gudang','stokSampah'));
     }
 }

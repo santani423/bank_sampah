@@ -11,13 +11,11 @@ class DetailPengiriman extends Model
 
     protected $table = 'detail_pengiriman';
 
-    protected $fillable = [
-        'pengiriman_id', 'sampah_id', 'berat_kg', 'harga_per_kg', 'harga_total'
-    ];
+    protected   $guarded = ['id'];
 
     public function pengiriman()
     {
-        return $this->belongsTo(PengirimanPengepul::class, 'pengiriman_id');
+        return $this->belongsTo(PengirimanPetugas::class, 'pengiriman_id');
     }
 
     public function sampah()

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(KegiatanSeeder::class);
         $this->call(SettingSeeder::class);
         $this->call(JenisMetodePenarikanSeeder::class);
+        $this->call(GudangSeeder::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
