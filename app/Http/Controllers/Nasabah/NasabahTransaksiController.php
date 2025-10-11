@@ -116,7 +116,7 @@ class NasabahTransaksiController extends Controller
                 . "Permintaan pencairan saldo Anda sebesar *Rp "
                 . number_format($request->jumlah_pencairan, 0, ',', '.') . "* telah diterima dan sedang diproses.\n\n"
                 . "_Status: Pending_\n"
-                . "Terima kasih telah menggunakan layanan kami.";
+                . "Terima kasih telah menggunakan layanan kami *{$setting->nama}*.";
 
             // 🔥 Panggil service WhatsApp
             $result = $this->whatsappService->sendMessage($setting->no_notifikasi, $pesan);

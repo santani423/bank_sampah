@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PencairanSaldo;
 use App\Models\Saldo;
+use App\Models\setting;
 use App\Models\User;
 use App\Models\UserNasabah;
 use Illuminate\Support\Facades\Log;
@@ -14,13 +15,15 @@ use Xendit\Configuration;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Services\WhatsAppService; // ✅ Tambahkan ini
 
 class PencairanSaldoController extends Controller
 {
     protected InvoiceApi $invoiceApi;
+    protected $whatsappService;
 
 
-    public function __construct()
+    public function __construct(WhatsAppService $whatsappService)
     {
         $apiKey = config('xendit.api_key');
 
@@ -34,6 +37,7 @@ class PencairanSaldoController extends Controller
 
         // Initialize the InvoiceApi (from previous context)
         $this->invoiceApi = new InvoiceApi();
+        $this->whatsappService = $whatsappService;
     }
     public function index()
     {
@@ -77,10 +81,10 @@ class PencairanSaldoController extends Controller
         $pencairan->tanggal_proses = now();
         $pencairan->updated_at = now();
         $pencairan->save();
-        
-        $nasabahUser  = UserNasabah::where('nasabah_id',$pencairan->nasabah_id)->first();
-        $user = User::where('id',$nasabahUser->user_id)->first();
-         
+
+        $nasabahUser  = UserNasabah::with('nasabah')->where('nasabah_id', $pencairan->nasabah_id)->first();
+        $user = User::where('id', $nasabahUser->user_id)->first();
+
         // Generate external_id unik
         $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
         // Buat payload sesuai format disbursement Xendit
@@ -117,6 +121,25 @@ class PencairanSaldoController extends Controller
             // ], $response->status());
         }
 
+        $nasabah = $nasabahUser->nasabah;
+
+
+
+
+        if ($nasabah) {
+            $setting = Setting::first();
+            $pesan = "*Pemberitahuan Pencairan Saldo*\n\n"
+                . "Halo *{$nasabah->nama_lengkap}*, 👋\n"
+                . "Permintaan pencairan saldo Anda sebesar *Rp " . number_format($pencairan->jumlah_pencairan, 0, ',', '.') . "* telah *DISETUJUI* dan sedang dalam proses pengiriman ke akun DANA Anda.\n\n"
+                . "📅 *Tanggal Proses:* " . now()->format('d-m-Y H:i') . "\n"
+                . "💸 *Status:* Disetujui ✅\n\n"
+                . "Terima kasih telah menggunakan layanan *{$setting->nama}*. 🌱";
+
+            // 🔥 Kirim pesan via WhatsApp Service
+            $result = $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
+        }
+
+
         return back()->with('success', 'Permintaan pencairan saldo telah disetujui.');
     }
 
@@ -143,22 +166,26 @@ class PencairanSaldoController extends Controller
         $pencairan->tanggal_proses = now();
         $pencairan->save();
 
-        // Generate external_id unik
-        $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
+        // Ambil data nasabah berdasarkan user_id dari pencairan
+        $userNasabah = UserNasabah::with('nasabah')->where('nasabah_id', $pencairan->nasabah_id)->first();
+        $nasabah = $userNasabah ? $userNasabah->nasabah : null;
 
-        // Buat payload sesuai format disbursement Xendit
-        $payload = [
-            'external_id' => $externalId,
-            'amount' => (int) $request->amount,
-            'bank_code' => 'DANA', // ✅ HARUS: gunakan DANA sebagai bank_code
-            'account_holder_name' => $request->account_holder_name,
-            'account_number' => $request->phone_number, // ✅ HARUS: ini nomor telepon penerima
-            'description' => $request->remark ?? 'Disbursement ke DANA'
-        ];
+        
 
+        if ($nasabah) {
+            $setting = Setting::first();
+            $pesan = "*Pemberitahuan Penolakan Pencairan Saldo*\n\n"
+                . "Halo *{$nasabah->nama_lengkap}*, 👋\n"
+                . "Permintaan pencairan saldo Anda sebesar *Rp " . number_format($pencairan->jumlah_pencairan, 0, ',', '.') . "* telah *DITOLAK*.\n\n"
+                . "📅 *Tanggal Proses:* " . now()->format('d-m-Y H:i') . "\n"
+                . "📝 *Alasan Penolakan:* {$request->keterangan}\n\n"
+                . "Silakan hubungi admin untuk informasi lebih lanjut.\n\n"
+                . "Terima kasih telah menggunakan layanan *{$setting->nama}*. 🌱";
 
+            // Kirim pesan via WhatsApp Service
+            $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
+        }
 
-
-        return redirect()->route('tarik-saldo.index')->with('error', 'Pengajuan pencairan saldo ditolak.');
+        return back()->with('error', 'Pengajuan pencairan saldo telah ditolak.');
     }
 }
