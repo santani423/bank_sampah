@@ -41,4 +41,28 @@ class Nasabah extends Model
     {
         return $this->hasMany(PencairanSaldo::class, 'nasabah_id');
     }
+
+      /**
+     * Relasi ke tabel user_nasabahs
+     * Satu nasabah bisa memiliki satu user
+     */
+    public function userNasabah()
+    {
+        return $this->hasOne(UserNasabah::class, 'nasabah_id');
+    }
+
+    /**
+     * Relasi langsung ke tabel users melalui user_nasabahs
+     */
+    public function user()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            UserNasabah::class,
+            'nasabah_id', // Foreign key di tabel user_nasabahs
+            'id',         // Foreign key di tabel users
+            'id',         // Local key di tabel nasabahs
+            'user_id'     // Local key di tabel user_nasabahs
+        );
+    }
 }

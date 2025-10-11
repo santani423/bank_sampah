@@ -16,6 +16,7 @@ class SettingSeeder extends Seeder
         DB::table('settings')->insert([
             'nama' => 'Wostin',
             'logo' => 'wostin/files/assets/images/resources/logo.png',
+            'logo' => '088289445437',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

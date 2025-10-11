@@ -46,6 +46,11 @@
                         <input type="number" name="max_penarikan"
                             value="{{ old('max_penarikan', $setting->max_penarikan) }}" class="form-control" step="0.01">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-arrow-up-circle me-1"></i> WA Notifikasi</label>
+                        <input type="number" name="no_notifikasi"
+                            value="{{ old('no_notifikasi', $setting->no_notifikasi) }}" class="form-control" step="0.01">
+                    </div>
 
                     <div class="d-flex justify-content-end mt-4">
                         <button type="submit" class="btn btn-success">

@@ -12,8 +12,13 @@ class PencairanSaldo extends Model
     protected $table = 'pencairan_saldo';
 
     protected $fillable = [
-        'nasabah_id', 'metode_id', 'jumlah_pencairan',
-        'tanggal_pengajuan', 'tanggal_proses', 'status', 'keterangan'
+        'nasabah_id',
+        'metode_id',
+        'jumlah_pencairan',
+        'tanggal_pengajuan',
+        'tanggal_proses',
+        'status',
+        'keterangan'
     ];
 
     public function nasabah()
@@ -26,4 +31,8 @@ class PencairanSaldo extends Model
         return $this->belongsTo(MetodePencairan::class, 'metode_id');
     }
 
+    public function metode()
+    {
+        return $this->belongsTo(MetodePencairan::class, 'metode_id');
+    }
 }

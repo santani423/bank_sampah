@@ -28,12 +28,14 @@ class SettingController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'min_penarikan' => 'nullable|numeric|min:0',
             'max_penarikan' => 'nullable|numeric|min:0',
+            'no_notifikasi' => 'nullable|numeric|min:0',
         ]);
 
         $setting = Setting::findOrFail($id);
         $setting->nama = $request->nama;
         $setting->min_penarikan = $request->min_penarikan;
         $setting->max_penarikan = $request->max_penarikan;
+        $setting->no_notifikasi = $request->no_notifikasi;
 
         // Jika user upload logo baru
         if ($request->hasFile('logo')) {

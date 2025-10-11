@@ -97,7 +97,7 @@
         <!-- Submenu start -->
         <ul class="sidebar-submenu">
             <li class="sidebar-submenu__item">
-                <a href="{{ route('admin.transaksi.index') }}" class="sidebar-submenu__link">
+                <a href="{{ route('admin.token-whatsapp.index') }}" class="sidebar-submenu__link">
                     Token WhatsApp </a>
             </li>
             {{-- <li class="sidebar-submenu__item">
