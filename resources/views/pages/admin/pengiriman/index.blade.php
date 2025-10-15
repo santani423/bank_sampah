@@ -72,19 +72,23 @@
                                         <td class="text-center">
                                             <div class="row">
                                                 <div class="col">
-                                                    <a href="{{ route('petugas.pengiriman.show', $pengiriman->kode_pengiriman) }}"
+                                                    <a href="{{ route(Auth::user()->role . '.pengiriman.show', $pengiriman->kode_pengiriman) }}"
                                                         class="btn btn-sm btn-info">
                                                         Detail
                                                     </a>
                                                 </div>
-                                                <div class="col">
-                                                    <a href="{{ route('petugas.pengiriman.edit', $pengiriman->kode_pengiriman) }}"
-                                                        class="btn btn-sm btn-primary">
-                                                        Edit
-                                                    </a>
-                                                </div>
+
+                                                @if (Auth::user()->role === 'petugas')
+                                                    <div class="col">
+                                                        <a href="{{ route('petugas.pengiriman.edit', $pengiriman->kode_pengiriman) }}"
+                                                            class="btn btn-sm btn-primary">
+                                                            Edit
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </td>
+
                                     </tr>
                                     @empty
                                         <tr>

@@ -22,31 +22,48 @@ class PengirimanPengepulController extends Controller
 {
     public function index()
     {
-        // // Ambil data pengiriman sampah dengan relasi ke pengepul
-        // $pengirimanSampah = PengirimanPengepul::with('pengepul')
-        //     ->paginate(10);
+        $user = Auth::user();
 
-        // // Transformasi data langsung pada koleksi paginator
-        // $pengirimanSampah->getCollection()->transform(function ($pengiriman) {
-        //     // Hitung total berat sampah dalam pengiriman ini
-        //     $pengiriman->total_berat = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
-        //         ->sum('berat_kg');
+        if ($user->role === 'admin') {
+            // Jika admin, ambil seluruh data
+            $pengirimanSampah = PengirimanPetugas::with(
+                'detailPengiriman',
+                'gudang',
+                'cabang',
+                'petugas',
+                'files'
+            )
+                ->orderByDesc('tanggal_pengiriman')
+                ->orderByDesc('id')
+                ->get();
+        } else {
+            // Ambil cabang yang dikelola petugas login
+            $cabangIds = DB::table('cabangs as c')
+                ->join('petugas_cabangs as pc', 'c.id', '=', 'pc.cabang_id')
+                ->join('petugas as p', 'p.id', '=', 'pc.petugas_id')
+                ->where('p.email', $user->email)
+                ->pluck('c.id'); // ambil hanya ID cabang
 
-        //     // Hitung jumlah jenis sampah yang berbeda dalam pengiriman ini
-        //     $pengiriman->jumlah_jenis_sampah = DetailPengiriman::where('pengiriman_id', $pengiriman->id)
-        //         ->distinct('sampah_id')
-        //         ->count('sampah_id');
+            // Ambil pengiriman petugas sesuai cabang
+            $pengirimanSampah = PengirimanPetugas::with(
+                'detailPengiriman',
+                'gudang',
+                'cabang',
+                'petugas',
+                'files'
+            )
+                ->whereIn('cabang_id', $cabangIds)
+                ->orderByDesc('tanggal_pengiriman')
+                ->orderByDesc('id')
+                ->get();
+        }
 
-        //     return $pengiriman;
-        // });
+        
 
-        // // Tampilkan ke view
-
-
-        $pengirimanSampah = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas')->get();
-        // dd($pengirimanSampah);
         return view('pages.admin.pengiriman.index', compact('pengirimanSampah'));
     }
+
+
 
     public function generateUniqueShippingCode()
     {
@@ -121,7 +138,8 @@ class PengirimanPengepulController extends Controller
             'ref_file_id'         => 'nullable|array',
             'ref_file_id.*'       => 'nullable|integer|exists:ref_file_pengiriman_petugas,id',
         ]);
-
+        // dd($request->file('file_upload'));
+        // dd($request->ref_file_id);
         try {
             // Ambil user dan petugas aktif
             $user = User::findOrFail(Auth::id());
@@ -166,13 +184,14 @@ class PengirimanPengepulController extends Controller
             // === Upload File Pendukung ===
             if ($request->hasFile('file_upload')) {
                 foreach ($request->file('file_upload') as $index => $file) {
-                    if ($file && isset($request->ref_file_id[$index])) {
+                    $keyKtg = $index - 1; // Karena index array mulai dari 0
+                    if ($file && isset($request->ref_file_id[$keyKtg])) {
                         $fileName = time() . '_' . $file->getClientOriginalName();
                         $path = $file->storeAs('pengiriman', $fileName, 'public');
 
                         FilePengirimanPetugas::create([
                             'pengiriman_petugas_id' => $pengiriman->id,
-                            'ref_file_id'           => $request->ref_file_id[$index],
+                            'ref_file_id'           => $request->ref_file_id[$keyKtg],
                             'nama_file'             => $fileName,
                             'path_file'             => 'storage/' . $path,
                             'uploaded_by'           => Auth::id(),
@@ -219,7 +238,7 @@ class PengirimanPengepulController extends Controller
 
     public function edit($code)
     {
-        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas')->where('kode_pengiriman', $code)->first();
+        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas', 'files')->where('kode_pengiriman', $code)->first();
         $cabang = cabang::join('petugas_cabangs as pc', 'pc.cabang_id', '=', 'cabangs.id')
             ->join('petugas as p', 'p.id', '=', 'pc.petugas_id')
             ->join('users as u', 'u.email', '=', 'p.email')
@@ -239,8 +258,112 @@ class PengirimanPengepulController extends Controller
 
 
         $gudang = Gudang::all();
-        // dd($pengiriman->detail_pengiriman);
+        // dd($pengiriman->files);
         $refUpladPengiriman = RefFilePengirimanPetugas::orderBy('urutan', 'ASC')->get();
         return view('pages.admin.pengiriman.edit', compact('pengiriman', 'cabang', 'gudang', 'stokSampah', 'refUpladPengiriman'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'cabang_id'           => 'required|exists:cabangs,id',
+            'gudang_id'           => 'required|exists:gudangs,id',
+            'tanggal_pengiriman'  => 'required|date',
+            'catatan'             => 'nullable|string|max:1000',
+            'sampah_id'           => 'required|array|min:1',
+            'sampah_id.*'         => 'exists:sampah,id',
+            'berat_kg'            => 'required|array|min:1',
+            'berat_kg.*'          => 'numeric|min:0.01',
+            'file_upload'         => 'nullable|array',
+            'file_upload.*'       => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'ref_file_id'         => 'nullable|array',
+            'ref_file_id.*'       => 'nullable|integer|exists:ref_file_pengiriman_petugas,id',
+        ]);
+
+        try {
+            $pengiriman = PengirimanPetugas::findOrFail($id);
+
+            // Update data pengiriman utama
+            $pengiriman->update([
+                'cabang_id'          => $request->cabang_id,
+                'gudang_id'          => $request->gudang_id,
+                'tanggal_pengiriman' => $request->tanggal_pengiriman,
+                'catatan'            => $request->catatan,
+            ]);
+
+            // === Update Detail Sampah ===
+            $pengiriman->detailPengiriman()->delete();
+            foreach ($request->sampah_id as $index => $sampahId) {
+                $beratPengiriman = $request->berat_kg[$index];
+
+                $stokSampah = Sampah::with(['detailTransaksi', 'detailPengiriman'])->findOrFail($sampahId);
+                $totalSetoran = $stokSampah->detailTransaksi->sum('berat_kg');
+                $totalPengiriman = $stokSampah->detailPengiriman->sum('berat_kg');
+                $stokTersedia = $totalSetoran - $totalPengiriman;
+
+                if ($beratPengiriman > $stokTersedia) {
+                    return back()
+                        ->withErrors([
+                            'error' => "Stok sampah '{$stokSampah->nama_sampah}' tidak mencukupi. Stok tersedia hanya {$stokTersedia} kg."
+                        ])
+                        ->withInput();
+                }
+
+                DetailPengiriman::create([
+                    'pengiriman_id' => $pengiriman->id,
+                    'sampah_id'     => $sampahId,
+                    'berat_kg'      => $beratPengiriman,
+                ]);
+            }
+
+            // === Upload / Update File Pendukung ===
+            if ($request->hasFile('file_upload')) {
+                foreach ($request->file('file_upload') as $index => $file) {
+                    // Pastikan ref_file_id ada
+                    if (!isset($request->ref_file_id[$index])) continue;
+
+                    $refFileId = $request->ref_file_id[$index];
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->storeAs('pengiriman', $fileName, 'public');
+
+                    // Cari file lama berdasarkan ref_file_id
+                    $existingFile = FilePengirimanPetugas::where('pengiriman_petugas_id', $pengiriman->id)
+                        ->where('ref_file_id', $refFileId)
+                        ->first();
+
+                    if ($existingFile) {
+                        // Hapus file lama dari storage
+                        if ($existingFile->path_file && file_exists(public_path($existingFile->path_file))) {
+                            unlink(public_path($existingFile->path_file));
+                        }
+
+                        // Update record lama
+                        $existingFile->update([
+                            'nama_file'   => $fileName,
+                            'path_file'   => 'storage/' . $path,
+                            'uploaded_by' => Auth::id(),
+                            'uploaded_at' => now(),
+                        ]);
+                    } else {
+                        // Buat record baru jika sebelumnya tidak ada
+                        FilePengirimanPetugas::create([
+                            'pengiriman_petugas_id' => $pengiriman->id,
+                            'ref_file_id'           => $refFileId,
+                            'nama_file'             => $fileName,
+                            'path_file'             => 'storage/' . $path,
+                            'uploaded_by'           => Auth::id(),
+                            'uploaded_at'           => now(),
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()->route('petugas.pengiriman.index')
+                ->with('success', 'Pengiriman berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Terjadi kesalahan saat memperbarui pengiriman: ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 }

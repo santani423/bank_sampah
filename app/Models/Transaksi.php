@@ -17,7 +17,7 @@ class Transaksi extends Model
         'petugas_id',
         'tanggal_transaksi'
     ];
-
+    protected $with = ['detailTransaksi'];
     public function nasabah()
     {
         return $this->belongsTo(Nasabah::class, 'nasabah_id');

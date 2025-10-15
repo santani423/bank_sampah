@@ -33,7 +33,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('petugas.pengiriman.update', $pengiriman->id) }}" method="POST">
+            <form action="{{ route('petugas.pengiriman.update', $pengiriman->id) }}" method="POST"  enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -91,20 +91,20 @@
                         {{-- Upload File Pengiriman --}}
                         <h5 class="mt-4 mb-3">Upload Dokumen Pengiriman</h5>
                         <div class="row">
-                            @foreach ($refUpladPengiriman as $ref)
-                                <input type="hidden" name="ref_file_id[]" value="{{ $ref->id }}">
+                            @foreach ($pengiriman->files as $ref)
+                                <input type="hidden" name="ref_file_id[]" value="{{ $ref->refFile->id }}">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ $ref->nama_file }}
+                                    <label class="form-label">{{ $ref->refFile->nama_file }}
                                         @if ($ref->wajib)
                                             <span class="text-danger">*</span>
                                         @endif
                                     </label>
-                                    <input type="file" name="file_upload[{{ $ref->id }}]"
+                                    <input type="file" name="file_upload[{{ $ref->refFile->id }}]"
                                         class="form-control file-input" accept="image/*"
-                                        {{ $ref->wajib ? 'required' : '' }}>
-                                    <img id="preview-{{ $ref->id }}" class="preview-img d-none" alt="Preview">
+                                         >
+                                    <img id="preview-{{ $ref->refFile->id }}" class="preview-img d-none" alt="Preview">
                                     @if ($ref->deskripsi)
-                                        <small class="form-text text-muted">{{ $ref->deskripsi }}</small>
+                                        <small class="form-text text-muted">{{ $ref->refFile->deskripsi }}</small>
                                     @endif
                                 </div>
                             @endforeach
@@ -113,8 +113,9 @@
                         {{-- Catatan --}}
                         <div class="form-group mt-4">
                             <label>Catatan Pengiriman (Opsional)</label>
-                            <textarea name="catatan" class="form-control" rows="3" placeholder="Tambahkan catatan jika diperlukan...">{{ old('catatan') }}</textarea>
+                            <textarea name="catatan" class="form-control" rows="3" placeholder="Tambahkan catatan jika diperlukan...">{{ old('catatan', $pengiriman->catatan) }}</textarea>
                         </div>
+
                     </div>
                 </div>
 

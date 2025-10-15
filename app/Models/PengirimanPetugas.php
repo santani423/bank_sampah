@@ -10,7 +10,7 @@ class PengirimanPetugas extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
-
+    
     /**
      * Relasi ke tabel detail_pengiriman
      * Setiap pengiriman_petugas memiliki banyak detail pengiriman
@@ -20,7 +20,7 @@ class PengirimanPetugas extends Model
         return $this->hasMany(DetailPengiriman::class, 'pengiriman_id');
     }
 
-     /**
+    /**
      * Relasi ke tabel cabangs
      * Setiap pengiriman petugas dimiliki oleh satu cabang
      */
@@ -29,7 +29,7 @@ class PengirimanPetugas extends Model
         return $this->belongsTo(Cabang::class, 'cabang_id');
     }
 
-      /**
+    /**
      * Relasi ke tabel gudangs
      * Setiap pengiriman petugas dilakukan ke satu gudang
      */
@@ -42,5 +42,14 @@ class PengirimanPetugas extends Model
     public function petugas()
     {
         return $this->belongsTo(Petugas::class, 'petugas_id');
+    }
+
+    /**
+     * Relasi ke tabel file_pengiriman_petugas
+     * Setiap pengiriman petugas bisa memiliki banyak file
+     */
+    public function files()
+    {
+        return $this->hasMany(FilePengirimanPetugas::class, 'pengiriman_petugas_id');
     }
 }

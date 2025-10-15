@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
+        {{-- <div class="col-sm-6 col-md-3">
             <div class="card card-stats card-round">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <div class="col-sm-6 col-md-3">
             <div class="card card-stats card-round">
                 <div class="card-body">
@@ -93,7 +93,7 @@
                         <div class="col col-stats ms-3 ms-sm-0">
                             <div class="numbers">
                                 <p class="card-category">Total Sampah</p>
-                                <h4 class="card-title">Rp {{ number_format($penarikan ?? 0, 0, ',', '.') }}</h4>
+                                <h4 class="card-title">{{ $totalBerat }} Kg</h4>
                             </div>
                         </div>
                     </div>
