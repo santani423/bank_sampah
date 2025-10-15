@@ -141,7 +141,7 @@
                                 @forelse ($riwayatPenarikan as $index => $penarikan)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $penarikan->tanggal_pengajuan }}</td>
+                                        <td>{{ $penarikan->created_at }}</td>
                                         <td>Rp{{ number_format($penarikan->jumlah_pencairan, 2) }}</td>
                                         <td>{{ ucfirst($penarikan->status) }}</td>
                                         <td>{{ $penarikan->keterangan ?? '-' }}</td>

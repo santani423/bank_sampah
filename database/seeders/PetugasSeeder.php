@@ -75,12 +75,12 @@ class PetugasSeeder extends Seeder
             $name = $faker->name;
             $email = $faker->unique()->safeEmail;
             $username = 'petugas' . $i;
-
+            $pss = Hash::make('12345678');
             DB::table('petugas')->insert([
                 'nama' => $name,
                 'email' => $email,
                 'username' => $username,
-                'password' => Hash::make('12345678'),
+                'password' => $pss,
                 'role' => 'petugas',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -90,7 +90,7 @@ class PetugasSeeder extends Seeder
                 'name' => $name,
                 'email' => $email,
                 'username' => $username,
-                'password' => Hash::make('12345678'),
+                'password' => $pss,
                 'role' => 'petugas',
                 'created_at' => now(),
                 'updated_at' => now(),

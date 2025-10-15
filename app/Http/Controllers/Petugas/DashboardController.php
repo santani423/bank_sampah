@@ -9,6 +9,7 @@ use App\Models\DetailTransaksi;
 use App\Models\saldoPetugas;
 use App\Models\Transaksi;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -17,7 +18,19 @@ class DashboardController extends Controller
         // Total Nasabah
 
         $auth = auth()->user();
-        $totalNasabah = Nasabah::count();
+
+
+        // Hitung total nasabah langsung di DB
+        $totalNasabah = Nasabah::join('user_nasabahs', 'nasabah.id', '=', 'user_nasabahs.nasabah_id')
+            ->join('cabang_users', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
+            ->join('cabangs', 'cabang_users.cabang_id', '=', 'cabangs.id')
+            ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
+            ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id')
+            ->where('petugas.email', auth()->user()->email)
+            ->distinct('nasabah.id') // pastikan hanya menghitung nasabah unik
+            ->count('nasabah.id'); // langsung dihitung di DB
+
+
         $saldoPetugas =  SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
             ->where('petugas.email', auth()->user()->email)
             ->first();

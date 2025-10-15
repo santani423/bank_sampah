@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class PetugasController extends Controller
 {
@@ -33,12 +34,24 @@ class PetugasController extends Controller
             'role' => 'required|in:admin,petugas'
         ]);
 
+        $pss = Hash::make($request->password);
+
         Petugas::create([
             'nama' => $request->nama,
             'email' => $request->email,
             'username' => $request->username,
-            'password' => Hash::make($request->password),
+            'password' => $pss,
             'role' => $request->role,
+        ]);
+
+        DB::table('users')->insert([
+            'name' => $request->nama,
+            'email' => $request->email,
+            'username' => $request->username,
+            'password' => $pss,
+            'role' => 'petugas',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil ditambahkan.');
@@ -72,10 +85,10 @@ class PetugasController extends Controller
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil diperbarui.');
     }
 
-    public function destroy( $petugas)
+    public function destroy($petugas)
     {
-   
-       Petugas::whereId($petugas)->delete();
+
+        Petugas::whereId($petugas)->delete();
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil dihapus.');
     }
 }

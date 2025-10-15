@@ -66,6 +66,7 @@
                                     <th>Nama</th>
                                     <th>No. Registrasi</th>
                                     <th>No. HP</th> 
+                                    <th>Cabang</th> 
                                     <th>Status</th>
                                     <th style="width: 250px">Aksi</th>
                                 </tr>
@@ -77,6 +78,7 @@
                                         <td>{{ $nasabah->nama_lengkap }}</td>
                                         <td>{{ $nasabah->no_registrasi }}</td>
                                         <td>{{ $nasabah->no_hp }}</td>
+                                        <td>{{ $nasabah->nama_cabang }}</td>
                                          
                                         <td>
                                             @if ($nasabah->status === 'aktif')

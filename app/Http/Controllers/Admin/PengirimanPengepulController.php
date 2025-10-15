@@ -9,9 +9,11 @@ use App\Models\Pengepul;
 use App\Models\Sampah;
 use App\Models\PengirimanPengepul;
 use App\Models\DetailPengiriman;
+use App\Models\FilePengirimanPetugas;
 use App\Models\Gudang;
 use App\Models\PengirimanPetugas;
 use App\Models\Petugas;
+use App\Models\RefFilePengirimanPetugas;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -97,77 +99,99 @@ class PengirimanPengepulController extends Controller
         $gudang = Gudang::all();
 
 
+        $refUpladPengiriman = RefFilePengirimanPetugas::orderBy('urutan', 'ASC')->get();
 
 
-
-        return view('pages.admin.pengiriman.create', compact('pengepulList', 'stokSampah', 'kodePengiriman', 'cabang', 'gudang'));
+        return view('pages.admin.pengiriman.create', compact('pengepulList', 'stokSampah', 'kodePengiriman', 'cabang', 'gudang', 'refUpladPengiriman'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'cabang_id' => 'required|exists:cabangs,id',
-            'gudang_id' => 'required|exists:gudangs,id',
-            'tanggal_pengiriman' => 'required|date',
-            'sampah_id' => 'required|array',
-            'sampah_id.*' => 'exists:sampah,id',
-            'berat_kg' => 'required|array',
-            'berat_kg.*' => 'numeric|min:0',
+            'cabang_id'           => 'required|exists:cabangs,id',
+            'gudang_id'           => 'required|exists:gudangs,id',
+            'tanggal_pengiriman'  => 'required|date',
+            'catatan'             => 'nullable|string|max:1000',
+            'sampah_id'           => 'required|array|min:1',
+            'sampah_id.*'         => 'exists:sampah,id',
+            'berat_kg'            => 'required|array|min:1',
+            'berat_kg.*'          => 'numeric|min:0.01',
+            'file_upload'         => 'nullable|array',
+            'file_upload.*'       => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'ref_file_id'         => 'nullable|array',
+            'ref_file_id.*'       => 'nullable|integer|exists:ref_file_pengiriman_petugas,id',
         ]);
-        // dd($request->all());
+
         try {
-            $user = User::whereId(Auth::id())->first();
-            $petugas = Petugas::where('email', $user->email)->first();
-            // dd($request->sampah_id);
+            // Ambil user dan petugas aktif
+            $user = User::findOrFail(Auth::id());
+            $petugas = Petugas::where('email', $user->email)->firstOrFail();
+
             // Buat data pengiriman utama
             $pengiriman = PengirimanPetugas::create([
-                'kode_pengiriman' => $request->kode_pengiriman,
-                'cabang_id' => $request->cabang_id,
-                'gudang_id' => $request->gudang_id,
-                'petugas_id' => $petugas->id,
+                'kode_pengiriman'    => $request->kode_pengiriman,
+                'cabang_id'          => $request->cabang_id,
+                'gudang_id'          => $request->gudang_id,
+                'petugas_id'         => $petugas->id,
                 'tanggal_pengiriman' => $request->tanggal_pengiriman,
+                'catatan'            => $request->catatan,
             ]);
 
-            $totalHargaKeseluruhan = 0;
-
-
+            // === Simpan Detail Sampah ===
             foreach ($request->sampah_id as $index => $sampahId) {
                 $beratPengiriman = $request->berat_kg[$index];
-                // $hargaPerKg = $request->harga_per_kg[$index];
 
-                // Ambil data stok dinamis
-                $stokSampah = Sampah::with(['detailTransaksi', 'detailPengiriman'])->find($sampahId);
+                // Ambil stok dinamis
+                $stokSampah = Sampah::with(['detailTransaksi', 'detailPengiriman'])->findOrFail($sampahId);
                 $totalSetoran = $stokSampah->detailTransaksi->sum('berat_kg');
                 $totalPengiriman = $stokSampah->detailPengiriman->sum('berat_kg');
                 $stokTersedia = $totalSetoran - $totalPengiriman;
 
                 // Validasi stok
                 if ($beratPengiriman > $stokTersedia) {
-                    return redirect()->back()->withErrors(['error' => "Stok sampah '{$stokSampah->nama_sampah}' tidak mencukupi. Stok tersedia hanya {$stokTersedia} kg."])->withInput();
+                    return back()
+                        ->withErrors([
+                            'error' => "Stok sampah '{$stokSampah->nama_sampah}' tidak mencukupi. Stok tersedia hanya {$stokTersedia} kg."
+                        ])
+                        ->withInput();
                 }
 
-                // Hitung harga total
-                // $hargaTotal = $beratPengiriman * $hargaPerKg;
-                // $totalHargaKeseluruhan += $hargaTotal;
-
-                // Simpan detail pengiriman
                 DetailPengiriman::create([
                     'pengiriman_id' => $pengiriman->id,
-                    'sampah_id' => $sampahId,
-                    'berat_kg' => $beratPengiriman,
-                    // 'harga_per_kg' => $hargaPerKg,
-                    // 'harga_total' => $hargaTotal,
+                    'sampah_id'     => $sampahId,
+                    'berat_kg'      => $beratPengiriman,
                 ]);
             }
 
-            // Update total harga keseluruhan di tabel pengiriman jika diperlukan
-            // $pengiriman->update(['total_harga' => $totalHargaKeseluruhan]);
+            // === Upload File Pendukung ===
+            if ($request->hasFile('file_upload')) {
+                foreach ($request->file('file_upload') as $index => $file) {
+                    if ($file && isset($request->ref_file_id[$index])) {
+                        $fileName = time() . '_' . $file->getClientOriginalName();
+                        $path = $file->storeAs('pengiriman', $fileName, 'public');
 
-            return redirect()->route('petugas.pengiriman.index')->with('success', 'Pengiriman berhasil ditambahkan.');
+                        FilePengirimanPetugas::create([
+                            'pengiriman_petugas_id' => $pengiriman->id,
+                            'ref_file_id'           => $request->ref_file_id[$index],
+                            'nama_file'             => $fileName,
+                            'path_file'             => 'storage/' . $path,
+                            'uploaded_by'           => Auth::id(),
+                            'uploaded_at'           => now(),
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()
+                ->route('petugas.pengiriman.index')
+                ->with('success', 'Pengiriman dan file berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data pengiriman: ' . $e->getMessage()])->withInput();
+            return back()->withErrors([
+                'error' => 'Terjadi kesalahan saat menyimpan data pengiriman: ' . $e->getMessage()
+            ])->withInput();
         }
     }
+
 
 
     public function destroy($id)
@@ -216,6 +240,7 @@ class PengirimanPengepulController extends Controller
 
         $gudang = Gudang::all();
         // dd($pengiriman->detail_pengiriman);
-        return view('pages.admin.pengiriman.edit', compact('pengiriman', 'cabang', 'gudang','stokSampah'));
+        $refUpladPengiriman = RefFilePengirimanPetugas::orderBy('urutan', 'ASC')->get();
+        return view('pages.admin.pengiriman.edit', compact('pengiriman', 'cabang', 'gudang', 'stokSampah', 'refUpladPengiriman'));
     }
 }
