@@ -59,11 +59,7 @@
         <!-- sidebar close btn -->
 
         <div style="display: flex; justify-content: center;">
-            <a href="#"
-                class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10">
-                <img src="{{ asset('wostin/files/assets/images/resources/logo.png') }}" alt="Logo"
-                    style="width: 100%; height: auto;">
-            </a>
+            <x-LogoComponent />
         </div>
 
         <div class="sidebar-menu-wrapper overflow-y-auto scroll-sm">
@@ -329,8 +325,7 @@
                                             class="py-12 text-15 px-20 hover-bg-gray-50 text-gray-300 rounded-8 flex-align gap-8 fw-medium text-15">
                                             <span class="text-2xl text-primary-600 d-flex"><svg
                                                     xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    fill="currentColor" class="bi bi-person-fill"
-                                                    viewBox="0 0 16 16">
+                                                    fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
                                                     <path
                                                         d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
                                                 </svg></span>

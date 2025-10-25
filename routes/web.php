@@ -45,17 +45,18 @@ use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenar
 
  
 
-Route::controller(landingPageController::class)->group(function () {
-    Route::get('/', 'index')->name('home');
-    Route::get('kegiatan', 'kegiatan')->name('kegiatan');
-    Route::get('about', 'about')->name('about');
-    Route::get('berita', 'berita')->name('berita');
-    Route::get('berita/{id}', 'beritaDetail')->name('berita.detail');
-    Route::get('berita/kategori/{id}', 'beritaKategori')->name('berita.kategori');
-});
+// Route::controller(landingPageController::class)->group(function () {
+//     Route::get('/', 'index')->name('home');
+//     Route::get('kegiatan', 'kegiatan')->name('kegiatan');
+//     Route::get('about', 'about')->name('about');
+//     Route::get('berita', 'berita')->name('berita');
+//     Route::get('berita/{id}', 'beritaDetail')->name('berita.detail');
+//     Route::get('berita/kategori/{id}', 'beritaKategori')->name('berita.kategori');
+// });
 
 
 Route::middleware('guest')->group(function () {
+    Route::get('/', [AuthController::class, 'showLoginForm'])->name('home');
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
 

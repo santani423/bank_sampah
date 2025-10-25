@@ -107,6 +107,10 @@
                 <a href="{{ route('admin.tentang_kami.index') }}" class="sidebar-submenu__link">
                     Tentang Kami </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.settings.index') }}" class="sidebar-submenu__link">
+                    Applikasi </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>

@@ -25,28 +25,63 @@ class SettingController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'keywords' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'google_map' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:255',
+            'instagram' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'youtube' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
+            'no_notifikasi' => 'nullable|string|max:255',
             'min_penarikan' => 'nullable|numeric|min:0',
             'max_penarikan' => 'nullable|numeric|min:0',
-            'no_notifikasi' => 'nullable|numeric|min:0',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'favicon' => 'nullable|image|mimes:jpeg,png,jpg,ico,webp|max:1024',
         ]);
 
         $setting = Setting::findOrFail($id);
-        $setting->nama = $request->nama;
-        $setting->min_penarikan = $request->min_penarikan;
-        $setting->max_penarikan = $request->max_penarikan;
-        $setting->no_notifikasi = $request->no_notifikasi;
 
-        // Jika user upload logo baru
+        // Update kolom teks langsung
+        $setting->fill([
+            'nama' => $request->nama,
+            'title' => $request->title,
+            'description' => $request->description,
+            'keywords' => $request->keywords,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'google_map' => $request->google_map,
+            'whatsapp' => $request->whatsapp,
+            'instagram' => $request->instagram,
+            'twitter' => $request->twitter,
+            'youtube' => $request->youtube,
+            'tiktok' => $request->tiktok,
+            'no_notifikasi' => $request->no_notifikasi,
+            'min_penarikan' => $request->min_penarikan,
+            'max_penarikan' => $request->max_penarikan,
+        ]);
+
+        // === Upload Logo Baru (jika ada) ===
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada
             if ($setting->logo && Storage::disk('public')->exists($setting->logo)) {
                 Storage::disk('public')->delete($setting->logo);
             }
-
-            // Simpan logo baru
             $path = $request->file('logo')->store('logos', 'public');
             $setting->logo = $path;
+        }
+
+        // === Upload Favicon Baru (jika ada) ===
+        if ($request->hasFile('favicon')) {
+            if ($setting->favicon && Storage::disk('public')->exists($setting->favicon)) {
+                Storage::disk('public')->delete($setting->favicon);
+            }
+            $path = $request->file('favicon')->store('favicons', 'public');
+            $setting->favicon = $path;
         }
 
         $setting->save();
