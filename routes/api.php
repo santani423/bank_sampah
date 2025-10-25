@@ -25,5 +25,5 @@ use App\Http\Controllers\TessController;
  Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
  Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
- Route::get('/setting', [SettingController::class, 'index'])->name('api.setting');
+ Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
  Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);

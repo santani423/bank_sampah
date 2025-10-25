@@ -12,10 +12,23 @@ class SettingController extends Controller
      */
     public function index()
     {
-        $setting = setting::first();
-        
+        $setting = Setting::first();
+
+        if ($setting) {
+            $baseUrl = url('storage');
+
+            $setting->logo = $setting->logo
+                ? $baseUrl . '/' . ltrim($setting->logo, '/')
+                : null;
+
+            $setting->favicon = $setting->favicon
+                ? $baseUrl . '/' . ltrim($setting->favicon, '/')
+                : null;
+        }
+
         return response()->json($setting);
     }
+
 
     /**
      * Show the form for creating a new resource.
