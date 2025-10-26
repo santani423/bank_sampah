@@ -56,11 +56,12 @@ class ActivityController extends Controller
     }
 
     // Menampilkan satu activity
-    public function show($id)
+    public function show($slug)
     {
-        $activity = Activity::with('label')->findOrFail($id);
+        $activity = Activity::with('label')->where('slug', $slug)->firstOrFail();
         return new ActivityResource($activity);
     }
+
 
     // Update activity
     public function update(Request $request, $id)
