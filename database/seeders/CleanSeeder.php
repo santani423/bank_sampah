@@ -18,7 +18,7 @@ class CleanSeeder extends Seeder
                 'title' => $title,
                 'slug' => Str::slug($title) . '-' . Str::random(5),
                 'description' => $faker->paragraph(4),
-                'image' => 'uploads/cleans/clean' . $i . '.jpg',
+                'image' => 'cleans/JMGlcVu913taC15FM11NXcDO1BWoiExgswMLS82k.jpg' ,
                 'status' => $faker->randomElement(['active', 'inactive']),
                 'created_at' => now(),
                 'updated_at' => now(),
