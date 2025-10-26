@@ -60,6 +60,9 @@
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.labels.index') }}" class="sidebar-submenu__link"> Label </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.activities.index') }}" class="sidebar-submenu__link"> Activities </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>

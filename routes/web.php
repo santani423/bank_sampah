@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
@@ -78,6 +79,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
     Route::resource('/data-time', TimeController::class)->names('admin.time');
     Route::resource('/data-label', LabelController::class)->names('admin.labels');
+    Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
     Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten

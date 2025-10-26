@@ -8,6 +8,7 @@ use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiControll
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TessController;
 use App\Http\Controllers\Api\TimeApiController;
+use App\Http\Controllers\API\ActivityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,11 @@ Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
 Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
 Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
+
+
+
+Route::apiResource('activities', ActivityController::class);
+
 
 
 

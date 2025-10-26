@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GudangSeeder::class);
         $this->call(RefFilePengirimanPetugasSeeder::class);
         $this->call(LabelSeeder::class);
+        $this->call(ActivitySeeder::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
