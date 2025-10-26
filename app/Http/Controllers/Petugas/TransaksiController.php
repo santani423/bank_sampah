@@ -173,6 +173,7 @@ class TransaksiController extends Controller
 
         $sldPtgs = SaldoPetugas::where('id', $saldoPetugas->id)->first();
         $sldPtgs->saldo = $sldPtgs->saldo - $totalTransaksi;
+        
         $sldPtgs->save();
 
         // Redirect ke halaman cetak nota transaksi

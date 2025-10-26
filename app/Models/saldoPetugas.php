@@ -9,5 +9,8 @@ use App\Traits\LogsActivity;
 class saldoPetugas extends Model
 {
     use HasFactory, LogsActivity;
-    protected $guarded = [];
+    protected $fillable = [
+        'petugas_id',
+        'saldo',
+    ];
 }
