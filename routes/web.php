@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
     Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
     Route::resource('/data-time', TimeController::class)->names('admin.time');
+    Route::resource('/data-label', LabelController::class)->names('admin.labels');
     Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten

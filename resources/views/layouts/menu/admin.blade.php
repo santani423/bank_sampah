@@ -57,6 +57,9 @@
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.time.index') }}" class="sidebar-submenu__link"> Time </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.labels.index') }}" class="sidebar-submenu__link"> Label </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>
