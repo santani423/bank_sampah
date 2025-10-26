@@ -9,6 +9,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TessController;
 use App\Http\Controllers\Api\TimeApiController;
 use App\Http\Controllers\API\ActivityController;
+use App\Http\Controllers\Api\CleanController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +32,8 @@ Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.su
 Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
 Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
 
+
+Route::apiResource('cleans', CleanController::class);
 
 
 Route::apiResource('activities', ActivityController::class);
