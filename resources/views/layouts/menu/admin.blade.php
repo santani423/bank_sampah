@@ -27,8 +27,8 @@
                 </a>
             </li>
             <li class="sidebar-submenu__item">
-                <a href="{{ route('admin.pengepul.index') }}" class="sidebar-submenu__link"> Data
-                    Pengepul </a>
+                <a href="{{ route('admin.gudangs.index') }}" class="sidebar-submenu__link"> Data
+                    Gudang </a>
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.cabang.index') }}" class="sidebar-submenu__link"> Data

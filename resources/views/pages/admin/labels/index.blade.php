@@ -3,23 +3,7 @@
 @section('title', 'Daftar Label')
 
 @push('style')
-<style>
-    /* Semua teks tabel jadi hitam */
-    table.table td,
-    table.table th {
-        color: #000 !important;
-    }
-
-    /* Header tabel juga hitam */
-    table.table thead th {
-        color: #000 !important;
-    }
-
-    /* Badge warna tetap dengan teks putih */
-    table.table td span {
-        color: #fff !important;
-    }
-</style>
+    <!-- CSS Libraries -->
 @endpush
 
 @section('main')
@@ -47,8 +31,8 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table class="table table-striped align-middle">
-                        <thead>
+                    <table class="table table-hover table-bordered table-head-bg-primary">
+                        <thead class="table-dark">
                             <tr>
                                 <th>#</th>
                                 <th>Nama Label</th>
@@ -66,7 +50,7 @@
                                     <td>{{ $label->slug }}</td>
                                     <td>
                                         @if($label->color)
-                                            <span style="background: {{ $label->color }}; padding:4px 12px; border-radius:8px;">
+                                            <span style="background: {{ $label->color }}; padding:4px 12px; border-radius:8px; color:#fff;">
                                                 {{ $label->color }}
                                             </span>
                                         @else

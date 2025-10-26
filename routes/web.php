@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 use App\Http\Controllers\CleanController;
+use App\Http\Controllers\GudangController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
@@ -82,6 +83,9 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-time', TimeController::class)->names('admin.time');
     Route::resource('/data-label', LabelController::class)->names('admin.labels');
     Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
+    Route::resource('/data-gudang', GudangController::class)->names('admin.gudangs');
+    Route::post('admin/gudangs/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
+
 
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
     Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
