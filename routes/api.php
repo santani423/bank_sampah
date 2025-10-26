@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TessController;
+use App\Http\Controllers\Api\TimeApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,8 +23,18 @@ use App\Http\Controllers\TessController;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
- Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
+Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
- Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
- Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
- Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
+Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
+Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
+Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
+
+
+
+Route::prefix('times')->group(function () {
+    Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
+    Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
+    Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data
+    Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
+    Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
+});

@@ -32,6 +32,8 @@ use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardControll
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
+use App\Http\Controllers\TimeController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -73,6 +75,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-sampah', AdminSampahController::class)->names('admin.sampah');
     Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
     Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
+    Route::resource('/data-time', TimeController::class)->names('admin.time');
     Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten

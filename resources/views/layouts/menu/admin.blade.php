@@ -45,7 +45,7 @@
         </a>
         <!-- Submenu start -->
         <ul class="sidebar-submenu">
-            <li class="sidebar-submenu__item">
+            {{-- <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.banner.index') }}" class="sidebar-submenu__link"> Data
                     Banner
                 </a>
@@ -53,6 +53,9 @@
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.artikel.index') }}" class="sidebar-submenu__link"> Data
                     Artikel </a>
+            </li> --}}
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.time.index') }}" class="sidebar-submenu__link"> Time </a>
             </li>
         </ul>
         <!-- Submenu End -->
