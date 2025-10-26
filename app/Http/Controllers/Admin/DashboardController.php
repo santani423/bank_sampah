@@ -65,4 +65,8 @@ class DashboardController extends Controller
             'nasabahTerbaik'
         ));
     }
+
+    public function faceUser() {
+        return view('pages.admin.faceUser');
+    }
 }

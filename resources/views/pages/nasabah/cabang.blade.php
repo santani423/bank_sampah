@@ -16,7 +16,7 @@
                     <h4>Daftar Cabang</h4>
                     <!-- Tombol Tambah Cabang -->
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCabang">
-                        Tambah Cabang
+                        Pilih Cabang
                     </button>
                 </div>
 

@@ -123,6 +123,10 @@
                 <a href="{{ route('admin.settings.index') }}" class="sidebar-submenu__link">
                     Applikasi </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.faceUser') }}" class="sidebar-submenu__link">
+                    Fack User </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>

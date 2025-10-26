@@ -25,21 +25,31 @@ class CabangController extends Controller
 
     public function store(Request $request)
     {
-        // Logic for joining a cabang
-        $nasabah =  UserNasabah::where('user_id', auth()->id())->first();
+        // Ambil data nasabah yang login
+        $nasabah = UserNasabah::where('user_id', auth()->id())->first();
 
-        $cbg = cabang::findOrFail($request->id);
-        $cabangNasabah = CabangUser::where('user_nasabah_id', $nasabah->id)->where('cabang_id', $request->id)->first();
+        // Ambil cabang yang ingin digabung
+        $cbg = Cabang::findOrFail($request->id);
+
+        // Cek apakah user sudah tergabung dengan cabang ini
+        $cabangNasabah = CabangUser::where('user_nasabah_id', $nasabah->id)->first();
 
         if ($cabangNasabah) {
-            return redirect()->route('nasabah.cabang.index')->with('error', 'Anda sudah bergabung dengan cabang ' . $cbg->nama_cabang);
-        }
- 
-        $cabang = new CabangUser;
+            // Jika sudah ada, update cabang_id
+            $cabangNasabah->cabang_id = $request->id;
+            $cabangNasabah->save();
 
-        $cabang->cabang_id = $request->id;
-        $cabang->user_nasabah_id = $nasabah->id; 
-        $cabang->save(); 
-        return redirect()->route('nasabah.cabang.index')->with('success', 'Anda telah bergabung dengan cabang ' . $cbg->nama_cabang);
+            return redirect()->route('nasabah.cabang.index')
+                ->with('success', 'Cabang Anda telah diperbarui menjadi ' . $cbg->nama_cabang);
+        } else {
+            // Jika belum ada, buat record baru
+            $cabang = new CabangUser;
+            $cabang->cabang_id = $request->id;
+            $cabang->user_nasabah_id = $nasabah->id;
+            $cabang->save();
+
+            return redirect()->route('nasabah.cabang.index')
+                ->with('success', 'Anda telah bergabung dengan cabang ' . $cbg->nama_cabang);
+        }
     }
 }

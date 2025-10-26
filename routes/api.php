@@ -10,7 +10,7 @@ use App\Http\Controllers\TessController;
 use App\Http\Controllers\Api\TimeApiController;
 use App\Http\Controllers\API\ActivityController;
 use App\Http\Controllers\Api\CleanController;
-
+use App\Http\Controllers\Api\UserFaceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +37,11 @@ Route::apiResource('cleans', CleanController::class);
 
 
 Route::apiResource('activities', ActivityController::class);
+
+
+
+Route::post('/user-face/create', [UserFaceController::class, 'create']);
+
 
 
 
