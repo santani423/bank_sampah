@@ -31,7 +31,7 @@ Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
 
 
 
-Route::prefix('times')->group(function () {
+Route::prefix('teams')->group(function () {
     Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
     Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
     Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data

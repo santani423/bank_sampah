@@ -12,7 +12,13 @@ class TimeApiController extends Controller
     // GET /api/times
     public function index()
     {
-        $times = Time::latest()->get();
+        $times = Time::latest()->get()->map(function ($time) {
+            if ($time->avatar) {
+                $time->avatar = asset(Storage::url($time->avatar));
+            }
+            return $time;
+        });
+
         return response()->json([
             'status' => 'success',
             'data' => $times
@@ -26,6 +32,10 @@ class TimeApiController extends Controller
 
         if (!$time) {
             return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        if ($time->avatar) {
+            $time->avatar = asset(Storage::url($time->avatar));
         }
 
         return response()->json(['status' => 'success', 'data' => $time]);
@@ -46,6 +56,11 @@ class TimeApiController extends Controller
         }
 
         $time = Time::create($validated);
+
+        // Tambahkan URL avatar ke respons
+        if ($time->avatar) {
+            $time->avatar = asset(Storage::url($time->avatar));
+        }
 
         return response()->json([
             'status' => 'success',
@@ -71,7 +86,6 @@ class TimeApiController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            // Hapus avatar lama jika ada
             if ($time->avatar && Storage::disk('public')->exists($time->avatar)) {
                 Storage::disk('public')->delete($time->avatar);
             }
@@ -80,6 +94,10 @@ class TimeApiController extends Controller
         }
 
         $time->update($validated);
+
+        if ($time->avatar) {
+            $time->avatar = asset(Storage::url($time->avatar));
+        }
 
         return response()->json([
             'status' => 'success',
@@ -97,7 +115,6 @@ class TimeApiController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
 
-        // Hapus avatar dari storage jika ada
         if ($time->avatar && Storage::disk('public')->exists($time->avatar)) {
             Storage::disk('public')->delete($time->avatar);
         }
