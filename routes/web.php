@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
+use App\Http\Controllers\CleanController;
 // Petugas Controller
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
@@ -47,7 +48,7 @@ use App\Http\Controllers\TimeController;
 |
 */
 
- 
+
 
 // Route::controller(landingPageController::class)->group(function () {
 //     Route::get('/', 'index')->name('home');
@@ -80,6 +81,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-time', TimeController::class)->names('admin.time');
     Route::resource('/data-label', LabelController::class)->names('admin.labels');
     Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
+
+    Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
     Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten
@@ -134,7 +137,7 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
     Route::get('/dashboard', [NasabahDashboardController::class, 'index'])->name('nasabah.dashboard');
     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('nasabah.profile');
     Route::put('/update/{id}', [NasabahDashboardController::class, 'update'])->name('nasabah.update');
-     
+
     // Data Cabang
     Route::resource('/cabang', NasabahCabangController::class)->names('nasabah.cabang');
     // Transaksi
@@ -144,8 +147,6 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('nasabah.transaksi.print');
 
     Route::resource('/metode-penarikan', NasabahMetodePenarikanController::class)->names('nasabah.metode-penarikan');
-
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-

@@ -63,6 +63,9 @@
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.activities.index') }}" class="sidebar-submenu__link"> Activities </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.cleans.index') }}" class="sidebar-submenu__link"> Mitra </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>
