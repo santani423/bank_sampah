@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('saldo_petugas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('petugas_id')->constrained()->onDelete('cascade'); 
-            $table->longText('temp_before_data');  
+            $table->longText('temp_before_data')->nullable();  
             $table->bigInteger('saldo');  
             $table->timestamps();
         });
