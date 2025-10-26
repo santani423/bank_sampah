@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('nama')->nullable();    
-            $table->string('logo')->nullable();    
+            $table->string('logo')->nullable();   
+            $table->longText('temp_before_data')->nullable();   
             $table->timestamps();
         });
     }

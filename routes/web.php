@@ -37,7 +37,7 @@ use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiC
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
 use App\Http\Controllers\TimeController;
-
+use Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -155,3 +155,16 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+
+
+Route::get('storage/{filename}', function ($filename) {
+    $path = storage_path('app/public/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return Response::file($path);
+});
+
