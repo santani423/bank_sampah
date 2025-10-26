@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class PengirimanPetugas extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $guarded = ['id'];
-    
+
     /**
      * Relasi ke tabel detail_pengiriman
      * Setiap pengiriman_petugas memiliki banyak detail pengiriman

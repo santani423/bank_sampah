@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\LogsActivity;  
 
 class Activity extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity; 
 
     protected $table = 'activities';
 
@@ -22,7 +23,7 @@ class Activity extends Model
         'location',
         'image',
         'status',
-        'label_id', // tambahkan label_id
+        'label_id',  
     ];
 
     // Auto-generate slug dari title

@@ -6,11 +6,13 @@ use App\Models\Label;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+
 class LabelController extends Controller
 {
+    
     public function index()
     {
-        $labels = Label::latest()->paginate(10);
+        $labels = Label::latest()->paginate(100);
         return view('pages.admin.labels.index', compact('labels'));
     }
 

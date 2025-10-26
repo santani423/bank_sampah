@@ -4,17 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class Nasabah extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'nasabah';
 
     protected $fillable = [
-        'no_registrasi', 'nik', 'nama_lengkap', 'jenis_kelamin',
-        'tempat_lahir', 'tanggal_lahir', 'no_hp', 'email',
-        'username', 'password', 'alamat_lengkap', 'foto', 'status'
+        'no_registrasi',
+        'nik',
+        'nama_lengkap',
+        'jenis_kelamin',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'no_hp',
+        'email',
+        'username',
+        'password',
+        'alamat_lengkap',
+        'foto',
+        'status'
     ];
 
     public function saldo()
@@ -42,7 +53,7 @@ class Nasabah extends Model
         return $this->hasMany(PencairanSaldo::class, 'nasabah_id');
     }
 
-      /**
+    /**
      * Relasi ke tabel user_nasabahs
      * Satu nasabah bisa memiliki satu user
      */

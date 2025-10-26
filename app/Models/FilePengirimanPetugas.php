@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class FilePengirimanPetugas extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $guarded = ['id'];
 
-        /**
+    /**
      * Setiap kali model ini dipanggil, otomatis eager load refFile
      */
     protected $with = ['refFile'];
