@@ -11,3 +11,4 @@ class petugasLog extends Model
     use HasFactory, LogsActivity;
     protected $guarded = [];
 }
+// sdfsd
