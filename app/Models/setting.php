@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\LogsActivity;  
 
-class setting extends Model
+class Setting extends Model
 {
-    use HasFactory, LogsActivity; 
-    protected $guarded = []; 
+   use HasFactory, LogsActivity; 
+
+    protected   $guarded = ['id'];
 }
