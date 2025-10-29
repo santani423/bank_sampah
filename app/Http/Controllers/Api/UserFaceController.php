@@ -54,7 +54,7 @@ class UserFaceController extends Controller
                 ]);
 
                 // buat no_registrasi yang unik dan terperinci
-                $no_registrasi = 'API' . $now->format('YmdHis') . rand(1000, 9999);
+                $no_registrasi = 'API' . $now->format('YmdHis') . strtoupper(uniqid());;
 
                 // buat NIK unik menggunakan microtime + loop counter
                 $micro = microtime(true); // float, misal 1698401234.123456
