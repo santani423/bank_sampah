@@ -69,18 +69,46 @@
             margin: 0;
         }
 
-        /* Tampilan khusus untuk Description dan Content */
+        /* Box untuk deskripsi dan konten */
         .activity-text-box {
             background-color: #f9f9f9;
             padding: 15px;
             border-radius: 10px;
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
             line-height: 1.6;
+            overflow: hidden;
         }
 
         .activity-text-box h6 {
             font-weight: 600;
             margin-bottom: 8px;
+        }
+
+        /* Responsif untuk embed video */
+        .activity-text-box iframe,
+        .activity-text-box video {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        /* Untuk responsive ratio 16:9 (YouTube) */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
     </style>
 @endpush
@@ -135,7 +163,14 @@
 
                     <h5>Content</h5>
                     <div class="activity-text-box">
-                        {!! $activity->content ?? '<em>-</em>' !!}
+                        {{-- Deteksi jika ada embed YouTube --}}
+                        @if (Str::contains($activity->content, 'youtube.com') || Str::contains($activity->content, 'youtu.be'))
+                            <div class="video-wrapper">
+                                {!! $activity->content !!}
+                            </div>
+                        @else
+                            {!! $activity->content ?? '<em>-</em>' !!}
+                        @endif
                     </div>
                 </div>
 
