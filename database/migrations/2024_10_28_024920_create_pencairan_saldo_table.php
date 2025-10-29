@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('tanggal_proses')->nullable();
             $table->enum('status', ['pending', 'disetujui', 'ditolak']);
             $table->text('keterangan')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

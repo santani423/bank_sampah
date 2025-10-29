@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->bigInteger('user_id');
             $table->bigInteger('nasabah_id');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_banner');
             $table->string('file_banner');
             $table->enum('status', ['aktif', 'tidak_aktif']);
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('payment_type')->nullable();   // credit_card, bank_transfer, dll
             $table->string('transaction_id')->nullable(); // ID dari Midtrans
+            $table->longText('temp_before_data')->nullable();  
 
             $table->timestamps();
         });

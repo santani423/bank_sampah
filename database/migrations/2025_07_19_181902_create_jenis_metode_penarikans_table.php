@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama')->nullable(); 
             $table->string('keterangan')->nullable(); 
             $table->string('code')->nullable(); 
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

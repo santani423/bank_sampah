@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('berat_kg', 15, 2);
             $table->decimal('harga_per_kg', 10, 2);
             $table->decimal('harga_total', 15, 2);
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

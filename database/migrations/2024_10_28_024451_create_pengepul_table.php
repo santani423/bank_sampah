@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama');
             $table->text('alamat');
             $table->string('kontak');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

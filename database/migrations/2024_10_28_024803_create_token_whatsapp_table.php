@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('token_whatsapp', function (Blueprint $table) {
             $table->id();
             $table->string('token_whatsapp');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

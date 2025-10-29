@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('judul_feedback');
             $table->text('isi_feedback');
+            $table->longText('temp_before_data')->nullable();  
             $table->foreignId('nasabah_id')->constrained('nasabah')->onDelete('cascade');
             $table->timestamps();
         });

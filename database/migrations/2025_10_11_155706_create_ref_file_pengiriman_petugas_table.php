@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->boolean('wajib')->default(0); // 1 = wajib upload, 0 = opsional
             $table->integer('urutan')->default(0);
+            $table->longText('temp_before_data')->nullable();  
             $table->boolean('aktif')->default(1); // 1 = aktif, 0 = nonaktif
             $table->timestamps();
         });

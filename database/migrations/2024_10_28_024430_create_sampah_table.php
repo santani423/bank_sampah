@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_sampah');
             $table->decimal('harga_per_kg', 10, 2);
             $table->string('gambar')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

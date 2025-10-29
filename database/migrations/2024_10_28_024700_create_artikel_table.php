@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('judul_postingan');
             $table->text('isi_postingan');
             $table->string('thumbnail')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

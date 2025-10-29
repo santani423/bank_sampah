@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('nasabah_id')->constrained('nasabah')->onDelete('cascade');
             $table->decimal('saldo', 15, 2);
             $table->timestamp('tanggal_update')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

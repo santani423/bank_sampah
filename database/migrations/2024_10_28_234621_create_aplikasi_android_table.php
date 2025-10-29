@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigInteger('ukuran_file');
             $table->string('url_apk');
             $table->text('keterangan')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

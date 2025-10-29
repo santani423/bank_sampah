@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('ref_file_id')
                   ->constrained('ref_file_pengiriman_petugas')
                   ->onDelete('cascade');
+            $table->longText('temp_before_data')->nullable();  
 
             $table->string('nama_file', 255); // nama file sebenarnya
             $table->string('path_file', 500); // lokasi penyimpanan file (storage path)

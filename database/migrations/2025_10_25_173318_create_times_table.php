@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('avatar')->nullable(); // path atau URL foto
             $table->string('jabatan', 100)->nullable(); // jabatan / posisi
             $table->text('keterangan')->nullable(); // deskripsi tambahan
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps(); // created_at & updated_at
         });
     }

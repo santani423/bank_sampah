@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('type', ['credit', 'debit']); // 	credit (menambah saldo) atau debit (mengurangi saldo)
             $table->string('source')->nullable(); // sumber: topup, refund, order, adjustment, etc
             $table->text('description')->nullable(); // keterangan tambahan
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

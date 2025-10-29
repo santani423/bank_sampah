@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->string('foto_kegiatan')->nullable(); // bisa simpan path ke file foto
             $table->string('video_edukasi')->nullable(); // bisa simpan URL YouTube atau path video
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             
             $table->text('name')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

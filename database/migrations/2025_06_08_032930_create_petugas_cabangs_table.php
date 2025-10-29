@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cabang_id')->constrained('cabangs')->onDelete('cascade');
             $table->foreignId('petugas_id')->constrained('petugas')->onDelete('cascade');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

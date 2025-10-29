@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'petugas', 'nasabah'])->default('petugas');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

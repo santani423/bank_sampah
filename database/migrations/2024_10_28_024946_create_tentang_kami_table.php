@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tentang_kami', function (Blueprint $table) {
             $table->id();
             $table->text('isi_tentang_kami');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

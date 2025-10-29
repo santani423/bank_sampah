@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('kode_pengiriman');
             $table->date('tanggal_pengiriman')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->foreignId('pengepul_id')->constrained('pengepul')->onDelete('cascade');
             $table->timestamps();
         });

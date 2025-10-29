@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('provinsi', 100)->nullable();
             $table->string('kode_pos', 10)->nullable();
             $table->string('telepon', 20)->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });

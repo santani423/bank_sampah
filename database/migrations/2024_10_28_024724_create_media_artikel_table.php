@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('artikel_id')->constrained('artikel')->onDelete('cascade');
             $table->string('file_gambar');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

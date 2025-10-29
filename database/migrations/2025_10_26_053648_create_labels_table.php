@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug')->unique(); // Slug unik (misal: untuk URL-friendly)
             $table->string('color')->nullable(); // Warna label (opsional, misal: #ff0000)
             $table->text('description')->nullable(); // Deskripsi label
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

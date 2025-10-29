@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('jenis_metode_penarikan_id');
             $table->string('nama_metode_pencairan');
             $table->string('no_rek');
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

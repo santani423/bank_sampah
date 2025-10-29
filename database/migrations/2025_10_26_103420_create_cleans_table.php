@@ -18,6 +18,7 @@ class CreateCleansTable extends Migration
             $table->text('description')->nullable(); // deskripsi singkat    
             $table->string('image')->nullable(); // gambar utama kegiatan
             $table->enum('status', ['active', 'inactive'])->default('active'); // status kegiatan 
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

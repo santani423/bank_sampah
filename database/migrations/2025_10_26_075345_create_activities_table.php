@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->string('location')->nullable();
             $table->string('image')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             
             // Relasi ke table labels
             $table->unsignedBigInteger('label_id')->nullable();

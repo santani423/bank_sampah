@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('author')->nullable(); // Penulis 
             $table->timestamp('published_at')->nullable(); // Tanggal terbit
             $table->boolean('is_published')->default(false); // Status tampil/tidak
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps(); // created_at & updated_at
         });
     }

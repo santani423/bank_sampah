@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('ip_address')->nullable(); 
             $table->string('user_agent')->nullable();
             $table->text('description')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

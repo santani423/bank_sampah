@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('petugas_id')->constrained()->onDelete('cascade'); 
             $table->longText('temp_before_data')->nullable();  
-            $table->bigInteger('saldo');  
+            $table->bigInteger('saldo');   
             $table->timestamps();
         });
     }
