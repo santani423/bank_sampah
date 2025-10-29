@@ -111,9 +111,9 @@
 <!-- CKEditor 5 Classic -->
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-    ClassicEditor
-        .create( document.querySelector( '#description' ) )
-        .catch( error => { console.error( error ); } );
+    // ClassicEditor
+    //     .create( document.querySelector( '#description' ) )
+    //     .catch( error => { console.error( error ); } );
 
     ClassicEditor
         .create( document.querySelector( '#content' ) )
