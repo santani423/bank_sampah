@@ -12,8 +12,14 @@ class Logging extends Model
     protected $table = 'logging';
 
     protected $fillable = [
-        'code', 'user_id', 'action', 'description',
-        'data_before', 'data_after', 'ip_address', 'user_agent',
+        'code',
+        'user_id',
+        'action',
+        'description',
+        'data_before',
+        'data_after',
+        'ip_address',
+        'user_agent',
     ];
 
     protected $casts = [
@@ -32,7 +38,7 @@ class Logging extends Model
         static::creating(function ($logging) {
             $last = self::latest('id')->first();
             $number = $last ? $last->id + 1 : 1;
-            $logging->code = 'LOG-' . str_pad($number, 5, '0', STR_PAD_LEFT);
+            $logging->code = 'LOG-' . str_pad($number, 5, '0', STR_PAD_LEFT) . strtoupper(uniqid());;
         });
     }
 }
