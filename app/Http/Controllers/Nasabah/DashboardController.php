@@ -66,7 +66,7 @@ class DashboardController extends Controller
             'email'         => 'required|email|unique:users,email,' . $user->id,
             'username'      => 'required|string|max:50|unique:users,username,' . $user->id,
             'password'      => 'nullable|string|min:6',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
 
             // Nasabah
             'nama_lengkap'  => 'required|string|max:100',
