@@ -115,7 +115,7 @@
 
                     </div>
                     <div class="float-right">
-                        {{ $nasabahs->withQueryString()->links() }}
+                        {{-- {{ $nasabahs->withQueryString()->links() }} --}}
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 @section('title', 'Daftar Activity')
 
 @push('style')
-    <style>
+    {{-- <style>
         /* Semua teks tabel jadi hitam */
         table.table td,
         table.table th {
@@ -19,7 +19,7 @@
         table.table td span {
             color: #fff !important;
         }
-    </style>
+    </style> --}}
 @endpush
 
 @section('main')
@@ -39,6 +39,22 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="float-right">
+                            <form method="GET" action="{{ route('admin.activities.index') }}">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Cari Nama" name="title"
+                                        value="{{ request('title') }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary">Search</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 <div class="card-body">
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -48,12 +64,12 @@
                     @endif
 
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Title</th>
-                                    {{-- <th>Slug</th> --}}
+                                    <th>Slug</th>
                                     {{-- <th>Deskripsi</th> --}}
                                     <th>Start Date</th>
                                     <th>End Date</th>
@@ -68,7 +84,7 @@
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $activity->title }}</td>
-                                        {{-- <td>{{ $activity->slug }}</td> --}}
+                                        <td>{{ $activity->slug }}</td>
                                         {{-- <td>{{ $activity->description ?? '-' }}</td> --}}
                                         <td>{{ $activity->start_date ?? '-' }}</td>
                                         <td>{{ $activity->end_date ?? '-' }}</td>
@@ -97,7 +113,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        <x-pagination :data="$activities" />
                     </div>
+
 
                     <!-- Pagination jika pakai paginate -->
                     {{-- {{ $activities->links() }} --}}

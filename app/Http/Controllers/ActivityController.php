@@ -10,11 +10,25 @@ use Illuminate\Support\Str;
 class ActivityController extends Controller
 {
     // Menampilkan daftar activity
-    public function index()
+    public function index(Request $request)
     {
-        $activities = Activity::with('label')->get();
+        $query = Activity::with('label');
+        $perPage = (int) $request->get('per_page', 10);
+        $page = max(1, (int) $request->get('page', 1));
+        // Filter pencarian berdasarkan title
+        if ($request->filled('title')) {
+            $query->where('title', 'like', '%' . $request->title . '%');
+        }
+
+        // Urutkan berdasarkan created_at terbaru (optional)
+        $query->orderByDesc('created_at');
+
+        // Pagination
+        $activities = $query->paginate($perPage, ['*'], 'page', $page);
+
         return view('pages.admin.activities.index', compact('activities'));
     }
+
 
     // Menampilkan form create
     public function create()
