@@ -92,8 +92,9 @@ class DashboardController extends Controller
                 Storage::delete('public/foto/' . $user->foto);
             }
 
-            $fileName = time() . '.' . $request->foto->extension();
-            $request->foto->storeAs('public/foto', $fileName);
+
+            $fileName = $request->file('foto')->store('foto', 'public');
+
             $user->foto = $fileName;
         }
 

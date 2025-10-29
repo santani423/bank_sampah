@@ -52,7 +52,7 @@
             <div class="profile-card">
                 <div class="profile-header">
                     <img id="fotoPreview" 
-                         src="{{ $user->foto ? asset('storage/foto/' . $user->foto) : asset('images/default-user.png') }}" 
+                         src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/default-user.png') }}" 
                          alt="Profile Photo">
                     <h4 class="mt-2">{{ $user->name }}</h4>
                     <p class="text-muted">{{ $user->email }}</p>
@@ -97,12 +97,12 @@
                     <div class="mb-3">
                         <label>Foto Profile</label>
                         <input type="file" class="form-control" name="foto" accept="image/*" id="fotoInput">
-                        <div class="mt-2">
+                        {{-- <div class="mt-2">
                             <img id="fotoPreview" 
-                                 src="{{ $user->foto ? asset('storage/foto/' . $user->foto) : asset('images/default-user.png') }}" 
+                                 src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/default-user.png') }}" 
                                  alt="Preview Foto" 
                                  style="max-width: 150px; max-height: 150px; border-radius: 10px; display: block;">
-                        </div>
+                        </div> --}}
                     </div>
 
                     <hr>
