@@ -96,7 +96,8 @@
         /* Untuk responsive ratio 16:9 (YouTube) */
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 */
+            padding-bottom: 56.25%;
+            /* 16:9 */
             height: 0;
             overflow: hidden;
             border-radius: 10px;
@@ -109,6 +110,14 @@
             width: 100%;
             height: 100%;
             border: 0;
+        }
+
+        .activity-text-box iframe {
+            display: block;
+            width: 100% !important;
+            height: 400px !important;
+            border: none;
+            border-radius: 10px;
         }
     </style>
 @endpush
