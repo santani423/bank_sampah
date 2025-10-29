@@ -81,8 +81,15 @@ class ActivityController extends Controller
     public function show($id)
     {
         $activity = Activity::with('label')->findOrFail($id);
+
+        // Decode HTML entities agar iframe tampil sebagai video
+        if ($activity->content) {
+            $activity->content = html_entity_decode($activity->content);
+        }
+
         return view('pages.admin.activities.show', compact('activity'));
     }
+
 
     // Menampilkan form edit
     public function edit($id)

@@ -59,6 +59,12 @@ class ActivityController extends Controller
     public function show($slug)
     {
         $activity = Activity::with('label')->where('slug', $slug)->firstOrFail();
+
+        // Decode HTML entities agar iframe tetap tampil di client
+        if ($activity->content) {
+            $activity->content = html_entity_decode($activity->content);
+        }
+
         return new ActivityResource($activity);
     }
 
