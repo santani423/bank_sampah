@@ -51,8 +51,9 @@
         <div class="col-md-5">
             <div class="profile-card">
                 <div class="profile-header">
-                    <img src="{{ $user->foto ? asset('storage/foto/' . $user->foto) : asset('images/default-user.png') }}"
-                        alt="Profile Photo">
+                    <img id="fotoPreview" 
+                         src="{{ $user->foto ? asset('storage/foto/' . $user->foto) : asset('images/default-user.png') }}" 
+                         alt="Profile Photo">
                     <h4 class="mt-2">{{ $user->name }}</h4>
                     <p class="text-muted">{{ $user->email }}</p>
                 </div>
@@ -95,7 +96,13 @@
                     </div>
                     <div class="mb-3">
                         <label>Foto Profile</label>
-                        <input type="file" class="form-control" name="foto">
+                        <input type="file" class="form-control" name="foto" accept="image/*" id="fotoInput">
+                        <div class="mt-2">
+                            <img id="fotoPreview" 
+                                 src="{{ $user->foto ? asset('storage/foto/' . $user->foto) : asset('images/default-user.png') }}" 
+                                 alt="Preview Foto" 
+                                 style="max-width: 150px; max-height: 150px; border-radius: 10px; display: block;">
+                        </div>
                     </div>
 
                     <hr>
@@ -143,3 +150,27 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const fotoInput = document.getElementById('fotoInput');
+    const fotoPreview = document.getElementById('fotoPreview');
+
+    fotoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Cek tipe file
+            if(!file.type.startsWith('image/')) {
+                alert('Hanya file gambar yang diperbolehkan!');
+                this.value = ''; // Reset input
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fotoPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+@endpush
