@@ -8,7 +8,7 @@ use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiControll
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TessController;
 use App\Http\Controllers\Api\TimeApiController;
-use App\Http\Controllers\API\ActivityController;
+use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\CleanController;
 use App\Http\Controllers\Api\UserFaceController;
 
