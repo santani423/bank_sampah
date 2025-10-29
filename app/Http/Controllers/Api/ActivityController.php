@@ -58,18 +58,20 @@ class ActivityController extends Controller
     // Menampilkan satu activity
     public function show($slug)
     {
+        // Ambil activity beserta label berdasarkan slug
         $activity = Activity::with('label')->where('slug', $slug)->firstOrFail();
 
-        // Decode HTML entities agar iframe tetap tampil di client
-        if ($activity->content) {
-            $activity->content = html_entity_decode($activity->content);
-        }
-        if ($activity->description) {
-            $activity->description = html_entity_decode($activity->description);
+        // Decode HTML entities untuk content dan description agar iframe/HTML tampil di frontend
+        $fieldsToDecode = ['content', 'description'];
+        foreach ($fieldsToDecode as $field) {
+            if (!empty($activity->$field)) {
+                $activity->$field = html_entity_decode($activity->$field);
+            }
         }
 
         return new ActivityResource($activity);
     }
+
 
 
     // Update activity
