@@ -105,7 +105,7 @@ class NasabahTransaksiController extends Controller
             'status' => 'pending',
         ]);
         $nasabah = $userNasabah->nasabah;
-    
+
 
 
 
@@ -117,11 +117,16 @@ class NasabahTransaksiController extends Controller
                 . number_format($request->jumlah_pencairan, 0, ',', '.') . "* telah diterima dan sedang diproses.\n\n"
                 . "_Status: Pending_\n"
                 . "Terima kasih telah menggunakan layanan kami *{$setting->nama}*.";
+            $pesanAdmin = "*Pemberitahuan Admin*\n\n"
+                . "Nasabah *{$nasabah->nama_lengkap}* (No HP: {$nasabah->no_hp}) "
+                . "telah melakukan permintaan pencairan saldo sebesar *Rp "
+                . number_format($request->jumlah_pencairan, 0, ',', '.') . "*.\n\n"
+                . "_Status: Pending_\n"
+                . "Segera lakukan proses pencairan jika sudah sesuai.";
 
             // 🔥 Panggil service WhatsApp
-            $result = $this->whatsappService->sendMessage($setting->no_notifikasi, $pesan);
-
-       
+            $result = $this->whatsappService->sendMessage($setting->no_notifikasi, $pesanAdmin);
+            $result2 = $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
         }
 
 
