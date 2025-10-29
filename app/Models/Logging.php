@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Logging extends Model
 {
@@ -32,13 +33,16 @@ class Logging extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Auto-generate kode unik saat create
+    // Auto-generate kode unik saat membuat log baru
     protected static function booted()
     {
         static::creating(function ($logging) {
-            $last = self::latest('id')->first();
-            $number = $last ? $last->id + 1 : 1;
-            $logging->code = 'LOG-' . str_pad($number, 5, '0', STR_PAD_LEFT) . strtoupper(uniqid());;
+            do {
+                // contoh hasil: LOG-AB123
+                $code = 'LOG-' . strtoupper(Str::random(50));
+            } while (self::where('code', $code)->exists());
+
+            $logging->code = $code;
         });
     }
 }

@@ -40,7 +40,10 @@ Route::apiResource('activities', ActivityController::class);
 
 
 
-Route::post('/user-face/create', [UserFaceController::class, 'create']);
+
+Route::post('/api/user-face/create', [UserFaceController::class, 'create'])
+    ->name('api.user-face.create')
+    ->middleware('throttle:6000,1'); // batasi max 60 request per menit
 
 
 
