@@ -3,7 +3,7 @@
 @section('title', 'Detail Activity')
 
 @push('style')
-    <style>
+    {{-- <style>
         /* Card untuk activity */
         .activity-card {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -119,7 +119,7 @@
             border: none;
             border-radius: 10px;
         }
-    </style>
+    </style> --}}
 @endpush
 
 @section('main')
