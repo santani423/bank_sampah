@@ -43,4 +43,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+        /**
+     * Relasi ke tabel logging
+     * Satu user bisa memiliki banyak log
+     */
+    public function loggings()
+    {
+        return $this->hasMany(Logging::class, 'user_id', 'id');
+    }
+
+    /**
+     * Ambil log terbaru
+     */
+    public function latestLog()
+    {
+        return $this->hasOne(Logging::class, 'user_id', 'id')->latest();
+    }
 }

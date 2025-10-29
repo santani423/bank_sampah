@@ -97,7 +97,7 @@ class NasabahController extends Controller
     public function show($id)
     {
         // Ambil data nasabah
-        $nasabah = Nasabah::with('saldo','user')->findOrFail($id);
+        $nasabah = Nasabah::with('saldo','user','loggings')->findOrFail($id);
 
         // Ambil riwayat setoran (transaksi)
         $riwayatSetoran = Transaksi::with(['detailTransaksi.sampah'])
@@ -110,7 +110,7 @@ class NasabahController extends Controller
             ->where('nasabah_id', $id)
             ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
-
+        // dd($nasabah);
             
 
         return view('pages.admin.nasabah.show', compact('nasabah', 'riwayatSetoran', 'riwayatPenarikan'));

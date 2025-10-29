@@ -165,6 +165,50 @@
             </div>
         </div>
     </div>
+    <!-- Riwayat Penarikan Saldo -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">History Aktifitas</div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered table-head-bg-primary">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Waktu</th>
+                                    <th>Action</th>
+                                    <th>Description</th>
+                                    <th>IP</th>
+                                    <th>Browser</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($nasabah->loggings as $index => $loggings)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $loggings->created_at }}</td> 
+                                        <td>{{ $loggings->action }}</td> 
+                                        <td>{{ $loggings->description }}</td> 
+                                        <td>{{ $loggings->ip_address }}</td> 
+                                        <td>{{ $loggings->user_agent }}</td> 
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="text-center">Belum ada .</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')

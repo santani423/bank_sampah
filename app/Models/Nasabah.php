@@ -76,4 +76,28 @@ class Nasabah extends Model
             'user_id'     // Local key di tabel user_nasabahs
         );
     }
+
+    /**
+     * Relasi ke tabel logging melalui user
+     * Satu nasabah bisa memiliki banyak log
+     */
+    public function loggings()
+    {
+        return $this->hasManyThrough(
+            Logging::class,       // Model akhir
+            UserNasabah::class,   // Model perantara
+            'nasabah_id',         // Foreign key di user_nasabahs
+            'user_id',            // Foreign key di logging
+            'id',                 // Local key di nasabah
+            'user_id'             // Local key di user_nasabahs
+        );
+    }
+
+    /**
+     * Ambil log terbaru dari nasabah
+     */
+    public function latestLog()
+    {
+        return $this->loggings()->latest()->first();
+    }
 }
