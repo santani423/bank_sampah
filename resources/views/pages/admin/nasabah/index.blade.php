@@ -48,6 +48,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Nama</th>
+                                    <th>Username</th>
                                     <th>No. Registrasi</th>
                                     <th>No. HP</th>
                                     <th>Saldo</th>
@@ -60,6 +61,7 @@
                                     <tr>
                                         <td>{{ $nasabahs->firstItem() + $index }}</td>
                                         <td>{{ $nasabah->nama_lengkap }}</td>
+                                        <td>{{ $nasabah->user->username }}</td>
                                         <td>{{ $nasabah->no_registrasi }}</td>
                                         <td>{{ $nasabah->no_hp }}</td>
                                         <td>Rp </td>

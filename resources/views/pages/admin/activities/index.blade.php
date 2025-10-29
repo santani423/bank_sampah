@@ -45,7 +45,7 @@
                         <div class="float-right">
                             <form method="GET" action="{{ route('admin.activities.index') }}">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Cari Nama" name="title"
+                                    <input type="text" class="form-control" placeholder="Cari Titel" name="title"
                                         value="{{ request('title') }}">
                                     <div class="input-group-append">
                                         <button class="btn btn-primary">Search</button>

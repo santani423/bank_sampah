@@ -34,6 +34,11 @@
                             <td>{{ $nasabah->nama_lengkap }}</td>
                         </tr>
                         <tr>
+                            <td><strong>Username</strong></td>
+                            <td>:</td>
+                            <td>{{ $nasabah->user->username }}</td>
+                        </tr>
+                        <tr>
                             <td><strong>NIK</strong></td>
                             <td>:</td>
                             <td>{{ $nasabah->nik }}</td>

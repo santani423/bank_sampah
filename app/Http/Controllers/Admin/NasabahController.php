@@ -20,7 +20,7 @@ class NasabahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Nasabah::with('saldo');
+        $query = Nasabah::with('saldo','user');
         $perPage = (int) $request->get('per_page', 10);
         $page = max(1, (int) $request->get('page', 1));
         if ($request->filled('nama_nasabah')) {
@@ -97,7 +97,7 @@ class NasabahController extends Controller
     public function show($id)
     {
         // Ambil data nasabah
-        $nasabah = Nasabah::findOrFail($id);
+        $nasabah = Nasabah::with('saldo','user')->findOrFail($id);
 
         // Ambil riwayat setoran (transaksi)
         $riwayatSetoran = Transaksi::with(['detailTransaksi.sampah'])
@@ -110,6 +110,8 @@ class NasabahController extends Controller
             ->where('nasabah_id', $id)
             ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
+
+            
 
         return view('pages.admin.nasabah.show', compact('nasabah', 'riwayatSetoran', 'riwayatPenarikan'));
     }
