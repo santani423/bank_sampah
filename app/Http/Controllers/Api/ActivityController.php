@@ -64,6 +64,9 @@ class ActivityController extends Controller
         if ($activity->content) {
             $activity->content = html_entity_decode($activity->content);
         }
+        if ($activity->description) {
+            $activity->description = html_entity_decode($activity->description);
+        }
 
         return new ActivityResource($activity);
     }
