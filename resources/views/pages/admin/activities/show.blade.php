@@ -175,15 +175,15 @@
                         {{-- Deteksi jika ada embed YouTube --}}
                         @if (Str::contains($activity->content, 'youtube.com') || Str::contains($activity->content, 'youtu.be'))
                             <div class="video-wrapper">
+                                {!! $activity->content !!}
                             </div>
-                            @else
+                        @else
                             {!! $activity->content ?? '<em>-</em>' !!}
-                            @endif
-                            
-                        </div>
+                        @endif
+
                     </div>
-                    
-                    {!! $activity->content !!}
+                </div>
+
             </div>
         </div>
     </div>

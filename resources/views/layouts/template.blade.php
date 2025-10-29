@@ -8,7 +8,7 @@
     <!-- Title -->
     <title> @yield('title')</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('wostin/files/assets/images/resources/logo.png') }}">
+    {{-- <link rel="shortcut icon" href="{{ asset('wostin/files/assets/images/resources/logo.png') }}">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/bootstrap.min.css') }}">
     <!-- file upload -->
@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/jquery-jvectormap-2.0.5.css') }}">
     <!-- Main css -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/main.css') }}">
-    <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script> --}}
 
     @stack('style')
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.trendy.min.css') }}"> --}}
