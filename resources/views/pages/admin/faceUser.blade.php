@@ -49,7 +49,7 @@
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <span>Proses generate user...</span>
+                <span id="progress-text">Proses generate user...</span>
             </div>
 
             <form id="form-add-user-face">
@@ -79,8 +79,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="table-users">
-                    </tbody>
+                    <tbody id="table-users"></tbody>
                 </table>
             </div>
         </div>
@@ -90,6 +89,13 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+
+    // Fungsi pembuat kode random (contoh: "USER-5KX8Z2")
+    function generateRandomCode(prefix = "USER") {
+        const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+        return `${prefix}-${randomPart}`;
+    }
+
     $('#form-add-user-face').on('submit', async function(e) {
         e.preventDefault();
 
@@ -103,18 +109,23 @@ $(document).ready(function() {
         $('#alert-message').html('');
         $('#result-users').html('');
 
-        const batchSize = 10; // maksimal 10 user per hit
+        const batchSize = 10; // maksimal 10 per API hit
         const totalBatches = Math.ceil(jumlah / batchSize);
         let allUsers = [];
 
         try {
             for (let i = 0; i < totalBatches; i++) {
                 const jumlahBatch = (i === totalBatches - 1) ? jumlah - (i * batchSize) : batchSize;
+                const code = generateRandomCode("FACE"); // generate random code untuk tiap batch
+
+                // Update teks progres
+                $('#progress-text').text(`Memproses batch ${i + 1} dari ${totalBatches} (code: ${code})...`);
 
                 // Hit API per batch
                 const res = await $.ajax({
-                    url: '/api/user-face/create?jumlah=' + jumlahBatch,
+                    url: '/api/user-face/create',
                     method: 'POST',
+                    data: { jumlah: jumlahBatch, code: code },
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
@@ -123,7 +134,7 @@ $(document).ready(function() {
                 if (res.success) {
                     allUsers = allUsers.concat(res.data);
 
-                    // update tabel realtime
+                    // Update tabel realtime
                     res.data.forEach(user => {
                         const avatar = user.foto ? user.foto : 'default-avatar.png';
                         $('#table-users').append(`
@@ -145,12 +156,12 @@ $(document).ready(function() {
             // tampilkan alert sukses
             $('#alert-message').html(`
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Berhasil generate ${allUsers.length} user.
+                    Berhasil generate ${allUsers.length} user dari ${totalBatches} kali hit API.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `);
 
-            // tampilkan list user baru
+            // tampilkan daftar user baru
             let html = '<ul class="list-group">';
             allUsers.forEach(u => {
                 html += `<li class="list-group-item">${u.name} (${u.email})</li>`;
@@ -168,6 +179,7 @@ $(document).ready(function() {
             `);
         } finally {
             $('#loading-spinner').hide();
+            $('#progress-text').text('Proses generate user...');
         }
     });
 });

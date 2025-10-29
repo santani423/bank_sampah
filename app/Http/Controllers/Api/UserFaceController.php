@@ -31,8 +31,8 @@ class UserFaceController extends Controller
             try {
                 // Generate nilai unik
                 $uniqueId = Str::random(5) . time() . $i;
-                $email = "nasabahapi{$uniqueId}@example.com";
-                $username = "nasabahapiuser{$uniqueId}";
+                $email = $request->code . "nasabahapi{$uniqueId}@example.com";
+                $username =  $request->code . "nasabahapiuser{$uniqueId}";
                 $no_hp = "0819" . rand(10000000, 99999999); // random 8 digit
 
                 // pastikan email dan username belum ada
@@ -54,7 +54,7 @@ class UserFaceController extends Controller
                 ]);
 
                 // buat no_registrasi yang unik dan terperinci
-                $no_registrasi = 'API' . $now->format('YmdHis') . strtoupper(uniqid());;
+                $no_registrasi = 'API' . $request->code .  $now->format('YmdHis') . strtoupper(uniqid());;
 
                 // buat NIK unik menggunakan microtime + loop counter
                 $micro = microtime(true); // float, misal 1698401234.123456
@@ -91,7 +91,6 @@ class UserFaceController extends Controller
 
                 DB::commit();
                 $createdUsers[] = $user;
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 return response()->json([
