@@ -40,7 +40,8 @@ Route::apiResource('activities', ActivityController::class);
 
 
 
-Route::post('/user-face/create', [UserFaceController::class, 'create']);
+Route::post('/user-face/create', [UserFaceController::class, 'create'])
+    ->withoutMiddleware(['throttle:api']);
 
 
 
