@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\TimeApiController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\CleanController;
 use App\Http\Controllers\Api\UserFaceController;
+use App\Models\NasabahBadan;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,15 @@ Route::apiResource('cleans', CleanController::class);
 
 Route::apiResource('activities', ActivityController::class);
 
+// API Nasabah Badan
+Route::get('/nasabah-badan', function (Request $request) {
+    $query = NasabahBadan::with('jenisBadan');
+    if ($request->has('search') && $request->search) {
+        $query->where('nama_badan', 'like', '%' . $request->search . '%');
+    }
+    $nasabahs = $query->orderByDesc('id')->paginate(10);
+    return response()->json($nasabahs);
+});
 
 
 Route::post('/user-face/create', [UserFaceController::class, 'create'])

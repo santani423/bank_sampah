@@ -128,13 +128,29 @@ class NasabahUserBadanController extends Controller
      */
     public function update(Request $request, NasabahBadan $nasabahBadan)
     {
+        // Get user related to this nasabah badan
+        $userNasabahBadan = \App\Models\UserNasabahBadan::where('nasabah_badan_id', $nasabahBadan->id)->first();
+        $userId = $userNasabahBadan ? $userNasabahBadan->user_id : null;
+
         $request->validate([
             'jenis_badan_id' => 'required|exists:jenis_badans,id',
             'nama_badan' => 'required|string|max:150',
             'npwp' => ['nullable', 'string', 'max:50', Rule::unique('nasabah_badan')->ignore($nasabahBadan->id)],
             'nib' => ['nullable', 'string', 'max:50', Rule::unique('nasabah_badan')->ignore($nasabahBadan->id)],
-            'email' => ['required', 'email', 'max:100', Rule::unique('nasabah_badan')->ignore($nasabahBadan->id)],
-            'username' => ['required', 'string', 'max:50', Rule::unique('nasabah_badan')->ignore($nasabahBadan->id)],
+            'email' => [
+                'required',
+                'email',
+                'max:100',
+                Rule::unique('nasabah_badan')->ignore($nasabahBadan->id),
+                Rule::unique('users')->ignore($userId),
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('nasabah_badan')->ignore($nasabahBadan->id),
+                Rule::unique('users')->ignore($userId),
+            ],
             'password' => 'nullable|string|min:6',
             'no_telp' => 'nullable|string|max:20',
             'alamat_lengkap' => 'nullable|string',
@@ -162,7 +178,23 @@ class NasabahUserBadanController extends Controller
             $data['foto'] = $filename;
         }
 
+        // Update nasabah badan
         $nasabahBadan->update($data);
+
+        // Update user table if user exists
+        if ($userId) {
+            $userData = [
+                'name' => $request->nama_badan,
+                'email' => $request->email,
+                'username' => $request->username,
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            \App\Models\User::where('id', $userId)->update($userData);
+        }
 
         return redirect()
             ->route('petugas.rekanan.index')
