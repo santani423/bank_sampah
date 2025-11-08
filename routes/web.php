@@ -36,6 +36,7 @@ use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardControll
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
+use App\Http\Controllers\Petugas\NasabahUserBadanController;
 use App\Http\Controllers\TimeController;
 use Illuminate\Support\Facades\Response;
 /*
@@ -128,6 +129,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
 
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
+    Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');

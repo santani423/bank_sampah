@@ -19,6 +19,11 @@
                      Data
                      Nasabah </a>
              </li>
+             <li class="sidebar-submenu__item">
+                 <a href="{{ route('petugas.rekanan.index') }}" class="sidebar-submenu__link">
+                     Data
+                     Rekanan </a>
+             </li>
          </ul>
      </li>
      <li class="sidebar-menu__item has-dropdown">
