@@ -105,7 +105,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th style="width: 250px">Aksi</th>
+                                        <th style="width: 300px">Aksi</th>
                                         <th>Nama</th>
                                         <th>No. Registrasi</th>
                                         <th>No. HP</th> 
@@ -158,8 +158,9 @@ $(document).ready(function() {
                     rows += `<tr>
                         <td>${no++}</td>
                         <td>
-                            <a href='/petugas/data-rekanan/${nasabah.id}' class='btn btn-info btn-sm'>Detail</a>
-                            <a href='/petugas/data-rekanan/${nasabah.id}/edit' class='btn btn-warning btn-sm'>Edit</a>
+                            <a href='/petugas/data-rekanan/${nasabah.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
+                            <a href='/petugas/data-rekanan/${nasabah.id}/edit' class='btn btn-warning btn-sm mb-1'>Edit</a>
+                            <a href='/petugas/data-rekanan/${nasabah.id}/setor-sampah' class='btn btn-success btn-sm mb-1'>Setor Sampah</a>
                         </td>
                         <td>${nasabah.nama_badan}</td>
                         <td>${nasabah.nib ?? '-'}</td>

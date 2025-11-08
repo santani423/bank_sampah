@@ -236,4 +236,114 @@ class NasabahUserBadanController extends Controller
             ->route('petugas.rekanan.index')
             ->with('success', 'Nasabah Badan berhasil dihapus!');
     }
+
+    /**
+     * Show form setor sampah for nasabah badan
+     */
+    public function setorSampah($id)
+    {
+        $nasabahBadan = NasabahBadan::findOrFail($id);
+        $kodeTransaksi = $this->generateUniqueTransactionCode();
+        $stokSampah = \App\Models\Sampah::all();
+
+        return view('pages.petugas.nasabah-badan.setor-sampah', compact('nasabahBadan', 'kodeTransaksi', 'stokSampah'));
+    }
+
+    /**
+     * Store transaksi setor sampah for nasabah badan
+     */
+    public function storeSetorSampah(Request $request, $id)
+    {
+        $nasabahBadan = NasabahBadan::findOrFail($id);
+
+        // Validasi input
+        $request->validate([
+            'kode_transaksi' => 'required|string|unique:transaksi,kode_transaksi',
+            'tanggal_transaksi' => 'required|date',
+            'detail_transaksi' => 'required|array|min:1',
+            'detail_transaksi.*.sampah_id' => 'required|exists:sampah,id',
+            'detail_transaksi.*.berat_kg' => 'required|numeric|min:0',
+            'detail_transaksi.*.harga_per_kg' => 'required|numeric|min:0',
+        ]);
+
+        $totalTransaksi = 0;
+
+        // Hitung total transaksi
+        foreach ($request->detail_transaksi as $detail) {
+            $hargaTotal = $detail['berat_kg'] * $detail['harga_per_kg'];
+            $totalTransaksi += $hargaTotal;
+        }
+
+        // Cek saldo petugas
+        $saldoPetugas = \App\Models\SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
+            ->where('petugas.email', auth()->user()->email)
+            ->select('saldo_petugas.*')
+            ->first();
+
+        if (!$saldoPetugas || $saldoPetugas->saldo < $totalTransaksi) {
+            return back()->with('error', 'Saldo petugas tidak mencukupi untuk melakukan transaksi ini.');
+        }
+
+        // Ambil ID petugas
+        $petugas_id = auth()->user()->id;
+
+        // Simpan transaksi utama (gunakan nasabah_badan_id)
+        $transaksi = \App\Models\Transaksi::create([
+            'kode_transaksi' => $request->kode_transaksi,
+            'nasabah_badan_id' => $nasabahBadan->id, // Gunakan nasabah_badan_id
+            'nasabah_id' => null, // Kosongkan nasabah_id
+            'petugas_id' => $petugas_id,
+            'tanggal_transaksi' => $request->tanggal_transaksi,
+        ]);
+
+        // Simpan detail transaksi
+        foreach ($request->detail_transaksi as $detail) {
+            $hargaTotal = $detail['berat_kg'] * $detail['harga_per_kg'];
+
+            \App\Models\DetailTransaksi::create([
+                'transaksi_id' => $transaksi->id,
+                'sampah_id' => $detail['sampah_id'],
+                'berat_kg' => $detail['berat_kg'],
+                'harga_per_kg' => $detail['harga_per_kg'],
+                'harga_total' => $hargaTotal,
+            ]);
+        }
+
+        // Update saldo petugas (kurangi saldo)
+        $sldPtgs = \App\Models\SaldoPetugas::where('id', $saldoPetugas->id)->first();
+        $sldPtgs->saldo = $sldPtgs->saldo - $totalTransaksi;
+        $sldPtgs->save();
+
+        // TODO: Update saldo nasabah badan (jika ada tabel saldo untuk nasabah badan)
+        // Untuk sementara kita skip, bisa ditambahkan nanti
+
+        return redirect()
+            ->route('petugas.rekanan.index')
+            ->with('success', 'Transaksi setor sampah berhasil disimpan!');
+    }
+
+    /**
+     * Generate unique transaction code
+     */
+    private function generateUniqueTransactionCode()
+    {
+        // Format: BSR-YYYYMMDD-SET-001
+        $today = now()->format('Ymd');
+        $prefix = "BSR-{$today}-SET-";
+
+        // Cari kode transaksi terakhir hari ini
+        $lastTransaction = \App\Models\Transaksi::where('kode_transaksi', 'like', $prefix . '%')
+            ->orderBy('kode_transaksi', 'desc')
+            ->first();
+
+        if (!$lastTransaction) {
+            return $prefix . '001';
+        }
+
+        // Ekstrak nomor urut terakhir
+        $lastNumber = substr($lastTransaction->kode_transaksi, -3);
+        $newNumber = str_pad((int)$lastNumber + 1, 3, '0', STR_PAD_LEFT);
+
+        return $prefix . $newNumber;
+    }
 }
