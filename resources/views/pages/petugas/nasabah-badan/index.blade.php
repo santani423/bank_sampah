@@ -158,8 +158,8 @@ $(document).ready(function() {
                     rows += `<tr>
                         <td>${no++}</td>
                         <td>
-                            <a href='/petugas/rekanan/${nasabah.id}' class='btn btn-info btn-sm'>Detail</a>
-                            <a href='/petugas/rekanan/${nasabah.id}/edit' class='btn btn-warning btn-sm'>Edit</a>
+                            <a href='/petugas/data-rekanan/${nasabah.id}' class='btn btn-info btn-sm'>Detail</a>
+                            <a href='/petugas/data-rekanan/${nasabah.id}/edit' class='btn btn-warning btn-sm'>Edit</a>
                         </td>
                         <td>${nasabah.nama_badan}</td>
                         <td>${nasabah.nib ?? '-'}</td>

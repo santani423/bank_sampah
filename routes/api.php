@@ -49,6 +49,8 @@ Route::get('/nasabah-badan', function (Request $request) {
     return response()->json($nasabahs);
 });
 
+Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
+
 
 Route::post('/user-face/create', [UserFaceController::class, 'create'])
     ->withoutMiddleware(['throttle:api']);

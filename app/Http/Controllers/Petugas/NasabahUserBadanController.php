@@ -108,17 +108,34 @@ class NasabahUserBadanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(NasabahBadan $nasabahBadan)
+    public function show($id)
     {
+        $nasabahBadan = NasabahBadan::findOrFail($id);
+ 
         $nasabahBadan->load('jenisBadan');
         return view('pages.petugas.nasabah-badan.show', compact('nasabahBadan'));
     }
 
     /**
+     * API endpoint to get single nasabah badan detail as JSON
+     */
+    public function apiShow($id)
+    {
+        $nasabahBadan = NasabahBadan::with('jenisBadan', 'userNasabahBadan.user')->findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $nasabahBadan
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(NasabahBadan $nasabahBadan)
+    public function edit($id)
     {
+        $nasabahBadan = NasabahBadan::findOrFail($id);
+
         $jenisBadans = JenisBadan::all();
         return view('pages.petugas.nasabah-badan.edit', compact('nasabahBadan', 'jenisBadans'));
     }
@@ -126,8 +143,10 @@ class NasabahUserBadanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, NasabahBadan $nasabahBadan)
+    public function update(Request $request,  $id)
     {
+        $nasabahBadan = NasabahBadan::findOrFail($id);
+ 
         // Get user related to this nasabah badan
         $userNasabahBadan = \App\Models\UserNasabahBadan::where('nasabah_badan_id', $nasabahBadan->id)->first();
         $userId = $userNasabahBadan ? $userNasabahBadan->user_id : null;
@@ -159,7 +178,7 @@ class NasabahUserBadanController extends Controller
         ]);
 
         $data = $request->except('password');
-        
+
         // Update password only if provided
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
