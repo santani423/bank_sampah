@@ -4,6 +4,47 @@
 
 @push('style')
     <!-- CSS Libraries -->
+    <style>
+        /* Container for table + pagination to anchor the overlay */
+        #nasabah-container { position: relative; }
+        /* Simple translucent overlay with centered spinner */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .loading-overlay .spinner {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+        }
+        /* Pagination look & feel like the screenshot */
+        #nasabah-pagination .pagination { gap: .5rem; }
+        #nasabah-pagination .page-link {
+            border-radius: .75rem; /* rounded */
+            border: 1px solid #e5e7eb; /* slate-200 */
+            color: #6b7280; /* slate-500 */
+            padding: .375rem .75rem;
+            background: #ffffff;
+        }
+        #nasabah-pagination .page-item.active .page-link {
+            background: #eef4ff; /* soft primary */
+            color: #3b82f6; /* primary text */
+            border-color: #dbeafe; /* primary-100 */
+            box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.08);
+        }
+        #nasabah-pagination .page-item.disabled .page-link {
+            color: #cbd5e1; /* slate-300 */
+            background: #f8fafc; /* slate-50 */
+            border-color: #f1f5f9; /* slate-100 */
+        }
+        #nasabah-pagination .page-link:focus { box-shadow: none; }
+    </style>
 @endpush
 
 @section('main')
@@ -58,28 +99,35 @@
                             </button>
                         </div>
                     @endif
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-head-bg-primary">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th style="width: 250px">Aksi</th>
-                                    <th>Nama</th>
-                                    <th>No. Registrasi</th>
-                                    <th>No. HP</th> 
-                                    <th>Cabang</th> 
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                               
-                            </tbody>
-                        </table>
-
-                    </div>
-                    <div class="d-flex justify-content-end align-items-center mt-3 gap-2">
-                        <div id="nasabah-summary" class="text-muted small me-3"></div>
-                        <nav id="nasabah-pagination" aria-label="Pagination"></nav>
+                    <div id="nasabah-container">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-head-bg-primary">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th style="width: 250px">Aksi</th>
+                                        <th>Nama</th>
+                                        <th>No. Registrasi</th>
+                                        <th>No. HP</th> 
+                                        <th>Cabang</th> 
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div id="nasabah-summary" class="text-muted small"></div>
+                            <nav id="nasabah-pagination" aria-label="Pagination"></nav>
+                        </div>
+                        <div id="loading-overlay" class="loading-overlay d-none">
+                            <div class="spinner">
+                                <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                                <div class="small text-muted">Memuat data...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,6 +142,8 @@ $(document).ready(function() {
     let currentSearch = '';
 
     function fetchNasabah(page = 1, search = '') {
+        // Show loading overlay while fetching data
+        $('#loading-overlay').removeClass('d-none');
         $.ajax({
             url: `/api/nasabah-badan?page=${page}&search=${search}`,
             method: 'GET',
@@ -123,7 +173,7 @@ $(document).ready(function() {
                 // Pagination
                 let pagination = '';
                 if (res.last_page > 1) {
-                    pagination += '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+                    pagination += '<ul class="pagination mb-0">';
                     
                     // Previous button
                     pagination += `<li class="page-item${res.current_page === 1 ? ' disabled' : ''}">
@@ -166,9 +216,24 @@ $(document).ready(function() {
                         </a>
                     </li>`;
                     
-                    pagination += '</ul></nav>';
+                    pagination += '</ul>';
                 }
-                $(".float-right").html(pagination);
+                // Inject to the dedicated pagination container
+                $("#nasabah-pagination").html(pagination);
+                // Update summary text
+                const from = res.data.length ? ((res.current_page - 1) * res.per_page) + 1 : 0;
+                const to = ((res.current_page - 1) * res.per_page) + res.data.length;
+                const total = (typeof res.total !== 'undefined') ? res.total : to;
+                $("#nasabah-summary").text(`Showing ${from} to ${to} of ${total} entries`);
+            },
+            error: function(xhr) {
+                $(".table tbody").html('<tr><td colspan="7" class="text-center text-danger">Gagal memuat data</td></tr>');
+                $("#nasabah-pagination").empty();
+                $("#nasabah-summary").text('');
+            },
+            complete: function() {
+                // Hide loading overlay after request finishes
+                $('#loading-overlay').addClass('d-none');
             }
         });
     }
