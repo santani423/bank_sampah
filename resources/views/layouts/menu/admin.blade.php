@@ -28,11 +28,11 @@
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.gudangs.index') }}" class="sidebar-submenu__link"> Data
-                    Gudang </a>
+                    Customer </a>
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.cabang.index') }}" class="sidebar-submenu__link"> Data
-                    Cabang </a>
+                    Collaction Center </a>
             </li>
         </ul>
         <!-- Submenu End -->
@@ -55,13 +55,13 @@
                     Artikel </a>
             </li> --}}
             <li class="sidebar-submenu__item">
-                <a href="{{ route('admin.time.index') }}" class="sidebar-submenu__link"> Time </a>
+                <a href="{{ route('admin.time.index') }}" class="sidebar-submenu__link"> Tim </a>
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.labels.index') }}" class="sidebar-submenu__link"> Label </a>
             </li>
             <li class="sidebar-submenu__item">
-                <a href="{{ route('admin.activities.index') }}" class="sidebar-submenu__link"> Activities </a>
+                <a href="{{ route('admin.activities.index') }}" class="sidebar-submenu__link"> Artikel </a>
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.cleans.index') }}" class="sidebar-submenu__link"> Mitra </a>

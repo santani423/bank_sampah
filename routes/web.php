@@ -79,16 +79,16 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
     Route::resource('/data-sampah', AdminSampahController::class)->names('admin.sampah');
     Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
-    Route::resource('/data-cabang', AdminCabangController::class)->names('admin.cabang');
-    Route::resource('/data-time', TimeController::class)->names('admin.time');
+    Route::resource('/data-collaction-center', AdminCabangController::class)->names('admin.cabang');
+    Route::resource('/data-tim', TimeController::class)->names('admin.time');
     Route::resource('/data-label', LabelController::class)->names('admin.labels');
     Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
-    Route::resource('/data-gudang', GudangController::class)->names('admin.gudangs');
-    Route::post('admin/gudangs/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
+    Route::resource('/data-customers', GudangController::class)->names('admin.gudangs');
+    Route::post('admin/customers/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
 
 
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
-    Route::post('/data-cabang/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
+    Route::post('/data-collaction-center/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten
     Route::resource('/data-banner', AdminBannerController::class)->names('admin.banner');

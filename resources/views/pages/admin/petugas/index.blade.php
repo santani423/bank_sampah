@@ -31,8 +31,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-head-bg-primary">
+
+                    <div class="table-responsive" style="overflow-x:auto;">
+                        <table class="table table-hover table-bordered table-head-bg-primary text-nowrap">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -77,8 +78,8 @@
                                 @endforelse
                             </tbody>
                         </table>
-              
-                       <x-pagination :data="$petugas" />
+
+                        <x-pagination :data="$petugas" />
 
 
 

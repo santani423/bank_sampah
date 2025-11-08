@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ActivitySeeder::class);
         $this->call(CleanSeeder::class);
         $this->call(TokenWhatsappSeeder::class);
+        $this->call(JenisBadanSeeder::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

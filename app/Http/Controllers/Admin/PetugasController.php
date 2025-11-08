@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Petugas;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -69,21 +70,56 @@ class PetugasController extends Controller
         return view('pages.admin.petugas.edit', compact('petugas'));
     }
 
+
+
     public function update(Request $request, $id)
     {
         $petugas = Petugas::findOrFail($id);
 
+        // Validasi input
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:petugas,email,' . $petugas->id,
             'username' => 'required|string|unique:petugas,username,' . $petugas->id,
-            'role' => 'required|in:admin,petugas'
+            'role' => 'required|in:admin,petugas',
+            'password' => 'nullable|min:6' // password opsional
         ]);
 
-        $petugas->update($request->only(['nama', 'email', 'username', 'role']));
+        // Siapkan data yang akan diupdate
+        $petugasData = [
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'username' => $request->username,
+            'role' => $request->role,
+        ];
 
-        return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil diperbarui.');
+        $userData = [
+            'name' => $request->nama,
+            'email' => $request->email,
+            'username' => $request->username,
+            'role' => $request->role,
+        ];
+
+        // Jika password diisi, hash dan tambahkan ke data update
+        if (!empty($request->password)) {
+            $hashedPassword = Hash::make($request->password);
+            $petugasData['password'] = $hashedPassword;
+            $userData['password'] = $hashedPassword;
+        }
+
+        // Update data pada tabel users
+        $user = User::where('email', $petugas->email)->first();
+        if ($user) {
+            $user->update($userData);
+        }
+
+        // Update data pada tabel petugas
+        $petugas->update($petugasData);
+
+        return redirect()->route('admin.petugas.index')
+            ->with('success', 'Petugas berhasil diperbarui.');
     }
+
 
     public function destroy($petugas)
     {

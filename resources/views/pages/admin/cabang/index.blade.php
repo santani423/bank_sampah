@@ -46,11 +46,11 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-head-bg-primary">
+                    <div class="table-responsive" style="overflow-x:auto;">
+                        <table class="table table-hover table-bordered table-head-bg-primary text-nowrap">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>#</th>
                                     <th>Nama</th>
                                     <th>Alamat</th>
                                     <th>Kontak</th>
@@ -58,9 +58,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($cabangs as $cabang)
+                                @foreach ($cabangs as $index => $cabang)
                                     <tr>
-                                        <td>{{ $cabang->id }}</td>
+                                        <td>{{  $loop->iteration}}</td>
                                         <td>{{ $cabang->nama_cabang }}</td>
                                         <td>{{ $cabang->alamat }}</td>
                                         <td>{{ $cabang->telepon }}</td>
