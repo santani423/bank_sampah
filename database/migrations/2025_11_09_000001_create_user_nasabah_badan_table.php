@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jenis_badans', function (Blueprint $table) {
+        Schema::create('user_nasabah_badan', function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 100)->unique(); // Contoh: PT, CV, Koperasi, Yayasan
-            $table->text('keterangan')->nullable();
-            $table->longText('temp_before_data')->nullable();  
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('nasabah_badan_id')->constrained('nasabah_badan')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jenis_badans');
+        Schema::dropIfExists('user_nasabah_badan');
     }
 };

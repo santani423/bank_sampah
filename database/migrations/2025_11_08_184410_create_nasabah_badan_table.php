@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('nasabah_badan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('jenis_badan_id')->constrained('jenis_badan')->onDelete('cascade');
+            $table->foreignId('jenis_badan_id');
             $table->string('nama_badan', 150);
             $table->string('npwp', 50)->nullable()->unique();
             $table->string('nib', 50)->nullable()->unique()->comment('Nomor Induk Berusaha');

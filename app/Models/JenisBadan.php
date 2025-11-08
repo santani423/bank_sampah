@@ -9,5 +9,7 @@ use App\Traits\LogsActivity;
 class JenisBadan extends Model
 {
     use HasFactory, LogsActivity;
+
+     protected $table = 'jenis_badans';
     protected $guarded = [];
 }

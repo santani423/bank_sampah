@@ -9,7 +9,7 @@ class JenisBadanSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('jenis_badan')->insert([
+        DB::table('jenis_badans')->insert([
             [
                 'nama' => 'PT',
                 'keterangan' => 'Perseroan Terbatas',

@@ -14,7 +14,7 @@
         </div>
         <div class="ms-md-auto py-2 py-md-0">
             <div class="section-header-button">
-                {{-- <a href="{{ route('petugas.nasabah.create') }}" class="btn btn-primary btn-round">Tambah Nasabah Baru</a> --}}
+                <a href="{{ route('petugas.rekanan.create') }}" class="btn btn-primary btn-round">Tambah Nasabah Baru</a>
             </div>
         </div>
     </div>
