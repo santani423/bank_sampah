@@ -77,8 +77,9 @@
                         </table>
 
                     </div>
-                    <div class="float-right">
-                         
+                    <div class="d-flex justify-content-end align-items-center mt-3 gap-2">
+                        <div id="nasabah-summary" class="text-muted small me-3"></div>
+                        <nav id="nasabah-pagination" aria-label="Pagination"></nav>
                     </div>
                 </div>
             </div>
@@ -122,10 +123,49 @@ $(document).ready(function() {
                 // Pagination
                 let pagination = '';
                 if (res.last_page > 1) {
-                    pagination += '<nav><ul class="pagination">';
-                    for (let i = 1; i <= res.last_page; i++) {
-                        pagination += `<li class="page-item${i === res.current_page ? ' active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                    pagination += '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    pagination += `<li class="page-item${res.current_page === 1 ? ' disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${res.current_page - 1}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>`;
+                    
+                    // Page numbers with smart pagination
+                    let startPage = Math.max(1, res.current_page - 2);
+                    let endPage = Math.min(res.last_page, res.current_page + 2);
+                    
+                    // First page
+                    if (startPage > 1) {
+                        pagination += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+                        if (startPage > 2) {
+                            pagination += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                        }
                     }
+                    
+                    // Page numbers
+                    for (let i = startPage; i <= endPage; i++) {
+                        pagination += `<li class="page-item${i === res.current_page ? ' active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>`;
+                    }
+                    
+                    // Last page
+                    if (endPage < res.last_page) {
+                        if (endPage < res.last_page - 1) {
+                            pagination += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                        }
+                        pagination += `<li class="page-item"><a class="page-link" href="#" data-page="${res.last_page}">${res.last_page}</a></li>`;
+                    }
+                    
+                    // Next button
+                    pagination += `<li class="page-item${res.current_page === res.last_page ? ' disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${res.current_page + 1}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>`;
+                    
                     pagination += '</ul></nav>';
                 }
                 $(".float-right").html(pagination);
