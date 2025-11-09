@@ -49,4 +49,18 @@ class TransaksiNasabahBadan extends Model
     {
         return $this->hasMany(DetailTransaksiNasabahBadan::class, 'transaksi_nasabah_badan_id');
     }
+
+    /**
+     * Relasi untuk menarik data Sampah yang terlibat dalam transaksi
+     * melalui tabel pivot detail_transaksi_nasabah_badan beserta atribut pivot-nya.
+     */
+    public function sampah()
+    {
+        return $this->belongsToMany(
+            Sampah::class,
+            'detail_transaksi_nasabah_badan',
+            'transaksi_nasabah_badan_id',
+            'sampah_id'
+        )->withPivot(['berat_kg', 'harga_per_kg', 'harga_total']);
+    }
 }

@@ -609,9 +609,8 @@ $(document).ready(function() {
     // View detail button handler (you can implement modal or redirect)
     $(document).on('click', '.btn-view-detail', function() {
         const transactionId = $(this).data('id');
-        // Implement detail view logic here
-        alert('Detail transaksi ID: ' + transactionId);
-        // You can open a modal or redirect to detail page
+        // Redirect to detail page
+        window.location.href = `/petugas/data-rekanan/${nasabahId}/transaksi/${transactionId}`;
     });
     
     // Format currency helper

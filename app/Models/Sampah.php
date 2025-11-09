@@ -27,4 +27,12 @@ class Sampah extends Model
     {
         return $this->hasMany(DetailPengiriman::class, 'sampah_id');
     }
+
+    /**
+     * Relasi ke detail transaksi nasabah badan (jika berbeda dengan detail_transaksi umum)
+     */
+    public function detailTransaksiNasabahBadan()
+    {
+        return $this->hasMany(DetailTransaksiNasabahBadan::class, 'sampah_id');
+    }
 }

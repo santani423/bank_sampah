@@ -11,6 +11,9 @@ class DetailTransaksiNasabahBadan extends Model
 
     protected $table = 'detail_transaksi_nasabah_badan';
 
+    // Otomatis ikutkan data sampah saat memuat detail transaksi
+    protected $with = ['sampah'];
+
     protected $fillable = [
         'transaksi_nasabah_badan_id',
         'sampah_id',

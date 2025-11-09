@@ -132,6 +132,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
     Route::get('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'setorSampah'])->name('petugas.rekanan.setor-sampah');
     Route::post('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'storeSetorSampah'])->name('petugas.rekanan.setor-sampah.store');
+    Route::get('/data-rekanan/{nasabahBadan}/transaksi/{transaksi}', [NasabahUserBadanController::class, 'showTransaksi'])->name('petugas.rekanan.transaksi.show');
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');

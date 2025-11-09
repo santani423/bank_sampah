@@ -357,4 +357,20 @@ class NasabahUserBadanController extends Controller
 
         return $prefix . $newNumber;
     }
+
+    /**
+     * Show detail transaksi nasabah badan
+     */
+    public function showTransaksi($nasabahBadanId, $transaksiId)
+    {
+        $nasabahBadan = NasabahBadan::findOrFail($nasabahBadanId);
+        $transaksi = \App\Models\TransaksiNasabahBadan::with([
+            'nasabahBadan',
+            'petugas',
+            'detailTransaksi'
+        ])->where('nasabah_badan_id', $nasabahBadanId)
+          ->findOrFail($transaksiId);
+            // dd($transaksi);
+        return view('pages.petugas.nasabah-badan.transaksi-detail', compact('nasabahBadan', 'transaksi'));
+    }
 }
