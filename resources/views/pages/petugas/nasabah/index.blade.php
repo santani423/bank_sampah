@@ -132,7 +132,7 @@
                         rows += `<tr>
                             <td>${no++}</td>
                             <td>
-                                <a href='/petugas/nasabah/${n.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
+                                <a href='/petugas/data-nasabah/${n.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
                                 <a href='/petugas/transaksi/create?no_registrasi=${n.no_registrasi}' class='btn btn-warning btn-sm mb-1'>Setoran</a>
                             </td>
                             <td>${n.nama_lengkap ?? '-'}</td>
