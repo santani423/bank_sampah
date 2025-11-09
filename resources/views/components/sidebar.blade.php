@@ -125,6 +125,14 @@
                         </div>
                     </li>
 
+                    <!-- Top Up Saldo Utama -->
+                    <li class="nav-item">
+                        <a href="{{ route('admin.topup.index') }}">
+                            <i class="fas fa-wallet"></i>
+                            <p>Top Up Saldo Utama</p>
+                        </a>
+                    </li>
+
                     <!-- Dashboard -->
                     <li class="nav-item">
                         <a href="{{ route('admin.laporan.index') }}">

@@ -95,6 +95,12 @@
         <!-- Submenu End -->
     </li>
     <li class="sidebar-menu__item">
+        <a href="{{ route('admin.topup.index') }}" class="sidebar-menu__link">
+            <span class="icon"><i class="ph ph-wallet"></i></span>
+            <span class="text">Top Up Saldo Utama</span>
+        </a>
+    </li>
+    <li class="sidebar-menu__item">
         <a href="{{ route('admin.laporan.index') }}" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-users-three"></i></span>
             <span class="text">Cetak Laporan</span>

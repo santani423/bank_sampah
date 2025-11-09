@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 use App\Http\Controllers\CleanController;
@@ -122,6 +123,13 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     // Feedback
     Route::resource('/data-feedback', AdminFeedbackController::class)->names('admin.feedback');
     Route::resource('/settings', SettingController::class)->names('admin.settings');
+    
+    // Top Up Saldo Utama
+    Route::get('/topup', [AdminTopUpController::class, 'index'])->name('admin.topup.index');
+    Route::get('/topup/create', [AdminTopUpController::class, 'create'])->name('admin.topup.create');
+    Route::post('/topup/store', [AdminTopUpController::class, 'store'])->name('admin.topup.store');
+    Route::get('/topup/success', [AdminTopUpController::class, 'success'])->name('admin.topup.success');
+    Route::get('/topup/{id}', [AdminTopUpController::class, 'show'])->name('admin.topup.show');
 });
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
@@ -163,6 +171,10 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+// Xendit Callback (tidak perlu auth)
+Route::post('/xendit/callback/topup', [AdminTopUpController::class, 'callback'])->name('xendit.callback.topup');
+
 
 
 
