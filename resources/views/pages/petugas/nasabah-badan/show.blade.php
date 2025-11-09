@@ -34,6 +34,37 @@
             font-size: 0.875rem;
             padding: 0.375rem 0.75rem;
         }
+        
+        /* History Setoran Sampah Table Styles */
+        #transaction-table-body tr td {
+            color: #212529 !important;
+            vertical-align: middle;
+        }
+        
+        #transaction-table-body tr td ul {
+            color: #212529 !important;
+        }
+        
+        #transaction-table-body tr td ul li {
+            color: #212529 !important;
+        }
+        
+        #transaction-table-body tr td ul li small {
+            color: #495057 !important;
+        }
+        
+        #transaction-table-body tr td strong {
+            color: #000000 !important;
+        }
+        
+        .table thead th {
+            color: #212529 !important;
+            font-weight: 600;
+        }
+        
+        #showing-info {
+            color: #6c757d !important;
+        }
     </style>
 @endpush
 
