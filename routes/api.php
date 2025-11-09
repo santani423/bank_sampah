@@ -46,7 +46,7 @@ Route::apiResource('activities', ActivityController::class);
 Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
 
 // API Nasabah Perorangan (moved to controller)
-Route::get('/nasabah', [ApiNasabahController::class, 'index']);
+Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);
 
 Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 

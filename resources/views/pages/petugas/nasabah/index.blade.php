@@ -105,14 +105,25 @@
     <script>
         let currentPage = 1;
         let currentSearch = '';
+        const petugasEmail = `{{ auth()->check() ? auth()->user()->email : '' }}`;
 
         function fetchNasabah(page = 1, search = '') {
             const overlay = document.getElementById('loading-overlay');
             overlay.classList.remove('d-none');
             const tbody = document.getElementById('nasabahTableBody');
             tbody.innerHTML = '';
-            const url = `/api/nasabah?page=${page}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
-            fetch(url,{headers:{'Accept':'application/json'}})
+            // Build URL with new expected query params: nama_nasabah & no_registrasi (controller supports both separately)
+            const baseUrl = `{{ url('/api/nasabah-petugas') }}`;
+            const urlObj = new URL(baseUrl, window.location.origin);
+            urlObj.searchParams.set('page', page);
+            if (petugasEmail) {
+                urlObj.searchParams.set('email', petugasEmail);
+            }
+            if (search) {
+                // Send search term to both filters so backend can match either field
+                urlObj.searchParams.set('search', search); 
+            }
+            fetch(urlObj.toString(), {headers:{'Accept':'application/json'}})
                 .then(r => r.json())
                 .then(res => {
                     let rows='';
