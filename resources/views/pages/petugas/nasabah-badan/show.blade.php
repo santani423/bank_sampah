@@ -65,6 +65,46 @@
         #showing-info {
             color: #6c757d !important;
         }
+        
+        /* Saldo Card Styles */
+        .saldo-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .saldo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .saldo-card .saldo-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .saldo-card .saldo-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .saldo-card .saldo-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
 @endpush
 
@@ -81,6 +121,29 @@
             <a href="{{ route('petugas.rekanan.edit', $nasabahBadan->id) }}" class="btn btn-warning btn-round">
                 <i class="fas fa-edit"></i> Edit
             </a>
+        </div>
+    </div>
+
+    <!-- Saldo Card - Prominent Display -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="saldo-card position-relative">
+                <div class="row align-items-center">
+                    <div class="col-md-10">
+                        <div class="saldo-label">
+                            <i class="fas fa-wallet me-2"></i>Saldo Nasabah Badan
+                        </div>
+                        <h2 class="saldo-amount" id="saldo-display">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Memuat...
+                        </h2>
+                        <small class="d-block mt-2" style="opacity: 0.8;" id="saldo-updated">Terakhir diperbarui: -</small>
+                    </div>
+                    <div class="col-md-2 text-end d-none d-md-block">
+                        <i class="fas fa-money-bill-wave saldo-icon"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -260,6 +323,18 @@ $(document).ready(function() {
                     $('#username').text(data.username || '-');
                     $('#no-telp').text(data.no_telp || '-');
                     $('#alamat-lengkap').text(data.alamat_lengkap || '-');
+                    
+                    // Saldo - Display in prominent card
+                    const saldo = data.saldo ? data.saldo.saldo : 0;
+                    $('#saldo-display').html(`Rp ${formatCurrency(saldo)}`);
+                    
+                    // Saldo last updated
+                    if (data.saldo && data.saldo.updated_at) {
+                        const saldoUpdated = new Date(data.saldo.updated_at);
+                        $('#saldo-updated').text(`Terakhir diperbarui: ${formatDate(saldoUpdated)}`);
+                    } else {
+                        $('#saldo-updated').text('Terakhir diperbarui: -');
+                    }
                     
                     // Status badge
                     const statusBadge = $('#status');
@@ -538,6 +613,14 @@ $(document).ready(function() {
         alert('Detail transaksi ID: ' + transactionId);
         // You can open a modal or redirect to detail page
     });
+    
+    // Format currency helper
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
     
     // Format date helper
     function formatDate(date) {

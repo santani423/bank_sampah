@@ -121,7 +121,7 @@ class NasabahUserBadanController extends Controller
      */
     public function apiShow($id)
     {
-        $nasabahBadan = NasabahBadan::with('jenisBadan', 'userNasabahBadan.user')->findOrFail($id);
+        $nasabahBadan = NasabahBadan::with('jenisBadan', 'userNasabahBadan.user', 'saldo')->findOrFail($id);
         
         return response()->json([
             'success' => true,
