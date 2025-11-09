@@ -69,13 +69,13 @@ class TopUpController extends Controller
     {
         // Validasi input
         $validated = $request->validate([
-            'jumlah' => 'required|numeric|min:10000|max:100000000',
+            'jumlah' => 'required|numeric|min:10000|max:1000000000000000000',
             'keterangan' => 'nullable|string|max:500',
         ], [
             'jumlah.required' => 'Jumlah top up harus diisi',
             'jumlah.numeric' => 'Jumlah harus berupa angka',
             'jumlah.min' => 'Minimal top up adalah Rp 10.000',
-            'jumlah.max' => 'Maksimal top up adalah Rp 100.000.000',
+            'jumlah.max' => 'Maksimal top up adalah Rp 1.000.000.000.000.000.000',
             'keterangan.max' => 'Keterangan maksimal 500 karakter',
         ]);
 

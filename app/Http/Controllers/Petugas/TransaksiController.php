@@ -15,7 +15,9 @@ use App\Models\petugasBalaceMutation;
 use App\Models\petugasLog;
 use App\Models\petugasTopUp;
 use App\Models\saldoPetugas;
+use App\Models\SaldoUtama;
 use App\Models\TokenWhatsApp;
+use App\Models\TopUpAdmin;
 use Barryvdh\DomPDF\Facade as PDF;
 use RealRashid\SweetAlert\Facades\Alert;
 use Midtrans\Snap;
@@ -27,6 +29,7 @@ use Xendit\Invoice\InvoiceApi;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransaksiController extends Controller
 {
@@ -173,7 +176,7 @@ class TransaksiController extends Controller
 
         $sldPtgs = SaldoPetugas::where('id', $saldoPetugas->id)->first();
         $sldPtgs->saldo = $sldPtgs->saldo - $totalTransaksi;
-        
+
         $sldPtgs->save();
 
         // Redirect ke halaman cetak nota transaksi
@@ -354,54 +357,139 @@ class TransaksiController extends Controller
     public function callback(Request $request)
     {
         try {
-            // Log seluruh data callback dari Xendit
-            Log::info('Xendit Callback Received:', $request->all());
+            Log::info('📩 Xendit Callback Received (Admin TopUp):', $request->all());
 
-            $data = $request->all();
+            $payload = $request->all();
+            $data = $payload['data'] ?? [];
 
-            // Validasi field penting
-            if (empty($data['external_id']) || empty($data['status'])) {
-                Log::warning('Xendit Callback Missing Fields', $data);
+            if (empty($data['reference']) || empty($payload['event'])) {
+                Log::warning('⚠️ Xendit Callback Missing Fields (Admin TopUp)', $payload);
                 return response()->json(['message' => 'Invalid data'], 400);
             }
 
-            // Cari transaksi dari tabel petugasTopUp
-            $transaction = petugasTopUp::where('order_id', $data['external_id'])->first();
+            $externalId = $data['reference'];
+            $incomingStatus = strtolower($payload['event']) === 'payment.completed' ? 'paid' : 'pending';
+
+            DB::beginTransaction();
+            // Ambil dengan kunci untuk mencegah race-condition
+            $transaction = TopUpAdmin::where('xendit_external_id', $externalId)->lockForUpdate()->first();
 
             if (!$transaction) {
-                Log::warning('Transaksi tidak ditemukan untuk order_id: ' . $data['external_id']);
+                DB::rollBack();
+                Log::warning('🚫 Transaksi admin tidak ditemukan untuk xendit_external_id: ' . $externalId);
                 return response()->json(['message' => 'Transaction not found'], 404);
             }
 
-            // Update status transaksi sesuai status dari Xendit
-            $transaction->status = $data['status'];
+            // Idempotency: jika sudah paid / success jangan proses ulang
+            if (in_array(strtolower($transaction->status), ['paid', 'success', 'settlement'])) {
+                DB::commit();
+                Log::info('🟢 Callback diabaikan karena sudah diproses sebelumnya.', [
+                    'xendit_external_id' => $externalId,
+                    'existing_status' => $transaction->status,
+                ]);
+                return response()->json(['message' => 'Already processed'], 200);
+            }
 
-
-
+            // Perbarui status ke status terbaru dari Xendit
+            $transaction->status = $incomingStatus;
             $transaction->save();
 
-            if (strtolower($data['status']) === 'paid') {
-                $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->first();
-                // return response()->json(['message' => $transaction], 200);
-
+            if ($incomingStatus === 'paid') {
+                $saldo = SaldoUtama::lockForUpdate()->first();
                 if ($saldo) {
-                    $saldo->saldo = $saldo->saldo + $transaction->amount;
+                    $oldSaldo = $saldo->saldo;
+                    $saldo->saldo += $transaction->jumlah;
                     $saldo->save();
-
-                    Log::info('Saldo petugas berhasil ditambahkan. Petugas ID: ' . $transaction->petugas_id . ', Jumlah: ' . $transaction->amount);
+                    Log::info('✅ Saldo utama berhasil ditambahkan (Admin TopUp).', [
+                        'old_saldo' => $oldSaldo,
+                        'new_saldo' => $saldo->saldo,
+                        'topup_amount' => $transaction->jumlah,
+                        'xendit_external_id' => $externalId,
+                    ]);
                 } else {
-                    Log::warning('Saldo petugas tidak ditemukan untuk Petugas ID: ' . $transaction->petugas_id);
+                    Log::warning('⚠️ Saldo utama tidak ditemukan saat pemrosesan TopUp Admin.');
                 }
             }
 
-            Log::info('Transaksi berhasil diperbarui. order_id: ' . $transaction->order_id . ', status: ' . $transaction->status);
+            DB::commit();
 
-            return response()->json(['message' => 'Callback processed'], 200);
+            Log::info('💾 Transaksi admin berhasil diperbarui.', [
+                'external_id' => $externalId,
+                'status' => $transaction->status,
+            ]);
+            return response()->json(['message' => 'Callback processed successfully'], 200);
         } catch (\Exception $e) {
-            Log::error('Callback Xendit error: ' . $e->getMessage(), [
+            DB::rollBack();
+            Log::error('💥 Callback Xendit error (Admin TopUp): ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
 
+
+    public function callbackPetugas(Request $request)
+    {
+        try {
+            Log::info('📩 Xendit Callback Received (Petugas TopUp):', $request->all());
+
+            $data = $request->all();
+            if (empty($data['external_id']) || empty($data['status'])) {
+                Log::warning('⚠️ Xendit Callback Missing Fields (Petugas TopUp)', $data);
+                return response()->json(['message' => 'Invalid data'], 400);
+            }
+
+            DB::beginTransaction();
+            $transaction = petugasTopUp::where('order_id', $data['external_id'])->lockForUpdate()->first();
+            if (!$transaction) {
+                DB::rollBack();
+                Log::warning('🚫 Transaksi petugas tidak ditemukan untuk order_id: ' . $data['external_id']);
+                return response()->json(['message' => 'Transaction not found'], 404);
+            }
+
+            // Idempotency: jika sudah paid / success jangan proses ulang
+            if (in_array(strtolower($transaction->status), ['paid', 'success', 'settlement'])) {
+                DB::commit();
+                Log::info('🟢 Callback petugas diabaikan karena sudah diproses.', [
+                    'order_id' => $transaction->order_id,
+                    'existing_status' => $transaction->status
+                ]);
+                return response()->json(['message' => 'Already processed'], 200);
+            }
+
+            $incomingStatus = strtolower($data['status']);
+            $transaction->status = $incomingStatus;
+            $transaction->save();
+
+            if ($incomingStatus === 'paid') {
+                $saldo = saldoPetugas::where('petugas_id', $transaction->petugas_id)->lockForUpdate()->first();
+                if ($saldo) {
+                    $oldSaldo = $saldo->saldo;
+                    $saldo->saldo += $transaction->amount;
+                    $saldo->save();
+                    Log::info('✅ Saldo petugas bertambah (Petugas TopUp).', [
+                        'petugas_id' => $transaction->petugas_id,
+                        'old_saldo' => $oldSaldo,
+                        'new_saldo' => $saldo->saldo,
+                        'topup_amount' => $transaction->amount,
+                        'order_id' => $transaction->order_id
+                    ]);
+                } else {
+                    Log::warning('⚠️ Saldo petugas tidak ditemukan saat callback. Petugas ID: ' . $transaction->petugas_id);
+                }
+            }
+
+            DB::commit();
+            Log::info('💾 Transaksi petugas diperbarui.', [
+                'order_id' => $transaction->order_id,
+                'status' => $transaction->status
+            ]);
+            return response()->json(['message' => 'Callback processed'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('💥 Callback Xendit error (Petugas TopUp): ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('saldo_nasabah_badans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('nasabah_badan_id')->unique()->constrained('nasabah_badan')->onDelete('cascade');
+            $table->longText('temp_before_data')->nullable();  
             $table->decimal('saldo', 15, 2)->default(0);
             $table->timestamps();
         });

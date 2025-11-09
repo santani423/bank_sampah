@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('xendit_invoice_url')->nullable();
             $table->string('xendit_external_id')->nullable();
             $table->text('keterangan')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamp('tanggal_bayar')->nullable();
             $table->timestamps();
 

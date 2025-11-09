@@ -26,4 +26,11 @@ return [
 
     // 'webhook_secret' => env('XENDIT_WEBHOOK_SECRET', ''),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Xendit Callback Token (Opsional untuk validasi header x-callback-token)
+    |--------------------------------------------------------------------------
+    */
+    'callback_token' => env('XENDIT_CALLBACK_TOKEN', null),
+
 ];

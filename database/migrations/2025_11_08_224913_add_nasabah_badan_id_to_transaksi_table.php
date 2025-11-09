@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('transaksi', function (Blueprint $table) {
             // Make nasabah_id nullable
-            $table->foreignId('nasabah_id')->nullable()->change();
+            $table->foreignId('nasabah_id')->nullable()->change();  
             
             // Add nasabah_badan_id column
             $table->foreignId('nasabah_badan_id')->nullable()->after('nasabah_id')->constrained('nasabah_badan')->onDelete('cascade');

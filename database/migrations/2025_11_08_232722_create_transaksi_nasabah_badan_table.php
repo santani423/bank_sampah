@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('total_transaksi', 15, 2)->default(0);
             $table->enum('status', ['pending', 'selesai', 'dibatalkan'])->default('selesai');
             $table->text('keterangan')->nullable();
+            $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
     }

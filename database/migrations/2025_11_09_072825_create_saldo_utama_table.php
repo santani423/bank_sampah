@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('saldo_utama', function (Blueprint $table) {
             $table->id();
             $table->decimal('saldo', 15, 2)->default(0);
+            $table->longText('temp_before_data')->nullable();  
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });
