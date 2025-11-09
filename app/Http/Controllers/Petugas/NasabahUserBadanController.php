@@ -367,10 +367,23 @@ class NasabahUserBadanController extends Controller
         $transaksi = \App\Models\TransaksiNasabahBadan::with([
             'nasabahBadan',
             'petugas',
-            'detailTransaksi'
+            'detailTransaksi.sampah'
         ])->where('nasabah_badan_id', $nasabahBadanId)
           ->findOrFail($transaksiId);
             // dd($transaksi);
         return view('pages.petugas.nasabah-badan.transaksi-detail', compact('nasabahBadan', 'transaksi'));
+    }
+
+    /**
+     * Cetak nota transaksi nasabah badan dalam format ringkas.
+     */
+    public function printTransaksi($nasabahBadanId, $transaksiId)
+    {
+        $nasabahBadan = NasabahBadan::findOrFail($nasabahBadanId);
+        $transaksi = \App\Models\TransaksiNasabahBadan::with(['nasabahBadan','petugas','detailTransaksi.sampah'])
+            ->where('nasabah_badan_id', $nasabahBadanId)
+            ->findOrFail($transaksiId);
+
+        return view('pages.petugas.nasabah-badan.transaksi-print', compact('nasabahBadan','transaksi'));
     }
 }
