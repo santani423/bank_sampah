@@ -170,7 +170,7 @@
                                 </tr>
                             </thead>
                             <tbody id="setoran-details">
-                                <tr>
+                                {{-- <tr>
                                     <td>
                                         <select name="detail_transaksi[0][sampah_id]" class="form-control" required>
                                             <option value="">-- Pilih Sampah --</option>
@@ -199,11 +199,11 @@
                                     </td>
                                     <td class="total-harga text-end" data-total="0">Rp 0</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-danger btn-sm remove-row" disabled>
+                                        <button type="button" class="btn btn-danger btn-sm remove-row"  >
                                             Hapus
                                         </button>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -354,6 +354,31 @@ $(document).ready(function() {
         updateTotal(row);
     });
 
+    // Update harga & total saat pilih sampah preview
+    $(document).on('change', 'select.preview-sampah-select', function() {
+        let row = $(this).closest('tr');
+        let selectedOption = $(this).find(':selected');
+        let hargaPerKg = selectedOption.data('harga') || 0;
+        row.find('input.preview-harga').val(hargaPerKg);
+        // Calculate total for preview row
+        const beratVal = parseFloat(row.find('input.preview-berat').val()) || 0;
+        const totalVal = beratVal * hargaPerKg;
+        row.find('.total-harga').data('total', totalVal);
+        row.find('.total-harga').text('Rp ' + totalVal.toLocaleString('id-ID'));
+        calculateTotalTransaksi();
+    });
+
+    // Update total saat ubah berat preview
+    $(document).on('input', 'input.preview-berat, input.preview-harga', function() {
+        let row = $(this).closest('tr');
+        const beratVal = parseFloat(row.find('input.preview-berat').val()) || 0;
+        const hargaVal = parseFloat(row.find('input.preview-harga').val()) || 0;
+        const totalVal = beratVal * hargaVal;
+        row.find('.total-harga').data('total', totalVal);
+        row.find('.total-harga').text('Rp ' + totalVal.toLocaleString('id-ID'));
+        calculateTotalTransaksi();
+    });
+
     // Update total saat ubah berat
     $(document).on('input', 'input[name*="berat_kg"]', function() {
         let row = $(this).closest('tr');
@@ -428,18 +453,24 @@ $(document).ready(function() {
                     <td><input type="number" class="form-control preview-berat" value="${parseFloat(qty) || 0}" step="0.01" min="0"></td>
                     <td><input type="number" class="form-control preview-harga" value="0"></td>
                     <td class="total-harga text-end">Rp 0</td>
-                    <td class="text-center"><button type="button" class="btn btn-sm btn-secondary" disabled>Preview</button></td>
+                    <td class="text-center"><button type="button" class="btn btn-danger btn-sm remove-preview-row">Hapus</button></td>
                 </tr>`;
                 $('#setoran-details').append(newRow);
                 previewCount++;
                 // Auto select matching sampah by name
                 const lastSelect = $('#setoran-details tr:last select.preview-sampah-select');
+                const lastRow = $('#setoran-details tr:last');
                 lastSelect.find('option').each(function(){
                     if($(this).text().trim().toLowerCase() === nama.trim().toLowerCase()){
                         lastSelect.val($(this).val());
                         // Auto-fill harga from selected option
                         const hargaPerKg = $(this).data('harga') || 0;
-                        $('#setoran-details tr:last input.preview-harga').val(hargaPerKg);
+                        lastRow.find('input.preview-harga').val(hargaPerKg);
+                        // Calculate total for preview row
+                        const beratVal = parseFloat(lastRow.find('input.preview-berat').val()) || 0;
+                        const totalVal = beratVal * hargaPerKg;
+                        lastRow.find('.total-harga').data('total', totalVal);
+                        lastRow.find('.total-harga').text('Rp ' + totalVal.toLocaleString('id-ID'));
                         return false;
                     }
                 });
@@ -447,6 +478,7 @@ $(document).ready(function() {
             if(previewCount === 0){
                 alert('Tidak ada baris data yang valid untuk dipreview.');
             } else {
+                calculateTotalTransaksi();
                 alert('Preview berhasil ditampilkan. Edit angka berat/harga jika perlu lalu tekan Masukkan Preview ke Form.');
                 $('#commit-preview').prop('disabled', false);
             }
@@ -502,6 +534,16 @@ $(document).ready(function() {
         calculateTotalTransaksi();
         $('#commit-preview').prop('disabled', true);
         alert(inserted + ' baris preview dimasukkan sebagai baris editable. Silakan ubah berat sebelum simpan.');
+    });
+
+    // Remove preview row
+    $(document).on('click', '.remove-preview-row', function() {
+        $(this).closest('tr').remove();
+        calculateTotalTransaksi();
+        const previewCount = $('.preview-import-row').length;
+        if(previewCount === 0){
+            $('#commit-preview').prop('disabled', true);
+        }
     });
 
     const jsTemplateBtn = document.getElementById('download-template-js');
