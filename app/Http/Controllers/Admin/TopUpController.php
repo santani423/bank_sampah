@@ -8,40 +8,47 @@ use App\Models\TopUpAdmin;
 use App\Models\SaldoUtama;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Xendit\Configuration;
 use Xendit\Invoice\InvoiceApi;
 
 class TopUpController extends Controller
 {
+    protected InvoiceApi $invoiceApi;
+
     public function __construct()
     {
-        // Set Xendit API Key
-        Configuration::setXenditKey(config('xendit.secret_key'));
+        $apiKey = config('xendit.api_key');
+
+        if (empty($apiKey)) {
+            Log::error('Xendit API Key not set in config.');
+            abort(500, 'Xendit API Key tidak tersedia.');
+        }
+
+        Configuration::setXenditKey($apiKey);
+        $this->invoiceApi = new InvoiceApi();
     }
 
     /**
-     * Menampilkan halaman top up
+     * Menampilkan daftar top up & saldo utama
      */
     public function index()
     {
         $topups = TopUpAdmin::with('user')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(20);
 
-        // Ambil saldo utama
-        $saldoUtama = SaldoUtama::first();
-        if (!$saldoUtama) {
-            $saldoUtama = SaldoUtama::create([
-                'saldo' => 0,
-                'keterangan' => 'Saldo Awal'
-            ]);
-        }
+        // Pastikan saldo utama tersedia
+        $saldoUtama = SaldoUtama::firstOrCreate(
+            [],
+            ['saldo' => 0, 'keterangan' => 'Saldo Awal']
+        );
 
         return view('pages.admin.topup.index', compact('topups', 'saldoUtama'));
     }
 
     /**
-     * Menampilkan form top up
+     * Form pembuatan top up
      */
     public function create()
     {
@@ -49,114 +56,190 @@ class TopUpController extends Controller
     }
 
     /**
-     * Proses create invoice Xendit
+     * Simpan dan buat invoice Xendit baru
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'jumlah' => 'required|numeric|min:10000',
-            'keterangan' => 'nullable|string'
+        // Validasi input
+        $validated = $request->validate([
+            'jumlah' => 'required|numeric|min:10000|max:100000000',
+            'keterangan' => 'nullable|string|max:500',
+        ], [
+            'jumlah.required' => 'Jumlah top up harus diisi',
+            'jumlah.numeric' => 'Jumlah harus berupa angka',
+            'jumlah.min' => 'Minimal top up adalah Rp 10.000',
+            'jumlah.max' => 'Maksimal top up adalah Rp 100.000.000',
+            'keterangan.max' => 'Keterangan maksimal 500 karakter',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $externalId = 'TOPUP-' . time() . '-' . Auth::id();
+            $user = Auth::user();
 
-            // Create invoice Xendit
-            $apiInstance = new InvoiceApi();
-            
-            $createInvoiceRequest = [
+            if (!$user->email) {
+                throw new \Exception('Email user tidak ditemukan. Silakan lengkapi profil Anda terlebih dahulu.');
+            }
+
+            // Cegah top up ganda yang masih pending
+            $pendingTopup = TopUpAdmin::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($pendingTopup) {
+                throw new \Exception('Anda masih memiliki top up yang belum dibayar. Selesaikan terlebih dahulu sebelum membuat yang baru.');
+            }
+
+            // Generate external ID unik
+            $externalId = sprintf('TOPUP-%s-%d-%s', date('YmdHis'), $user->id, uniqid());
+
+            // Buat invoice di Xendit
+            $invoiceData = [
                 'external_id' => $externalId,
-                'amount' => (float) $request->jumlah,
-                'payer_email' => Auth::user()->email ?? 'admin@banksampah.com',
-                'description' => 'Top Up Saldo Bank Sampah - ' . ($request->keterangan ?? ''),
+                'amount' => (float) $validated['jumlah'],
+                'payer_email' => $user->email,
+                'description' => 'Top Up Saldo Bank Sampah' .
+                    (!empty($validated['keterangan']) ? ' - ' . $validated['keterangan'] : ''),
                 'invoice_duration' => 86400, // 24 jam
                 'currency' => 'IDR',
                 'success_redirect_url' => route('admin.topup.success'),
                 'failure_redirect_url' => route('admin.topup.index'),
             ];
 
-            $result = $apiInstance->createInvoice($createInvoiceRequest);
+            Log::info('Creating Xendit invoice', [
+                'external_id' => $externalId,
+                'amount' => $validated['jumlah'],
+                'user_id' => $user->id,
+            ]);
 
-            // Simpan ke database
+            $invoice = $this->invoiceApi->createInvoice($invoiceData);
+
+            if (empty($invoice['id']) || empty($invoice['invoice_url'])) {
+                throw new \Exception('Response dari Xendit tidak valid.');
+            }
+
+            // Simpan top up ke database
             $topup = TopUpAdmin::create([
-                'user_id' => Auth::id(),
-                'jumlah' => $request->jumlah,
+                'user_id' => $user->id,
+                'jumlah' => $validated['jumlah'],
                 'metode_pembayaran' => 'xendit',
                 'status' => 'pending',
-                'xendit_invoice_id' => $result['id'],
-                'xendit_invoice_url' => $result['invoice_url'],
+                'xendit_invoice_id' => $invoice['id'],
+                'xendit_invoice_url' => $invoice['invoice_url'],
                 'xendit_external_id' => $externalId,
-                'keterangan' => $request->keterangan
+                'keterangan' => $validated['keterangan'] ?? null,
             ]);
 
             DB::commit();
 
-            // Redirect ke payment page Xendit
-            return redirect($result['invoice_url']);
+            Log::info('Top up created successfully', [
+                'topup_id' => $topup->id,
+                'invoice_id' => $invoice['id'],
+            ]);
 
+            // Redirect ke halaman pembayaran Xendit
+            return redirect()->away($invoice['invoice_url']);
+        } catch (\Xendit\XenditSdkException $e) {
+            DB::rollBack();
+            Log::error('Xendit SDK Error', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Gagal terhubung ke payment gateway. Silakan coba lagi.')->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Gagal membuat invoice: ' . $e->getMessage())
-                ->withInput();
+            Log::error('Top up store error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Gagal membuat top up: ' . $e->getMessage())->withInput();
         }
     }
 
     /**
-     * Callback dari Xendit
+     * Callback webhook dari Xendit
      */
     public function callback(Request $request)
     {
         try {
+            Log::info('Xendit callback received', ['payload' => $request->all()]);
+
             // Verifikasi callback token
             $callbackToken = $request->header('x-callback-token');
             if ($callbackToken !== config('xendit.callback_token')) {
+                Log::warning('Invalid callback token', ['received_token' => $callbackToken]);
                 return response()->json(['error' => 'Invalid callback token'], 403);
             }
 
             $externalId = $request->external_id;
-            $status = $request->status;
+            $status = strtoupper($request->status);
+
+            if (!$externalId || !$status) {
+                Log::error('Missing required fields in callback', [
+                    'external_id' => $externalId,
+                    'status' => $status,
+                ]);
+                return response()->json(['error' => 'Missing required fields'], 400);
+            }
 
             $topup = TopUpAdmin::where('xendit_external_id', $externalId)->first();
 
             if (!$topup) {
+                Log::error('Top up not found', ['external_id' => $externalId]);
                 return response()->json(['error' => 'Top up not found'], 404);
             }
 
             DB::beginTransaction();
 
-            if ($status === 'PAID' && $topup->status === 'pending') {
-                // Update status top up
-                $topup->update([
-                    'status' => 'success',
-                    'tanggal_bayar' => now()
-                ]);
+            switch ($status) {
+                case 'PAID':
+                    if ($topup->status === 'pending') {
+                        $topup->update([
+                            'status' => 'success',
+                            'tanggal_bayar' => now(),
+                        ]);
 
-                // Update saldo utama
-                $saldoUtama = SaldoUtama::first();
-                if (!$saldoUtama) {
-                    $saldoUtama = SaldoUtama::create([
-                        'saldo' => 0,
-                        'keterangan' => 'Saldo Awal'
-                    ]);
-                }
+                        // Update saldo utama
+                        $saldoUtama = SaldoUtama::firstOrCreate(
+                            [],
+                            ['saldo' => 0, 'keterangan' => 'Saldo Awal']
+                        );
 
-                $saldoUtama->saldo += $topup->jumlah;
-                $saldoUtama->keterangan = 'Top Up oleh ' . $topup->user->name . ' sebesar Rp ' . number_format($topup->jumlah, 0, ',', '.');
-                $saldoUtama->save();
+                        $oldSaldo = $saldoUtama->saldo;
+                        $saldoUtama->saldo += $topup->jumlah;
+                        $saldoUtama->keterangan = 'Top Up oleh ' . $topup->user->name . ' sebesar Rp ' . number_format($topup->jumlah, 0, ',', '.');
+                        $saldoUtama->save();
 
-            } elseif ($status === 'EXPIRED') {
-                $topup->update(['status' => 'expired']);
+                        Log::info('Top up success and saldo updated', [
+                            'topup_id' => $topup->id,
+                            'old_saldo' => $oldSaldo,
+                            'new_saldo' => $saldoUtama->saldo,
+                        ]);
+                    }
+                    break;
+
+                case 'EXPIRED':
+                    $topup->update(['status' => 'expired']);
+                    Log::info('Top up expired', ['topup_id' => $topup->id]);
+                    break;
+
+                case 'FAILED':
+                    $topup->update(['status' => 'failed']);
+                    Log::info('Top up failed', ['topup_id' => $topup->id]);
+                    break;
             }
 
             DB::commit();
-
             return response()->json(['success' => true]);
-
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Callback error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
