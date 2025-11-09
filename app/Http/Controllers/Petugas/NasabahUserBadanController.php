@@ -13,6 +13,22 @@ use Illuminate\Validation\Rule;
 class NasabahUserBadanController extends Controller
 {
     /**
+     * Import data sampah dari file Excel/CSV (route: petugas.rekanan.sampah-import)
+     */
+    public function importSampah(Request $request, $nasabahBadanId)
+    {
+        $request->validate([
+            'file_import' => 'required|file|mimes:csv,xlsx,xls',
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\SampahImport, $request->file('file_import'));
+            return back()->with('success', 'Data sampah berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

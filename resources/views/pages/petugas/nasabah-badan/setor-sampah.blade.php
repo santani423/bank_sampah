@@ -43,6 +43,35 @@
             </div>
         @endif
 
+        <!-- Form Import CSV & Download Template -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><strong>Import Data Sampah dari Excel/CSV</strong></span>
+                <a href="{{ asset('template_import_sampah.csv') }}" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-download"></i> Download Template
+                </a>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('petugas.rekanan.sampah-import', $nasabahBadan->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <div class="form-group mb-0">
+                                <label for="file_import">Pilih File Excel/CSV</label>
+                                <input type="file" name="file_import" id="file_import" class="form-control" accept=".csv,.xlsx,.xls" required>
+                                <small class="text-muted">Format: .csv, .xlsx, .xls</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-import"></i> Import Data
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <form action="{{ route('petugas.rekanan.setor-sampah.store', $nasabahBadan->id) }}" method="POST" id="form-setor-sampah">
             @csrf
             
