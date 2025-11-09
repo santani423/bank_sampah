@@ -52,7 +52,14 @@ class TopUpController extends Controller
      */
     public function create()
     {
-        return view('pages.admin.topup.create');
+        $user = Auth::user();
+        
+        // Cek apakah ada top up yang masih pending
+        $pendingTopup = TopUpAdmin::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        return view('pages.admin.topup.create', compact('pendingTopup'));
     }
 
     /**
@@ -168,6 +175,7 @@ class TopUpController extends Controller
         $validated = $request->validate([
             'jumlah' => 'required|numeric|min:10000|max:100000000',
             'keterangan' => 'nullable|string|max:500',
+            'force_new' => 'nullable|boolean', // Parameter untuk force create new
         ], [
             'jumlah.required' => 'Jumlah top up harus diisi',
             'jumlah.numeric' => 'Jumlah harus berupa angka',
@@ -188,16 +196,31 @@ class TopUpController extends Controller
                 ], 400);
             }
 
-            // Cegah top up ganda yang masih pending
+            // Cek apakah ada top up yang masih pending
             $pendingTopup = TopUpAdmin::where('user_id', $user->id)
                 ->where('status', 'pending')
                 ->first();
 
-            if ($pendingTopup) {
+            // Jika ada pending dan user belum konfirmasi untuk membuat baru
+            if ($pendingTopup && !$request->input('force_new', false)) {
+                DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Anda masih memiliki top up yang belum dibayar. Selesaikan terlebih dahulu sebelum membuat yang baru.'
-                ], 400);
+                    'has_pending' => true,
+                    'pending_topup' => [
+                        'id' => $pendingTopup->id,
+                        'jumlah' => $pendingTopup->jumlah,
+                        'invoice_url' => $pendingTopup->xendit_invoice_url,
+                        'created_at' => $pendingTopup->created_at->format('d M Y H:i'),
+                    ],
+                    'message' => 'Anda masih memiliki transaksi top up yang belum dibayar.'
+                ], 409); // 409 Conflict
+            }
+
+            // Jika user memilih membuat baru, hapus/expire pending yang lama
+            if ($pendingTopup && $request->input('force_new', false)) {
+                $pendingTopup->update(['status' => 'expired']);
+                Log::info('Expired old pending topup', ['topup_id' => $pendingTopup->id]);
             }
 
             // Generate external ID unik

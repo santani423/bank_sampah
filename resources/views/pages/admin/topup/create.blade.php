@@ -74,7 +74,7 @@
 
 @section('main')
     <div class="d-flex align-items-center mb-4">
-        <a href="{{ route('admin.topup.index') }}" class="btn btn-outline-secondary me-3">
+        <a href="{{ route('admin.topup.index') }}" class="btn btn-secondary me-3">
             <i class="bi bi-arrow-left"></i>
         </a>
         <div>
@@ -85,6 +85,27 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-7 col-md-9">
+
+            {{-- Alert jika ada pending topup --}}
+            @if(isset($pendingTopup))
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.5rem;"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-2">Transaksi Top Up Pending</h6>
+                        <p class="mb-2">Anda memiliki transaksi top up sebesar <strong>Rp {{ number_format($pendingTopup->jumlah, 0, ',', '.') }}</strong> yang belum diselesaikan (dibuat pada {{ $pendingTopup->created_at->format('d M Y H:i') }}).</p>
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{{ $pendingTopup->xendit_invoice_url }}" target="_blank" class="btn btn-sm btn-primary">
+                                <i class="bi bi-credit-card me-1"></i> Lanjutkan Pembayaran
+                            </a>
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="alert">
+                                <i class="bi bi-x-circle me-1"></i> Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             {{-- Info Box --}}
             <div class="info-box mb-4">
@@ -175,7 +196,7 @@
                             <button type="submit" class="btn btn-primary btn-lg px-5">
                                 <i class="bi bi-check-circle me-1"></i> Lanjutkan ke Pembayaran
                             </button>
-                            <a href="{{ route('admin.topup.index') }}" class="btn btn-outline-secondary btn-lg px-5">
+                            <a href="{{ route('admin.topup.index') }}" class="btn btn-secondary btn-lg px-5">
                                 <i class="bi bi-x-circle me-1"></i> Batal
                             </a>
                         </div>
@@ -186,11 +207,56 @@
 
         </div>
     </div>
+
+    {{-- Modal Konfirmasi Pending Topup --}}
+    <div class="modal fade" id="pendingTopupModal" tabindex="-1" aria-labelledby="pendingTopupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="pendingTopupModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Transaksi Pending Ditemukan
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-clock-history text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center mb-3">Anda memiliki transaksi top up yang belum diselesaikan:</p>
+                    <div class="alert alert-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Jumlah:</span>
+                            <strong class="text-primary" id="pendingAmount">-</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Dibuat:</span>
+                            <span id="pendingDate">-</span>
+                        </div>
+                    </div>
+                    <p class="text-center mb-0">Apa yang ingin Anda lakukan?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" id="btnContinuePending">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Lanjutkan Pembayaran
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btnCreateNew">
+                        <i class="bi bi-plus-circle me-1"></i> Buat Transaksi Baru
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
         $(function() {
+            let pendingTopupData = null;
+            let formDataToSubmit = null;
+
             // Pilih nominal cepat
             $('.nominal-btn').on('click', function() {
                 $('.nominal-btn').removeClass('active');
@@ -203,28 +269,27 @@
                 $('.nominal-btn').removeClass('active');
             });
 
-            // AJAX submit form
-            $('#topupForm').on('submit', function(e) {
-                e.preventDefault();
-
-                const jumlah = parseInt($('#jumlah').val());
-                if (!jumlah || jumlah < 10000) {
-                    $('#jumlah').addClass('is-invalid');
-                    $('#jumlahError').text('Jumlah top up minimal Rp 10.000');
-                    return false;
-                }
-
-                // Remove previous errors
-                $('#jumlah').removeClass('is-invalid');
-                $('#jumlahError').text('');
-
+            // Function untuk submit form ke API
+            function submitTopupForm(forceNew = false) {
+                const submitBtn = $('#topupForm button[type="submit"]');
+                
                 // Disable button and show loading
-                const submitBtn = $(this).find('button[type="submit"]');
                 submitBtn.prop('disabled', true)
                     .html('<span class="spinner-border spinner-border-sm me-2"></span>Memproses...');
 
                 // Get CSRF token
                 const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                // Prepare data
+                const requestData = {
+                    jumlah: $('#jumlah').val(),
+                    keterangan: $('#keterangan').val()
+                };
+
+                // Jika force new, tambahkan parameter
+                if (forceNew) {
+                    requestData.force_new = true;
+                }
 
                 // Send AJAX request to API
                 $.ajax({
@@ -235,10 +300,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    data: JSON.stringify({
-                        jumlah: $('#jumlah').val(),
-                        keterangan: $('#keterangan').val()
-                    }),
+                    data: JSON.stringify(requestData),
                     success: function(response) {
                         if (response.success && response.data.invoice_url) {
                             // Redirect to payment page
@@ -253,6 +315,32 @@
                     error: function(xhr) {
                         // Handle error
                         let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                        
+                        // Jika status 409 (Conflict) berarti ada pending topup
+                        if (xhr.status === 409 && xhr.responseJSON && xhr.responseJSON.has_pending) {
+                            const pending = xhr.responseJSON.pending_topup;
+                            pendingTopupData = pending;
+                            
+                            // Update modal content
+                            $('#pendingAmount').text('Rp ' + parseInt(pending.jumlah).toLocaleString('id-ID'));
+                            $('#pendingDate').text(pending.created_at);
+                            
+                            // Simpan data form untuk digunakan nanti jika user pilih buat baru
+                            formDataToSubmit = {
+                                jumlah: $('#jumlah').val(),
+                                keterangan: $('#keterangan').val()
+                            };
+                            
+                            // Tampilkan modal
+                            const modal = new bootstrap.Modal(document.getElementById('pendingTopupModal'));
+                            modal.show();
+                            
+                            // Enable button
+                            submitBtn.prop('disabled', false)
+                                .html('<i class="bi bi-check-circle me-1"></i> Lanjutkan ke Pembayaran');
+                            
+                            return;
+                        }
                         
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
@@ -273,6 +361,42 @@
                             .html('<i class="bi bi-check-circle me-1"></i> Lanjutkan ke Pembayaran');
                     }
                 });
+            }
+
+            // AJAX submit form
+            $('#topupForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const jumlah = parseInt($('#jumlah').val());
+                if (!jumlah || jumlah < 10000) {
+                    $('#jumlah').addClass('is-invalid');
+                    $('#jumlahError').text('Jumlah top up minimal Rp 10.000');
+                    return false;
+                }
+
+                // Remove previous errors
+                $('#jumlah').removeClass('is-invalid');
+                $('#jumlahError').text('');
+
+                // Submit form
+                submitTopupForm(false);
+            });
+
+            // Handle button "Lanjutkan Pembayaran" di modal
+            $('#btnContinuePending').on('click', function() {
+                if (pendingTopupData && pendingTopupData.invoice_url) {
+                    window.location.href = pendingTopupData.invoice_url;
+                }
+            });
+
+            // Handle button "Buat Transaksi Baru" di modal
+            $('#btnCreateNew').on('click', function() {
+                // Tutup modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('pendingTopupModal'));
+                modal.hide();
+                
+                // Submit dengan force_new = true
+                submitTopupForm(true);
             });
         });
     </script>
