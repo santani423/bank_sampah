@@ -258,7 +258,7 @@ class NasabahUserBadanController extends Controller
 
         // Validasi input
         $request->validate([
-            'kode_transaksi' => 'required|string|unique:transaksi,kode_transaksi',
+            'kode_transaksi' => 'required|string|unique:transaksi_nasabah_badan,kode_transaksi',
             'tanggal_transaksi' => 'required|date',
             'detail_transaksi' => 'required|array|min:1',
             'detail_transaksi.*.sampah_id' => 'required|exists:sampah,id',
@@ -285,23 +285,26 @@ class NasabahUserBadanController extends Controller
         }
 
         // Ambil ID petugas
-        $petugas_id = auth()->user()->id;
+        $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
+        $petugas_id = $petugas ? $petugas->id : null;
 
-        // Simpan transaksi utama (gunakan nasabah_badan_id)
-        $transaksi = \App\Models\Transaksi::create([
+        // Simpan transaksi utama ke tabel transaksi_nasabah_badan
+        $transaksi = \App\Models\TransaksiNasabahBadan::create([
             'kode_transaksi' => $request->kode_transaksi,
-            'nasabah_badan_id' => $nasabahBadan->id, // Gunakan nasabah_badan_id
-            'nasabah_id' => null, // Kosongkan nasabah_id
+            'nasabah_badan_id' => $nasabahBadan->id,
             'petugas_id' => $petugas_id,
             'tanggal_transaksi' => $request->tanggal_transaksi,
+            'total_transaksi' => $totalTransaksi,
+            'status' => 'selesai',
+            'keterangan' => $request->keterangan ?? null,
         ]);
 
-        // Simpan detail transaksi
+        // Simpan detail transaksi ke tabel detail_transaksi_nasabah_badan
         foreach ($request->detail_transaksi as $detail) {
             $hargaTotal = $detail['berat_kg'] * $detail['harga_per_kg'];
 
-            \App\Models\DetailTransaksi::create([
-                'transaksi_id' => $transaksi->id,
+            \App\Models\DetailTransaksiNasabahBadan::create([
+                'transaksi_nasabah_badan_id' => $transaksi->id,
                 'sampah_id' => $detail['sampah_id'],
                 'berat_kg' => $detail['berat_kg'],
                 'harga_per_kg' => $detail['harga_per_kg'],
@@ -314,8 +317,16 @@ class NasabahUserBadanController extends Controller
         $sldPtgs->saldo = $sldPtgs->saldo - $totalTransaksi;
         $sldPtgs->save();
 
-        // TODO: Update saldo nasabah badan (jika ada tabel saldo untuk nasabah badan)
-        // Untuk sementara kita skip, bisa ditambahkan nanti
+        // Update saldo nasabah badan (jika ada tabel saldo untuk nasabah badan)
+        // Cari atau buat saldo nasabah badan
+        $saldoNasabahBadan = \App\Models\SaldoNasabahBadan::firstOrCreate(
+            ['nasabah_badan_id' => $nasabahBadan->id],
+            ['saldo' => 0]
+        );
+        
+        // Tambah saldo nasabah badan
+        $saldoNasabahBadan->saldo += $totalTransaksi;
+        $saldoNasabahBadan->save();
 
         return redirect()
             ->route('petugas.rekanan.index')

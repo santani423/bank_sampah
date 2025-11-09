@@ -41,4 +41,20 @@ class NasabahBadan extends Model
     {
         return $this->hasOne(UserNasabahBadan::class, 'nasabah_badan_id');
     }
+
+    /**
+     * Get all transaksi for this nasabah badan.
+     */
+    public function transaksiNasabahBadan()
+    {
+        return $this->hasMany(TransaksiNasabahBadan::class, 'nasabah_badan_id');
+    }
+
+    /**
+     * Get saldo for this nasabah badan.
+     */
+    public function saldo()
+    {
+        return $this->hasOne(SaldoNasabahBadan::class, 'nasabah_badan_id');
+    }
 }

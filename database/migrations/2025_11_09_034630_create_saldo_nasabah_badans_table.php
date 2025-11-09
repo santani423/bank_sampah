@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_nasabah_badan', function (Blueprint $table) {
+        Schema::create('saldo_nasabah_badans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('nasabah_badan_id')->constrained('nasabah_badan')->onDelete('cascade');
+            $table->foreignId('nasabah_badan_id')->unique()->constrained('nasabah_badan')->onDelete('cascade');
+            $table->decimal('saldo', 15, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_nasabah_badan');
+        Schema::dropIfExists('saldo_nasabah_badans');
     }
 };
