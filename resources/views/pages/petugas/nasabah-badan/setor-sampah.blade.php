@@ -47,24 +47,33 @@
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><strong>Import Data Sampah dari Excel/CSV</strong></span>
-                <a href="{{ asset('template_import_sampah.csv') }}" class="btn btn-outline-success btn-sm">
-                    <i class="fas fa-download"></i> Download Template
-                </a>
+                <div class="d-flex gap-2">
+          
+                    <a href="{{ asset('template_import_sampah.csv') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-download"></i> Download Template (File)
+                    </a>
+                    {{-- <button type="button" id="download-template-js" class="btn btn-primary btn-sm">
+                        <i class="fas fa-magic"></i> Download Template (JS)
+                    </button>
+                    <button type="button" id="commit-preview" class="btn btn-warning btn-sm" disabled>
+                        <i class="fas fa-check"></i> Masukkan Preview ke Form
+                    </button> --}}
+                </div>
             </div>
             <div class="card-body">
-                <form action="{{ route('petugas.rekanan.sampah-import', $nasabahBadan->id) }}" method="POST" enctype="multipart/form-data">
+                <form id="form-import-sampah" action="{{ route('petugas.rekanan.sampah-import', $nasabahBadan->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row align-items-end">
                         <div class="col-md-6">
                             <div class="form-group mb-0">
                                 <label for="file_import">Pilih File Excel/CSV</label>
                                 <input type="file" name="file_import" id="file_import" class="form-control" accept=".csv,.xlsx,.xls" required>
-                                <small class="text-muted">Format: .csv, .xlsx, .xls</small>
+                                <small class="text-muted">Format CSV: kode_sampah, nama_sampah, qty. Data akan dipreview dulu (tidak langsung disimpan).</small>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-file-import"></i> Import Data
+                            <button type="submit" class="btn btn-primary" id="btn-preview-import">
+                                <i class="fas fa-eye"></i> Preview Import
                             </button>
                         </div>
                     </div>
@@ -361,6 +370,166 @@ $(document).ready(function() {
 
     // Initial toggle
     toggleRemoveButtons();
+
+    // Preview import (client-side) - only for CSV
+    $('#form-import-sampah').on('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('file_import');
+        if(!fileInput.files.length){
+            alert('Pilih file terlebih dahulu.');
+            return;
+        }
+        const file = fileInput.files[0];
+        const ext = file.name.split('.').pop().toLowerCase();
+        if(ext !== 'csv'){ 
+            alert('Preview cepat hanya mendukung file CSV. Untuk XLS/XLSX silakan konversi ke CSV terlebih dahulu.');
+            return; 
+        }
+        const reader = new FileReader();
+        reader.onload = function(evt){
+            const text = evt.target.result;
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+            if(lines.length < 2){
+                alert('File tidak memiliki data yang cukup.');
+                return;
+            }
+            // Parse header
+            const header = lines[0].split(',').map(h => h.replace(/(^\"|\"$)/g,'').trim().toLowerCase());
+            const idxKode = header.indexOf('kode_sampah');
+            const idxNama = header.indexOf('nama_sampah');
+            const idxQty = header.indexOf('qty');
+            if(idxNama === -1 || idxQty === -1){
+                alert('Kolom wajib: nama_sampah, qty (kode_sampah opsional).');
+                return;
+            }
+            // Clear existing preview rows appended earlier
+            $('.preview-import-row').remove();
+            // Add rows to table for preview (not saved yet)
+            let previewCount = 0;
+            lines.slice(1).forEach((line,i) => {
+                const cols = line.split(',').map(c => c.replace(/(^\"|\"$)/g,'').trim());
+                if(cols.length === 0 || cols.every(c => c === '')) return;
+                const kode = idxKode !== -1 ? cols[idxKode] : '';
+                const nama = cols[idxNama] || '';
+                const qty = cols[idxQty] || '0';
+                if(!nama) return; // skip empty name rows
+                // Append an editable preview row
+                const newRow = `
+                <tr class="preview-import-row table-warning">
+                    <td>
+                        <div class="small text-muted">PREVIEW</div>
+                        <select class="form-control preview-sampah-select">
+                            <option value="">-- Pilih Sampah --</option>
+                            @foreach ($stokSampah as $sampah)
+                                <option value="{{ $sampah->id }}" data-harga="{{ $sampah->harga_per_kg }}">{{ $sampah->nama_sampah }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control preview-berat" value="${parseFloat(qty) || 0}" step="0.01" min="0"></td>
+                    <td><input type="number" class="form-control preview-harga" value="0"></td>
+                    <td class="total-harga text-end">Rp 0</td>
+                    <td class="text-center"><button type="button" class="btn btn-sm btn-secondary" disabled>Preview</button></td>
+                </tr>`;
+                $('#setoran-details').append(newRow);
+                previewCount++;
+                // Auto select matching sampah by name
+                const lastSelect = $('#setoran-details tr:last select.preview-sampah-select');
+                lastSelect.find('option').each(function(){
+                    if($(this).text().trim().toLowerCase() === nama.trim().toLowerCase()){
+                        lastSelect.val($(this).val());
+                        // Auto-fill harga from selected option
+                        const hargaPerKg = $(this).data('harga') || 0;
+                        $('#setoran-details tr:last input.preview-harga').val(hargaPerKg);
+                        return false;
+                    }
+                });
+            });
+            if(previewCount === 0){
+                alert('Tidak ada baris data yang valid untuk dipreview.');
+            } else {
+                alert('Preview berhasil ditampilkan. Edit angka berat/harga jika perlu lalu tekan Masukkan Preview ke Form.');
+                $('#commit-preview').prop('disabled', false);
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // Generate & download template CSV via JavaScript
+    // Commit preview rows into real form rows
+    $('#commit-preview').on('click', function(){
+        const previewRows = $('.preview-import-row');
+        if(previewRows.length === 0){
+            alert('Tidak ada baris preview untuk dimasukkan.');
+            return;
+        }
+        let inserted = 0;
+        previewRows.each(function(){
+            const selectEl = $(this).find('select.preview-sampah-select');
+            const sampahId = selectEl.val();
+            const beratVal = $(this).find('input.preview-berat').val();
+            const hargaVal = $(this).find('input.preview-harga').val();
+            const newRow = `
+            <tr>
+                <td>
+                    <select name="detail_transaksi[${rowIndex}][sampah_id]" class="form-control" required>
+                        <option value="">-- Pilih Sampah --</option>
+                        @foreach ($stokSampah as $sampah)
+                            <option value="{{ $sampah->id }}" data-harga="{{ $sampah->harga_per_kg }}">{{ $sampah->nama_sampah }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="detail_transaksi[${rowIndex}][berat_kg]" class="form-control berat-kg" step="0.01" min="0" value="${parseFloat(beratVal)||0}" required>
+                </td>
+                <td>
+                    <input type="number" name="detail_transaksi[${rowIndex}][harga_per_kg]" class="form-control harga-per-kg" value="${parseFloat(hargaVal)||0}" readonly>
+                </td>
+                <td class="total-harga text-end" data-total="0">Rp 0</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
+                </td>
+            </tr>`;
+            $('#setoran-details').append(newRow);
+            if(sampahId){
+                $('#setoran-details tr:last select').val(sampahId);
+            }
+            updateTotal($('#setoran-details tr:last'));
+            rowIndex++;
+            inserted++;
+        });
+        previewRows.remove();
+        toggleRemoveButtons();
+        calculateTotalTransaksi();
+        $('#commit-preview').prop('disabled', true);
+        alert(inserted + ' baris preview dimasukkan sebagai baris editable. Silakan ubah berat sebelum simpan.');
+    });
+
+    const jsTemplateBtn = document.getElementById('download-template-js');
+    if (jsTemplateBtn) {
+        jsTemplateBtn.addEventListener('click', function() {
+            // Define columns and sample rows
+            const rows = [
+                ['kode_sampah','nama_sampah','qty'],
+                ['SMP001','Plastik',20],
+                ['SMP002','Kertas',15],
+                ['SMP003','Logam',50]
+            ];
+
+            // Convert to CSV string
+            const csvContent = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            // Create temporary link
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'template_import_sampah_js.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
 });
 </script>
 @endpush
