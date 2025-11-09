@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Detail Pengepul')
+@section('title', 'Detail Cabang')
 
 @push('style')
     <style>
@@ -69,9 +69,80 @@
 @endpush
 
 @section('main')
-    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-2">
         <div>
-            <h3 class="fw-bold mb-3">Detail Pengepul</h3>
+            <h3 class="fw-bold mb-1">Detail Cabang</h3>
+            <p class="text-gray-600 mb-0">{{ $cabang->nama_cabang }} ({{ $cabang->kode_cabang }})</p>
+        </div>
+    </div>
+
+    <!-- Detail Cabang -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 160px;">Kode Cabang</th>
+                                <td>{{ $cabang->kode_cabang }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nama Cabang</th>
+                                <td>{{ $cabang->nama_cabang }}</td>
+                            </tr>
+                            <tr>
+                                <th>Telepon</th>
+                                <td>{{ $cabang->telepon ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tanggal Berdiri</th>
+                                <td>
+                                    @if ($cabang->tanggal_berdiri)
+                                        {{ optional($cabang->tanggal_berdiri)->format('d M Y') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 160px;">Alamat</th>
+                                <td>{{ $cabang->alamat }}</td>
+                            </tr>
+                            <tr>
+                                <th>Kota</th>
+                                <td>{{ $cabang->kota }}</td>
+                            </tr>
+                            <tr>
+                                <th>Provinsi</th>
+                                <td>{{ $cabang->provinsi }}</td>
+                            </tr>
+                            <tr>
+                                <th>Kode Pos</th>
+                                <td>{{ $cabang->kode_pos ?? '-' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <span class="badge {{ $cabang->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">Status: {{ ucfirst($cabang->status) }}</span>
+                <span class="badge bg-primary">Anggota: {{ $anggotaCabang->count() }}</span>
+                <span class="badge bg-outline-secondary border">Di luar: {{ $anggotaLuar->count() }}</span>
+                <span class="badge bg-light text-muted">Dibuat: {{ optional($cabang->created_at)->format('d M Y H:i') }}</span>
+                <span class="badge bg-light text-muted">Diperbarui: {{ optional($cabang->updated_at)->format('d M Y H:i') }}</span>
+            </div>
+
+            <div class="mt-3">
+                <a href="{{ route('admin.cabang.edit', $cabang->id) }}" class="btn btn-sm btn-main">Edit Cabang</a>
+            </div>
         </div>
     </div>
 

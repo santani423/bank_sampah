@@ -1,13 +1,13 @@
 <ul class="sidebar-menu">
     <li class="sidebar-menu__item">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-users-three"></i></span>
+            <span class="icon"><i class="ph ph-house"></i></span>
             <span class="text">Dashboard</span>
         </a>
     </li>
     <li class="sidebar-menu__item has-dropdown">
         <a href="javascript:void(0)" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-squares-four"></i></span>
+            <span class="icon"><i class="ph ph-users"></i></span>
             <span class="text">Data Member</span>
             {{-- <span class="link-badge">3</span> --}}
         </a>
@@ -39,7 +39,7 @@
     </li>
     <li class="sidebar-menu__item has-dropdown">
         <a href="javascript:void(0)" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-squares-four"></i></span>
+            <span class="icon"><i class="ph ph-folder-open"></i></span>
             <span class="text">Manajemen Konten</span>
             {{-- <span class="link-badge">3</span> --}}
         </a>
@@ -71,7 +71,7 @@
     </li>
     <li class="sidebar-menu__item has-dropdown">
         <a href="javascript:void(0)" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-squares-four"></i></span>
+            <span class="icon"><i class="ph ph-swap"></i></span>
             <span class="text">Transaksi</span>
             {{-- <span class="link-badge">3</span> --}}
         </a>
@@ -102,13 +102,13 @@
     </li>
     <li class="sidebar-menu__item">
         <a href="{{ route('admin.laporan.index') }}" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-users-three"></i></span>
+            <span class="icon"><i class="ph ph-file-text"></i></span>
             <span class="text">Cetak Laporan</span>
         </a>
     </li>
     <li class="sidebar-menu__item has-dropdown">
         <a href="javascript:void(0)" class="sidebar-menu__link">
-            <span class="icon"><i class="ph ph-squares-four"></i></span>
+            <span class="icon"><i class="ph ph-gear"></i></span>
             <span class="text">Pengaturan</span>
             {{-- <span class="link-badge">3</span> --}}
         </a>

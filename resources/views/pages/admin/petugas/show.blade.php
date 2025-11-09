@@ -322,7 +322,7 @@
                                     <tr class="fw-bold">
                                         <td colspan="3" class="text-end">Total Alokasi Diterima:</td>
                                         <td colspan="4">
-                                            <span class="badge badge-success fs-6">
+                                            <span class=" fs-6">
                                                 Rp {{ number_format($petugas->alokasiDiterima->sum('nominal'), 0, ',', '.') }}
                                             </span>
                                         </td>

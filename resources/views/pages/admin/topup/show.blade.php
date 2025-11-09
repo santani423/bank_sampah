@@ -74,6 +74,10 @@
                             <span class="status-badge bg-success">
                                 <i class="bi bi-check-circle"></i> Berhasil
                             </span>
+                        @elseif($topup->status === 'paid')
+                            <span class="status-badge bg-success text-dark">
+                                <i class="bi bi-clock"></i> Berhasil
+                            </span>
                         @elseif($topup->status === 'pending')
                             <span class="status-badge bg-warning text-dark">
                                 <i class="bi bi-clock"></i> Pending
