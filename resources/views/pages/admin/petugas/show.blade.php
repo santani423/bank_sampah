@@ -4,6 +4,26 @@
 
 @push('style')
     <!-- CSS Libraries -->
+    <style>
+        /* Semua teks tabel jadi hitam */
+        table.table,
+        table.table th,
+        table.table td,
+        table.table td * {
+            color: #000 !important;
+        }
+
+        /* Jika ada link di dalam tabel */
+        table.table a {
+            color: #000 !important;
+            text-decoration: none;
+        }
+
+        /* Badge tetap dengan warna yang sesuai tapi teks hitam */
+        table.table td span.badge {
+            color: #fff !important;
+        }
+    </style>
 @endpush
 
 @section('main')
@@ -49,6 +69,14 @@
                         </p>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Saldo Petugas</label>
+                        <p class="form-control-plaintext">
+                            <span class="badge badge-success fs-6">
+                                Rp {{ number_format($petugas->saldoPetugas->saldo ?? 0, 0, ',', '.') }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Terdaftar Sejak</label>
                         <p class="form-control-plaintext">
                             {{ $petugas->created_at ? $petugas->created_at->format('d M Y H:i') : '-' }}
@@ -62,6 +90,80 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Form Alokasi Saldo --}}
+            @if($adminPetugas->role == 'admin')
+            <div class="card mt-3">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0 text-white">Alokasi Saldo ke Petugas</h4>
+                </div>
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Saldo Admin Saat Ini</label>
+                        <p class="form-control-plaintext">
+                            <span class="badge badge-{{ ($adminSaldo->saldo ?? 0) >= 1000000 ? 'success' : 'danger' }} fs-6">
+                                Rp {{ number_format($adminSaldo->saldo ?? 0, 0, ',', '.') }}
+                            </span>
+                        </p>
+                        @if(($adminSaldo->saldo ?? 0) < 1000000)
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Saldo admin kurang dari Rp 1.000.000. Tidak dapat melakukan alokasi.
+                            </small>
+                        @endif
+                    </div>
+
+                    <form action="{{ route('admin.petugas.alokasiSaldo', $petugas->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="nominal" class="form-label">Nominal Alokasi <span class="text-danger">*</span></label>
+                            <input type="number" 
+                                   class="form-control @error('nominal') is-invalid @enderror" 
+                                   id="nominal" 
+                                   name="nominal" 
+                                   placeholder="Masukkan nominal" 
+                                   required
+                                   min="1"
+                                   {{ ($adminSaldo->saldo ?? 0) < 1000000 ? 'disabled' : '' }}>
+                            @error('nominal')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <textarea class="form-control @error('keterangan') is-invalid @enderror" 
+                                      id="keterangan" 
+                                      name="keterangan" 
+                                      rows="3" 
+                                      placeholder="Keterangan alokasi (opsional)"
+                                      {{ ($adminSaldo->saldo ?? 0) < 1000000 ? 'disabled' : '' }}></textarea>
+                            @error('keterangan')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <button type="submit" 
+                                class="btn btn-primary w-100" 
+                                {{ ($adminSaldo->saldo ?? 0) < 1000000 ? 'disabled' : '' }}>
+                            <i class="fas fa-money-bill-wave"></i> Alokasikan Saldo
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @endif
         </div>
 
         <div class="col-md-8">
@@ -176,6 +278,63 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {{-- History Alokasi Saldo --}}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="card-title">History Alokasi Saldo</h4>
+                </div>
+                <div class="card-body">
+                    @if($petugas->alokasiDiterima && $petugas->alokasiDiterima->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tanggal</th>
+                                        <th>Dari Admin</th>
+                                        <th>Nominal</th>
+                                        <th>Saldo Sebelum</th>
+                                        <th>Saldo Sesudah</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($petugas->alokasiDiterima->sortByDesc('created_at') as $index => $alokasi)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $alokasi->created_at->format('d M Y H:i') }}</td>
+                                            <td>{{ $alokasi->admin->nama ?? '-' }}</td>
+                                            <td>
+                                                <span  >
+                                                    + Rp {{ number_format($alokasi->nominal, 0, ',', '.') }}
+                                                </span>
+                                            </td>
+                                            <td>Rp {{ number_format($alokasi->saldo_petugas_sebelum, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($alokasi->saldo_petugas_sesudah, 0, ',', '.') }}</td>
+                                            <td>{{ $alokasi->keterangan ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="3" class="text-end">Total Alokasi Diterima:</td>
+                                        <td colspan="4">
+                                            <span class="badge badge-success fs-6">
+                                                Rp {{ number_format($petugas->alokasiDiterima->sum('nominal'), 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Belum ada history alokasi saldo untuk petugas ini.
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

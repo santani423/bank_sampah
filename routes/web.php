@@ -79,6 +79,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     // Data Master
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
+    Route::post('/data-petugas/{id}/alokasi-saldo', [AdminPetugasController::class, 'alokasiSaldo'])->name('admin.petugas.alokasiSaldo');
     Route::resource('/data-sampah', AdminSampahController::class)->names('admin.sampah');
     Route::resource('/data-pengepul', AdminPengepulController::class)->names('admin.pengepul');
     Route::resource('/data-collaction-center', AdminCabangController::class)->names('admin.cabang');

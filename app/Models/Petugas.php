@@ -22,4 +22,22 @@ class Petugas extends Authenticatable
         return $this->hasMany(Transaksi::class, 'petugas_id');
     }
 
+    // Relasi ke saldo petugas
+    public function saldoPetugas()
+    {
+        return $this->hasOne(saldoPetugas::class, 'petugas_id');
+    }
+
+    // Relasi ke alokasi yang diterima
+    public function alokasiDiterima()
+    {
+        return $this->hasMany(AlokasiSaldoAdmin::class, 'petugas_id');
+    }
+
+    // Relasi ke alokasi yang diberikan (untuk admin)
+    public function alokasiDiberikan()
+    {
+        return $this->hasMany(AlokasiSaldoAdmin::class, 'admin_id');
+    }
+
 }
