@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\UserFaceController;
 use App\Models\NasabahBadan;
 use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
 use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
+use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,8 +57,11 @@ Route::get('/nasabah-badan/{id}/transactions', [App\Http\Controllers\Api\Nasabah
 Route::post('/user-face/create', [UserFaceController::class, 'create'])
     ->withoutMiddleware(['throttle:api']);
 
-
-
+// API Top Up Admin (menggunakan session auth dari web)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/admin/topup/store', [AdminTopUpController::class, 'apiStore'])
+        ->name('api.admin.topup.store');
+});
 
 
 Route::prefix('teams')->group(function () {

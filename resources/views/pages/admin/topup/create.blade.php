@@ -112,7 +112,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.topup.store') }}" method="POST" id="topupForm">
+                    <form id="topupForm">
                         @csrf
 
                         {{-- Pilihan Nominal --}}
@@ -142,6 +142,7 @@
                                     placeholder="Masukkan jumlah nominal" min="10000" value="{{ old('jumlah') }}"
                                     required>
                             </div>
+                            <div class="invalid-feedback" id="jumlahError"></div>
                             @error('jumlah')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -202,16 +203,76 @@
                 $('.nominal-btn').removeClass('active');
             });
 
-            // Validasi & loading button
+            // AJAX submit form
             $('#topupForm').on('submit', function(e) {
+                e.preventDefault();
+
                 const jumlah = parseInt($('#jumlah').val());
                 if (!jumlah || jumlah < 10000) {
-                    e.preventDefault();
-                    alert('Jumlah top up minimal Rp 10.000');
+                    $('#jumlah').addClass('is-invalid');
+                    $('#jumlahError').text('Jumlah top up minimal Rp 10.000');
                     return false;
                 }
-                $(this).find('button[type="submit"]').prop('disabled', true)
+
+                // Remove previous errors
+                $('#jumlah').removeClass('is-invalid');
+                $('#jumlahError').text('');
+
+                // Disable button and show loading
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true)
                     .html('<span class="spinner-border spinner-border-sm me-2"></span>Memproses...');
+
+                // Get CSRF token
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                // Send AJAX request to API
+                $.ajax({
+                    url: '/api/admin/topup/store',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        jumlah: $('#jumlah').val(),
+                        keterangan: $('#keterangan').val()
+                    }),
+                    success: function(response) {
+                        if (response.success && response.data.invoice_url) {
+                            // Redirect to payment page
+                            window.location.href = response.data.invoice_url;
+                        } else {
+                            // Show error
+                            alert('Gagal membuat pembayaran');
+                            submitBtn.prop('disabled', false)
+                                .html('<i class="bi bi-check-circle me-1"></i> Lanjutkan ke Pembayaran');
+                        }
+                    },
+                    error: function(xhr) {
+                        // Handle error
+                        let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            // Validation errors
+                            const errors = xhr.responseJSON.errors;
+                            if (errors.jumlah) {
+                                $('#jumlah').addClass('is-invalid');
+                                $('#jumlahError').text(errors.jumlah[0]);
+                            }
+                            errorMessage = 'Periksa kembali data yang Anda masukkan.';
+                        }
+
+                        alert(errorMessage);
+                        
+                        // Enable button again
+                        submitBtn.prop('disabled', false)
+                            .html('<i class="bi bi-check-circle me-1"></i> Lanjutkan ke Pembayaran');
+                    }
+                });
             });
         });
     </script>

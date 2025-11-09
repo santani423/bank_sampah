@@ -160,6 +160,129 @@ class TopUpController extends Controller
     }
 
     /**
+     * API endpoint untuk membuat top up (via AJAX)
+     */
+    public function apiStore(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'jumlah' => 'required|numeric|min:10000|max:100000000',
+            'keterangan' => 'nullable|string|max:500',
+        ], [
+            'jumlah.required' => 'Jumlah top up harus diisi',
+            'jumlah.numeric' => 'Jumlah harus berupa angka',
+            'jumlah.min' => 'Minimal top up adalah Rp 10.000',
+            'jumlah.max' => 'Maksimal top up adalah Rp 100.000.000',
+            'keterangan.max' => 'Keterangan maksimal 500 karakter',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user = Auth::user();
+
+            if (!$user->email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email user tidak ditemukan. Silakan lengkapi profil Anda terlebih dahulu.'
+                ], 400);
+            }
+
+            // Cegah top up ganda yang masih pending
+            $pendingTopup = TopUpAdmin::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($pendingTopup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda masih memiliki top up yang belum dibayar. Selesaikan terlebih dahulu sebelum membuat yang baru.'
+                ], 400);
+            }
+
+            // Generate external ID unik
+            $externalId = sprintf('TOPUP-%s-%d-%s', date('YmdHis'), $user->id, uniqid());
+
+            // Buat invoice di Xendit
+            $invoiceData = [
+                'external_id' => $externalId,
+                'amount' => (float) $validated['jumlah'],
+                'payer_email' => $user->email,
+                'description' => 'Top Up Saldo Bank Sampah' .
+                    (!empty($validated['keterangan']) ? ' - ' . $validated['keterangan'] : ''),
+                'invoice_duration' => 86400, // 24 jam
+                'currency' => 'IDR',
+                'success_redirect_url' => route('admin.topup.success'),
+                'failure_redirect_url' => route('admin.topup.index'),
+            ];
+
+            Log::info('Creating Xendit invoice via API', [
+                'external_id' => $externalId,
+                'amount' => $validated['jumlah'],
+                'user_id' => $user->id,
+            ]);
+
+            $invoice = $this->invoiceApi->createInvoice($invoiceData);
+
+            if (empty($invoice['id']) || empty($invoice['invoice_url'])) {
+                throw new \Exception('Response dari Xendit tidak valid.');
+            }
+
+            // Simpan top up ke database
+            $topup = TopUpAdmin::create([
+                'user_id' => $user->id,
+                'jumlah' => $validated['jumlah'],
+                'metode_pembayaran' => 'xendit',
+                'status' => 'pending',
+                'xendit_invoice_id' => $invoice['id'],
+                'xendit_invoice_url' => $invoice['invoice_url'],
+                'xendit_external_id' => $externalId,
+                'keterangan' => $validated['keterangan'] ?? null,
+            ]);
+
+            DB::commit();
+
+            Log::info('Top up created successfully via API', [
+                'topup_id' => $topup->id,
+                'invoice_id' => $invoice['id'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Top up berhasil dibuat',
+                'data' => [
+                    'topup_id' => $topup->id,
+                    'invoice_url' => $invoice['invoice_url'],
+                    'amount' => $topup->jumlah,
+                ]
+            ]);
+        } catch (\Xendit\XenditSdkException $e) {
+            DB::rollBack();
+            Log::error('Xendit SDK Error (API)', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung ke payment gateway. Silakan coba lagi.'
+            ], 500);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Top up store error (API)', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat top up: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Callback webhook dari Xendit
      */
     public function callback(Request $request)
