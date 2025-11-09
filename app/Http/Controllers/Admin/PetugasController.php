@@ -58,10 +58,11 @@ class PetugasController extends Controller
         return redirect()->route('admin.petugas.index')->with('success', 'Petugas berhasil ditambahkan.');
     }
 
-    // public function show(Petugas $petugas)
-    // {
-    //     return view('admin.petugas.show', compact('petugas'));
-    // }
+    public function show(string $id)
+    {
+        $petugas = Petugas::with('transaksi')->findOrFail($id);
+        return view('pages.admin.petugas.show', compact('petugas'));
+    }
 
     public function edit(string $id)
     {

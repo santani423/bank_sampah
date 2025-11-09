@@ -55,6 +55,10 @@
                                         <td>
                                             <form onsubmit="return confirm('Apakah Anda yakin?');"
                                                 action="{{ route('admin.petugas.destroy', $pet->id) }}" method="POST">
+                                                <a href="{{ route('admin.petugas.show', $pet->id) }}"
+                                                    class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> Detail
+                                                </a>
                                                 <a href="{{ route('admin.petugas.edit', $pet->id) }}"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="fas fa-pencil-alt"></i> Edit
