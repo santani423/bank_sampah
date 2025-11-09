@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\CleanController;
 use App\Http\Controllers\Api\UserFaceController;
 use App\Models\NasabahBadan;
+use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
+use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,15 +41,12 @@ Route::apiResource('cleans', CleanController::class);
 
 Route::apiResource('activities', ActivityController::class);
 
-// API Nasabah Badan
-Route::get('/nasabah-badan', function (Request $request) {
-    $query = NasabahBadan::with('jenisBadan');
-    if ($request->has('search') && $request->search) {
-        $query->where('nama_badan', 'like', '%' . $request->search . '%');
-    }
-    $nasabahs = $query->orderByDesc('id')->paginate(10);
-    return response()->json($nasabahs);
-});
+
+// API Nasabah Badan (moved to controller)
+Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
+
+// API Nasabah Perorangan (moved to controller)
+Route::get('/nasabah', [ApiNasabahController::class, 'index']);
 
 Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 
