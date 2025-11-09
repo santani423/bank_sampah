@@ -277,12 +277,8 @@ $(document).ready(function() {
 
     // Toggle remove button
     function toggleRemoveButtons() {
-        const rowCount = $('#setoran-details tr').length;
-        if (rowCount === 1) {
-            $('.remove-row').prop('disabled', true);
-        } else {
-            $('.remove-row').prop('disabled', false);
-        }
+        // Tombol hapus selalu aktif, tidak ada disabled
+        $('.remove-row').prop('disabled', false);
     }
 
     // Tambah baris
