@@ -51,6 +51,8 @@ Route::get('/nasabah-badan', function (Request $request) {
 
 Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 
+// API Nasabah Badan Transaction History
+Route::get('/nasabah-badan/{id}/transactions', [App\Http\Controllers\Api\NasabahBadanTransaksiController::class, 'getTransactionHistory']);
 
 Route::post('/user-face/create', [UserFaceController::class, 'create'])
     ->withoutMiddleware(['throttle:api']);

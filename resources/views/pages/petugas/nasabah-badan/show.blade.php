@@ -123,12 +123,88 @@
             </div>
         </div>
     </div>
+
+    <!-- History Setoran Sampah -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>History Setoran Sampah</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="start-date" class="form-label">Tanggal Mulai</label>
+                            <input type="date" class="form-control" id="start-date" name="start_date">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end-date" class="form-label">Tanggal Akhir</label>
+                            <input type="date" class="form-control" id="end-date" name="end_date">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="button" class="btn btn-primary" id="btn-filter">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="btn-reset">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Detail Sampah</th>
+                                    <th>Total Berat</th>
+                                    <th>Total Harga</th>
+                                    <th>Petugas</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-table-body">
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div id="showing-info" class="text-muted"></div>
+                        <nav>
+                            <ul class="pagination mb-0" id="pagination-container"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script>
 $(document).ready(function() {
     const nasabahId = {{ $nasabahBadan->id }};
+    let currentPage = 1;
+    let currentFilters = {
+        start_date: '',
+        end_date: ''
+    };
     
     // Fetch data from API
     function fetchNasabahDetail() {
@@ -187,6 +263,251 @@ $(document).ready(function() {
         });
     }
     
+    // Fetch transaction history
+    function fetchTransactionHistory(page = 1) {
+        const params = {
+            page: page,
+            per_page: 10
+        };
+        
+        if (currentFilters.start_date) {
+            params.start_date = currentFilters.start_date;
+        }
+        
+        if (currentFilters.end_date) {
+            params.end_date = currentFilters.end_date;
+        }
+        
+        // Show loading in table
+        $('#transaction-table-body').html(`
+            <tr>
+                <td colspan="9" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+        
+        $.ajax({
+            url: `/api/nasabah-badan/${nasabahId}/transactions`,
+            method: 'GET',
+            data: params,
+            headers: {
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                if (response.success) {
+                    renderTransactionTable(response.data, response.pagination);
+                    renderPagination(response.pagination);
+                } else {
+                    showNoData();
+                }
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                $('#transaction-table-body').html(`
+                    <tr>
+                        <td colspan="9" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Silakan coba lagi.
+                        </td>
+                    </tr>
+                `);
+            }
+        });
+    }
+    
+    // Render transaction table
+    function renderTransactionTable(transactions, pagination) {
+        if (transactions.length === 0) {
+            showNoData();
+            return;
+        }
+        
+        let html = '';
+        const startNumber = pagination.from;
+        
+        transactions.forEach((transaction, index) => {
+            const number = startNumber + index;
+            
+            // Build detail sampah string
+            let detailSampah = '<ul class="mb-0 ps-3">';
+            let totalBerat = 0;
+            
+            transaction.detail_sampah.forEach(detail => {
+                totalBerat += parseFloat(detail.berat_kg);
+                detailSampah += `<li><small>${detail.sampah_nama} (${detail.sampah_jenis}): ${detail.berat_kg_formatted}</small></li>`;
+            });
+            
+            detailSampah += '</ul>';
+            
+            // Status badge
+            let statusBadge = '';
+            if (transaction.status === 'selesai') {
+                statusBadge = '<span class="badge badge-success">Selesai</span>';
+            } else if (transaction.status === 'pending') {
+                statusBadge = '<span class="badge badge-warning">Pending</span>';
+            } else {
+                statusBadge = '<span class="badge badge-secondary">' + transaction.status + '</span>';
+            }
+            
+            html += `
+                <tr>
+                    <td>${number}</td>
+                    <td><strong>${transaction.kode_transaksi}</strong></td>
+                    <td>${transaction.tanggal_transaksi_formatted}</td>
+                    <td>${detailSampah}</td>
+                    <td><strong>${totalBerat.toFixed(2)} kg</strong></td>
+                    <td><strong>${transaction.total_transaksi_formatted}</strong></td>
+                    <td>${transaction.petugas.nama}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info btn-view-detail" data-id="${transaction.id}" title="Lihat Detail">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        $('#transaction-table-body').html(html);
+        
+        // Update showing info
+        $('#showing-info').text(
+            `Menampilkan ${pagination.from} sampai ${pagination.to} dari ${pagination.total} data`
+        );
+    }
+    
+    // Show no data message
+    function showNoData() {
+        $('#transaction-table-body').html(`
+            <tr>
+                <td colspan="9" class="text-center text-muted">
+                    <i class="fas fa-inbox"></i> Tidak ada data transaksi
+                </td>
+            </tr>
+        `);
+        $('#showing-info').text('');
+        $('#pagination-container').html('');
+    }
+    
+    // Render pagination
+    function renderPagination(pagination) {
+        if (pagination.last_page <= 1) {
+            $('#pagination-container').html('');
+            return;
+        }
+        
+        let html = '';
+        
+        // Previous button
+        if (pagination.current_page > 1) {
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" data-page="${pagination.current_page - 1}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+        } else {
+            html += `
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                </li>
+            `;
+        }
+        
+        // Page numbers
+        const startPage = Math.max(1, pagination.current_page - 2);
+        const endPage = Math.min(pagination.last_page, pagination.current_page + 2);
+        
+        if (startPage > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+            if (startPage > 2) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === pagination.current_page) {
+                html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else {
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            }
+        }
+        
+        if (endPage < pagination.last_page) {
+            if (endPage < pagination.last_page - 1) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.last_page}">${pagination.last_page}</a></li>`;
+        }
+        
+        // Next button
+        if (pagination.current_page < pagination.last_page) {
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" data-page="${pagination.current_page + 1}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+        } else {
+            html += `
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                </li>
+            `;
+        }
+        
+        $('#pagination-container').html(html);
+    }
+    
+    // Pagination click handler
+    $(document).on('click', '#pagination-container .page-link', function(e) {
+        e.preventDefault();
+        const page = $(this).data('page');
+        if (page) {
+            currentPage = page;
+            fetchTransactionHistory(page);
+        }
+    });
+    
+    // Filter button handler
+    $('#btn-filter').on('click', function() {
+        currentFilters.start_date = $('#start-date').val();
+        currentFilters.end_date = $('#end-date').val();
+        
+        // Validate dates
+        if (currentFilters.start_date && currentFilters.end_date) {
+            if (currentFilters.start_date > currentFilters.end_date) {
+                alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir!');
+                return;
+            }
+        }
+        
+        currentPage = 1;
+        fetchTransactionHistory(1);
+    });
+    
+    // Reset button handler
+    $('#btn-reset').on('click', function() {
+        $('#start-date').val('');
+        $('#end-date').val('');
+        currentFilters.start_date = '';
+        currentFilters.end_date = '';
+        currentPage = 1;
+        fetchTransactionHistory(1);
+    });
+    
+    // View detail button handler (you can implement modal or redirect)
+    $(document).on('click', '.btn-view-detail', function() {
+        const transactionId = $(this).data('id');
+        // Implement detail view logic here
+        alert('Detail transaksi ID: ' + transactionId);
+        // You can open a modal or redirect to detail page
+    });
+    
     // Format date helper
     function formatDate(date) {
         const options = { 
@@ -201,6 +522,7 @@ $(document).ready(function() {
     
     // Initial fetch
     fetchNasabahDetail();
+    fetchTransactionHistory(1);
 });
 </script>
 @endpush
