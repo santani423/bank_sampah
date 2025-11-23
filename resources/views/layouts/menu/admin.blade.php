@@ -34,6 +34,10 @@
                 <a href="{{ route('admin.cabang.index') }}" class="sidebar-submenu__link"> Data
                     Collaction Center </a>
             </li>
+            <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.lapak.index') }}" class="sidebar-submenu__link"> Data
+                    Lapak </a>
+            </li>
         </ul>
         <!-- Submenu End -->
     </li>

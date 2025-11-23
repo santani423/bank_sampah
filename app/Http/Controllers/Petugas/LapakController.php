@@ -88,9 +88,13 @@ class LapakController extends Controller
             $data['foto'] = $filename;
         }
 
+        // Set default approval status ke pending dan status ke tidak_aktif
+        $data['approval_status'] = 'pending';
+        $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin
+
         Lapak::create($data);
 
-        Alert::success('Berhasil', 'Data lapak berhasil ditambahkan');
+        Alert::success('Berhasil', 'Data lapak berhasil ditambahkan dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
 

@@ -29,7 +29,8 @@ class LapakSeeder extends Seeder
                     'kode_pos' => '12345',
                     'no_telepon' => '081234567890',
                     'deskripsi' => 'Lapak sampah terpercaya di Jakarta',
-                    'status' => 'aktif',
+                    'status' => 'tidak_aktif',
+                    'approval_status' => 'pending',
                 ],
                 [
                     'cabang_id' => $cabangs[1]->id ?? $cabangs[0]->id,

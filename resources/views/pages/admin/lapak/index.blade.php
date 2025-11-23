@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Data Lapak')
+@section('title', 'Data Lapak - Admin')
 
 @push('style')
     <style>
@@ -11,6 +11,11 @@
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
         }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
     </style>
 @endpush
 
@@ -18,12 +23,7 @@
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
             <h3 class="fw-bold mb-3">Data Lapak</h3>
-            <h6 class="op-7 mb-2">Kelola data lapak milik nasabah</h6>
-        </div>
-        <div class="ms-md-auto py-2 py-md-0">
-            <a href="{{ route('petugas.lapak.create') }}" class="btn btn-primary btn-round">
-                <i class="fas fa-plus"></i> Tambah Lapak
-            </a>
+            <h6 class="op-7 mb-2">Kelola dan approve data lapak dari petugas</h6>
         </div>
     </div>
 
@@ -32,9 +32,9 @@
             <!-- Filter Card -->
             <div class="card mb-3">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('petugas.lapak.index') }}">
+                    <form method="GET" action="{{ route('admin.lapak.index') }}">
                         <div class="row">
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Nama Lapak</label>
                                     <input type="text" name="nama_lapak" class="form-control" 
@@ -44,22 +44,36 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Status</label>
-                                    <select name="status" class="form-control">
+                                    <label>Status Approval</label>
+                                    <select name="approval_status" class="form-control">
                                         <option value="">Semua Status</option>
-                                        <option value="aktif" {{ request('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                        <option value="tidak_aktif" {{ request('status') == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                        <option value="pending" {{ request('approval_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="approved" {{ request('approval_status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                        <option value="rejected" {{ request('approval_status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Cabang</label>
+                                    <select name="cabang_id" class="form-control">
+                                        <option value="">Semua Cabang</option>
+                                        @foreach($cabangs as $cabang)
+                                            <option value="{{ $cabang->id }}" {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
+                                                {{ $cabang->nama_cabang }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>&nbsp;</label>
                                     <div>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary btn-block">
                                             <i class="fas fa-search"></i> Filter
                                         </button>
-                                        <a href="{{ route('petugas.lapak.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.lapak.index') }}" class="btn btn-secondary btn-block mt-1">
                                             <i class="fas fa-redo"></i> Reset
                                         </a>
                                     </div>
@@ -95,15 +109,14 @@
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>
                                 <tr>
-                                    <th width="5%">#</th>
-                                    <th width="10%">Kode Lapak</th>
-                                    <th width="15%">Nama Lapak</th>
-                                    <th width="15%">Cabang</th>
-                                    <th width="15%">Alamat</th>
-                                    <th width="8%">Kota</th>
-                                    <th width="8%">Status</th>
-                                    <th width="10%">Approval</th>
-                                    <th width="14%">Aksi</th>
+                                    <th>#</th>
+                                    <th>Kode Lapak</th>
+                                    <th>Nama Lapak</th>
+                                    <th>Cabang</th>
+                                    <th>Alamat</th>
+                                    <th>Status</th>
+                                    <th>Approval</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -117,7 +130,6 @@
                                             <small class="text-muted">{{ $lapak->cabang->kode_cabang ?? '-' }}</small>
                                         </td>
                                         <td>{{ Str::limit($lapak->alamat, 30) }}</td>
-                                        <td>{{ $lapak->kota ?? '-' }}</td>
                                         <td>
                                             @if($lapak->status == 'aktif')
                                                 <span class="badge badge-success">Aktif</span>
@@ -132,19 +144,32 @@
                                                 <span class="badge badge-success">Approved</span>
                                             @else
                                                 <span class="badge badge-danger">Rejected</span>
-                                                @if($lapak->rejection_reason)
-                                                    <br><small class="text-danger" title="{{ $lapak->rejection_reason }}">{{ Str::limit($lapak->rejection_reason, 20) }}</small>
-                                                @endif
+                                            @endif
+                                            @if($lapak->approved_at)
+                                                <br><small class="text-muted">{{ $lapak->approved_at->format('d/m/Y') }}</small>
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}" 
-                                                   class="btn btn-sm btn-warning" 
-                                                   title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('petugas.lapak.destroy', $lapak->id) }}" 
+                                            <div class="action-buttons">
+                                                @if($lapak->approval_status == 'pending')
+                                                    <form action="{{ route('admin.lapak.approve', $lapak->id) }}" 
+                                                          method="POST" 
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Apakah Anda yakin ingin menyetujui lapak ini?')">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            data-toggle="modal" 
+                                                            data-target="#rejectModal{{ $lapak->id }}" 
+                                                            title="Reject">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                @endif
+                                                
+                                                <form action="{{ route('admin.lapak.destroy', $lapak->id) }}" 
                                                       method="POST" 
                                                       class="d-inline"
                                                       onsubmit="return confirm('Apakah Anda yakin ingin menghapus lapak ini?')">
@@ -157,9 +182,40 @@
                                             </div>
                                         </td>
                                     </tr>
+
+                                    <!-- Reject Modal -->
+                                    <div class="modal fade" id="rejectModal{{ $lapak->id }}" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <form action="{{ route('admin.lapak.reject', $lapak->id) }}" method="POST">
+                                                    @csrf
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Tolak Lapak</h5>
+                                                        <button type="button" class="close" data-dismiss="modal">
+                                                            <span>&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label>Alasan Penolakan <span class="text-danger">*</span></label>
+                                                            <textarea name="rejection_reason" 
+                                                                      class="form-control" 
+                                                                      rows="4" 
+                                                                      required
+                                                                      placeholder="Masukkan alasan penolakan..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-danger">Tolak Lapak</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">
+                                        <td colspan="8" class="text-center">
                                             <p class="text-muted my-3">Belum ada data lapak</p>
                                         </td>
                                     </tr>

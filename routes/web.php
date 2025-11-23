@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
+use App\Http\Controllers\Admin\LapakController as AdminLapakController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 use App\Http\Controllers\CleanController;
@@ -92,6 +93,11 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
 
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
+    
+    // Lapak Management
+    Route::resource('/data-lapak', AdminLapakController::class)->names('admin.lapak');
+    Route::post('/data-lapak/{id}/approve', [AdminLapakController::class, 'approve'])->name('admin.lapak.approve');
+    Route::post('/data-lapak/{id}/reject', [AdminLapakController::class, 'reject'])->name('admin.lapak.reject');
     Route::post('/data-collaction-center/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
 
     // Manajemen Konten

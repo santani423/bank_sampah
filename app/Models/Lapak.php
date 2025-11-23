@@ -22,7 +22,15 @@ class Lapak extends Model
         'no_telepon',
         'deskripsi',
         'foto',
-        'status'
+        'status',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'rejection_reason'
+    ];
+
+    protected $casts = [
+        'approved_at' => 'datetime'
     ];
 
     /**
