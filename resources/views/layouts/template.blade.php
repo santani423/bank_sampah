@@ -19,7 +19,7 @@
     <!-- file upload -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/plyr.css') }}">
     <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
     <!-- full calendar -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/full-calendar.css') }}">
     <!-- jquery Ui -->
@@ -394,7 +394,7 @@
     <!-- file upload -->
     <script src="{{ asset('edmate/assets/js/plyr.js') }}"></script>
     <!-- dataTables -->
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js') }}"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <!-- full calendar -->
     <script src="{{ asset('edmate/assets/js/full-calendar.js') }}"></script>
     <!-- jQuery UI -->
