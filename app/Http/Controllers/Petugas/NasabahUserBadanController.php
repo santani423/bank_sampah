@@ -350,28 +350,55 @@ class NasabahUserBadanController extends Controller
     }
 
     /**
-     * Generate unique transaction code
+     * Generate unique transaction code khusus untuk TransaksiNasabahBadan
      */
     private function generateUniqueTransactionCode()
     {
-        // Format: BSR-YYYYMMDD-SET-001
+        // Format: BSR-YYYYMMDD-BDN-001
         $today = now()->format('Ymd');
-        $prefix = "BSR-{$today}-SET-";
+        $prefix = "BSR-{$today}-BDN-";
 
-        // Cari kode transaksi terakhir hari ini
-        $lastTransaction = \App\Models\Transaksi::where('kode_transaksi', 'like', $prefix . '%')
-            ->orderBy('kode_transaksi', 'desc')
-            ->first();
+        $attempts = 0;
+        $maxAttempts = 100;
 
-        if (!$lastTransaction) {
-            return $prefix . '001';
-        }
+        do {
+            // Hitung jumlah transaksi hari ini + 1 untuk nomor urut
+            $count = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', 'like', $prefix . '%')
+                ->count();
+            
+            $nextNumber = $count + 1;
+            
+            // Format nomor urut dengan leading zeros (minimal 3 digit)
+            $formattedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $kodeTransaksi = $prefix . $formattedNumber;
 
-        // Ekstrak nomor urut terakhir
-        $lastNumber = substr($lastTransaction->kode_transaksi, -3);
-        $newNumber = str_pad((int)$lastNumber + 1, 3, '0', STR_PAD_LEFT);
+            // Cek apakah kode sudah ada (double check untuk race condition)
+            $exists = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', $kodeTransaksi)->exists();
+            
+            if (!$exists) {
+                return $kodeTransaksi;
+            }
 
-        return $prefix . $newNumber;
+            $attempts++;
+
+            // Jika sudah banyak percobaan, tambahkan random string
+            if ($attempts >= 10) {
+                $randomNum = str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT);
+                $kodeTransaksi = $prefix . $randomNum . '-' . strtoupper(substr(uniqid(), -4));
+                $exists = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', $kodeTransaksi)->exists();
+                
+                if (!$exists) {
+                    return $kodeTransaksi;
+                }
+            }
+
+            // Small delay to avoid tight loop
+            usleep(10000); // 10ms
+
+        } while ($attempts < $maxAttempts);
+
+        // Fallback: gunakan timestamp + random untuk memastikan uniqueness
+        return $prefix . time() . '-' . strtoupper(substr(uniqid(), -6));
     }
 
     /**

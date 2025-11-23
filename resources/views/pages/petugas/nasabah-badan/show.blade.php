@@ -1,8 +1,9 @@
 @extends('layouts.template')
 
-@section('title', 'Detail Nasabah Badan')
+@section('title', 'Detail Reknanan')
 
 @push('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         /* Loading overlay container */
         #detail-container { position: relative; min-height: 400px; }
@@ -111,8 +112,8 @@
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Detail Nasabah Badan</h3>
-            <h6 class="op-7 mb-2">Informasi lengkap nasabah badan</h6>
+            <h3 class="fw-bold mb-3">Detail Reknanan</h3>
+            <h6 class="op-7 mb-2">Informasi lengkap Reknanan</h6>
         </div>
         <div class="ms-md-auto py-2 py-md-0">
             <a href="{{ route('petugas.rekanan.index') }}" class="btn btn-secondary btn-round">
@@ -131,7 +132,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-10">
                         <div class="saldo-label">
-                            <i class="fas fa-wallet me-2"></i>Saldo Nasabah Badan
+                            <i class="fas fa-wallet me-2"></i>Saldo Reknanan
                         </div>
                         <h2 class="saldo-amount" id="saldo-display">
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -151,7 +152,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>Informasi Nasabah Badan</h4>
+                    <h4>Informasi Reknanan</h4>
                 </div>
                 <div class="card-body" id="detail-container">
                     <div class="row">
@@ -187,9 +188,7 @@
                                     <div class="info-value" id="no-telp">-</div>
 
                                     <div class="info-label">Status</div>
-                                    <div class="info-value">
-                                        <span id="status" class="badge badge-status">-</span>
-                                    </div>
+                                    <div class="info-value" id="status" style="color: #000000;">-</div>
 
                                     <div class="info-label">Terdaftar Sejak</div>
                                     <div class="info-value" id="created-at">-</div>
@@ -336,14 +335,12 @@ $(document).ready(function() {
                         $('#saldo-updated').text('Terakhir diperbarui: -');
                     }
                     
-                    // Status badge
-                    const statusBadge = $('#status');
+                    // Status text
+                    const statusText = $('#status');
                     if (data.status === 'aktif') {
-                        statusBadge.removeClass('badge-danger').addClass('badge-success');
-                        statusBadge.text('Aktif');
+                        statusText.text('Aktif');
                     } else {
-                        statusBadge.removeClass('badge-success').addClass('badge-danger');
-                        statusBadge.text('Tidak Aktif');
+                        statusText.text('Tidak Aktif');
                     }
                     
                     // Foto
@@ -447,14 +444,14 @@ $(document).ready(function() {
             
             detailSampah += '</ul>';
             
-            // Status badge
-            let statusBadge = '';
+            // Status text
+            let statusText = '';
             if (transaction.status === 'selesai') {
-                statusBadge = '<span class="badge badge-success">Selesai</span>';
+                statusText = '<span style="color: #000000;">Selesai</span>';
             } else if (transaction.status === 'pending') {
-                statusBadge = '<span class="badge badge-warning">Pending</span>';
+                statusText = '<span style="color: #000000;">Pending</span>';
             } else {
-                statusBadge = '<span class="badge badge-secondary">' + transaction.status + '</span>';
+                statusText = '<span style="color: #000000;">' + transaction.status + '</span>';
             }
             
             html += `
@@ -466,10 +463,10 @@ $(document).ready(function() {
                     <td><strong>${totalBerat.toFixed(2)} kg</strong></td>
                     <td><strong>${transaction.total_transaksi_formatted}</strong></td>
                     <td>${transaction.petugas.nama}</td>
-                    <td>${statusBadge}</td>
+                    <td>${statusText}</td>
                     <td>
                         <button class="btn btn-sm btn-info btn-view-detail" data-id="${transaction.id}" title="Lihat Detail">
-                            <i class="fas fa-eye"></i>
+                            <i class="bi bi-eye"></i>
                         </button>
                     </td>
                 </tr>

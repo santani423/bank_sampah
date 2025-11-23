@@ -158,10 +158,11 @@
                             </label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text">Rp</span>
-                                <input type="number" id="jumlah" name="jumlah"
+                                <input type="text" id="jumlah" name="jumlah"
                                     class="form-control @error('jumlah') is-invalid @enderror"
-                                    placeholder="Masukkan jumlah nominal" min="10000" value="{{ old('jumlah') }}"
+                                    placeholder="Masukkan jumlah nominal" value="{{ old('jumlah') }}"
                                     required>
+                                <input type="hidden" id="jumlah_raw" name="jumlah_raw">
                             </div>
                             <div class="invalid-feedback" id="jumlahError"></div>
                             @error('jumlah')
@@ -257,15 +258,42 @@
             let pendingTopupData = null;
             let formDataToSubmit = null;
 
+            // Function untuk format rupiah
+            function formatRupiah(angka) {
+                let number_string = angka.replace(/[^,\d]/g, '').toString();
+                let split = number_string.split(',');
+                let sisa = split[0].length % 3;
+                let rupiah = split[0].substr(0, sisa);
+                let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                if (ribuan) {
+                    let separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return rupiah;
+            }
+
+            // Function untuk convert format rupiah ke angka
+            function unformatRupiah(rupiah) {
+                return parseInt(rupiah.replace(/\./g, '')) || 0;
+            }
+
             // Pilih nominal cepat
             $('.nominal-btn').on('click', function() {
                 $('.nominal-btn').removeClass('active');
                 $(this).addClass('active');
-                $('#jumlah').val($(this).data('nominal'));
+                let nominal = $(this).data('nominal');
+                $('#jumlah').val(formatRupiah(nominal.toString()));
+                $('#jumlah_raw').val(nominal);
             });
 
-            // Jika input manual, hapus active class
-            $('#jumlah').on('input', function() {
+            // Format rupiah saat user mengetik
+            $('#jumlah').on('keyup', function() {
+                let nilai = $(this).val();
+                $(this).val(formatRupiah(nilai));
+                $('#jumlah_raw').val(unformatRupiah(nilai));
                 $('.nominal-btn').removeClass('active');
             });
 
@@ -282,7 +310,7 @@
 
                 // Prepare data
                 const requestData = {
-                    jumlah: $('#jumlah').val(),
+                    jumlah: $('#jumlah_raw').val() || unformatRupiah($('#jumlah').val()),
                     keterangan: $('#keterangan').val()
                 };
 
@@ -327,7 +355,7 @@
                             
                             // Simpan data form untuk digunakan nanti jika user pilih buat baru
                             formDataToSubmit = {
-                                jumlah: $('#jumlah').val(),
+                                jumlah: unformatRupiah($('#jumlah').val()),
                                 keterangan: $('#keterangan').val()
                             };
                             
@@ -367,7 +395,7 @@
             $('#topupForm').on('submit', function(e) {
                 e.preventDefault();
 
-                const jumlah = parseInt($('#jumlah').val());
+                const jumlah = unformatRupiah($('#jumlah').val());
                 if (!jumlah || jumlah < 10000) {
                     $('#jumlah').addClass('is-invalid');
                     $('#jumlahError').text('Jumlah top up minimal Rp 10.000');

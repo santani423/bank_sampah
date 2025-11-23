@@ -124,6 +124,7 @@ class PetugasController extends Controller
         $user = User::where('email', $petugas->email)->first();
         if ($user) {
             $user->update($userData);
+            // dd($user);
         }
 
         // Update data pada tabel petugas
