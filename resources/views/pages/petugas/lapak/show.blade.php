@@ -6,27 +6,32 @@
     <style>
         .detail-card {
             border: none;
-            box-shadow: 0 0 20px rgba(0,0,0,0.08);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
         }
+
         .detail-label {
             font-weight: 600;
             color: #495057;
             margin-bottom: 0.5rem;
         }
+
         .detail-value {
             color: #212529;
             margin-bottom: 1.5rem;
         }
+
         .lapak-image {
             max-width: 100%;
             height: auto;
             border-radius: 0.5rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
+
         .status-badge {
             font-size: 1rem;
             padding: 0.5rem 1rem;
         }
+
         .info-section {
             background-color: #f8f9fa;
             padding: 1.5rem;
@@ -51,85 +56,6 @@
             </a>
         </div>
     </div>
-
-    <!-- List Data Transaksi Lapak -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card detail-card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Data Transaksi Lapak</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="transaksiLapakTable">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Kode Transaksi</th>
-                                    <th>Tanggal</th>
-                                    <th>Jumlah</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td colspan="6" class="text-center text-muted">Memuat data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var lapakId = @json($lapak->id);
-            var tableBody = document.querySelector('#transaksiLapakTable tbody');
-            fetch(`/api/lapak/${lapakId}/transaksi`)
-                .then(response => response.json())
-                .then(data => {
-                    tableBody.innerHTML = '';
-                    if (data.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Belum ada data transaksi lapak</td></tr>`;
-                        return;
-                    }
-                    data.forEach(function(trx, idx) {
-                        let statusLabel = '';
-                        if (trx.approval === 'selesai' || trx.status === 'selesai') {
-                            statusLabel = '<span class="badge badge-success">Selesai</span>';
-                        } else if (trx.approval === 'pending' || trx.status === 'pending') {
-                            statusLabel = '<span class="badge badge-warning">Pending</span>';
-                        } else {
-                            statusLabel = '<span class="badge badge-danger">Dibatalkan</span>';
-                        }
-                        let jumlah = trx.total_transaksi ? Number(trx.total_transaksi).toLocaleString('id-ID') : '-';
-                        let tanggal = trx.tanggal_transaksi ? new Date(trx.tanggal_transaksi).toLocaleString('id-ID') : '-';
-                        let detailUrl = `/petugas/lapak/transaksi/${trx.id}`;
-                        tableBody.innerHTML += `
-                            <tr>
-                                <td>${idx + 1}</td>
-                                <td>${trx.kode_transaksi || '-'}</td>
-                                <td>${tanggal}</td>
-                                <td>${jumlah}</td>
-                                <td>${statusLabel}</td>
-                                <td>
-                                    <a href="${detailUrl}" class="btn btn-sm btn-info">
-                                        <i class="bi bi-eye"></i> Detail Transaksi
-                                    </a>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                })
-                .catch(() => {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Gagal memuat data transaksi</td></tr>`;
-                });
-        });
-    </script>
-@endpush
-
     <div class="row">
         <div class="col-md-8">
             <div class="card detail-card">
@@ -193,13 +119,12 @@
                         </div>
                     </div>
 
-                    @if($lapak->foto)
+                    @if ($lapak->foto)
                         <div class="row">
                             <div class="col-12">
                                 <div class="detail-label">Foto Lapak</div>
-                                <img src="{{ asset('uploads/lapak/' . $lapak->foto) }}" 
-                                     alt="{{ $lapak->nama_lapak }}" 
-                                     class="lapak-image">
+                                <img src="{{ asset('uploads/lapak/' . $lapak->foto) }}" alt="{{ $lapak->nama_lapak }}"
+                                    class="lapak-image">
                             </div>
                         </div>
                     @endif
@@ -216,7 +141,7 @@
                 <div class="card-body">
                     <div class="detail-label">Status Operasional</div>
                     <div class="mb-3">
-                        @if($lapak->status == 'aktif')
+                        @if ($lapak->status == 'aktif')
                             <span class="badge badge-success status-badge" style="color: #000 !important;">
                                 <i class="bi bi-check-circle-fill"></i> Aktif
                             </span>
@@ -229,7 +154,7 @@
 
                     <div class="detail-label">Status Approval</div>
                     <div class="mb-3">
-                        @if($lapak->approval_status == 'pending')
+                        @if ($lapak->approval_status == 'pending')
                             <span class="badge badge-warning status-badge" style="color: #000 !important;">
                                 <i class="bi bi-clock-fill"></i> Pending
                             </span>
@@ -244,14 +169,14 @@
                         @endif
                     </div>
 
-                    @if($lapak->approval_status == 'rejected' && $lapak->rejection_reason)
+                    @if ($lapak->approval_status == 'rejected' && $lapak->rejection_reason)
                         <div class="alert alert-danger">
                             <strong>Alasan Penolakan:</strong><br>
                             {{ $lapak->rejection_reason }}
                         </div>
                     @endif
 
-                    @if($lapak->approved_at)
+                    @if ($lapak->approved_at)
                         <div class="detail-label">Tanggal Approval</div>
                         <div class="detail-value">
                             {{ $lapak->approved_at->format('d F Y H:i') }}
@@ -279,6 +204,166 @@
             </div>
         </div>
     </div>
+
+
+
+
+    <!-- List Data Transaksi Lapak (paling bawah) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card detail-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Data Transaksi Lapak</h4>
+                    <div class="d-flex">
+                        <input type="text" id="searchTransaksi" class="form-control me-2"
+                            placeholder="Cari kode transaksi..." style="max-width:180px;">
+                        <input type="date" id="searchTanggal" class="form-control me-2" style="max-width:160px;">
+                        <button id="searchBtn" class="btn btn-primary">Cari</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="transaksiLapakTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Kode Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">Memuat data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div id="paginationInfo" class="text-muted"></div>
+                        <div>
+                            <button id="prevPage" class="btn btn-outline-secondary btn-sm me-2">&laquo; Prev</button>
+                            <button id="nextPage" class="btn btn-outline-secondary btn-sm">Next &raquo;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var lapakId = @json($lapak->id);
+                var tableBody = document.querySelector('#transaksiLapakTable tbody');
+                var searchInput = document.getElementById('searchTransaksi');
+                var searchBtn = document.getElementById('searchBtn');
+                var searchTanggal = document.getElementById('searchTanggal');
+                var prevPageBtn = document.getElementById('prevPage');
+                var nextPageBtn = document.getElementById('nextPage');
+                var paginationInfo = document.getElementById('paginationInfo');
+                var currentPage = 1;
+                var limit = 10;
+                var lastPage = 1;
+                var currentSearch = '';
+                var currentTanggal = '';
+
+                function loadTransaksi(page = 1, search = '', tanggal = '') {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Memuat data...</td></tr>`;
+                    let url = `/api/lapak/${lapakId}/transaksi?page=${page}&limit=${limit}`;
+                    if (search) url += `&search=${encodeURIComponent(search)}`;
+                    if (tanggal) url += `&tanggal=${encodeURIComponent(tanggal)}`;
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(res => {
+                            var data = res.data || res;
+                            var total = res.total || data.length;
+                            lastPage = res.last_page || Math.ceil(total / limit);
+                            currentPage = res.current_page || page;
+                            paginationInfo.textContent =
+                                `Halaman ${currentPage} dari ${lastPage} | Total: ${total}`;
+                            tableBody.innerHTML = '';
+                            if (!Array.isArray(data) || data.length === 0) {
+                                tableBody.innerHTML =
+                                    `<tr><td colspan="6" class="text-center text-muted">Belum ada data transaksi lapak</td></tr>`;
+                                return;
+                            }
+                            data.forEach(function(trx, idx) {
+                                let statusLabel = '';
+                                if (trx.approval === 'selesai' || trx.status === 'selesai') {
+                                    statusLabel = '<span class="badge badge-success" style="color:#000 !important;">Selesai</span>';
+                                } else if (trx.approval === 'pending' || trx.status === 'pending') {
+                                    statusLabel = '<span class="badge badge-warning" style="color:#000 !important;">Pending</span>';
+                                } else {
+                                    statusLabel = '<span class="badge badge-danger" style="color:#000 !important;">Dibatalkan</span>';
+                                }
+                                let jumlah = trx.total_transaksi ? Number(trx.total_transaksi)
+                                    .toLocaleString('id-ID') : '-';
+                                let tanggal = trx.tanggal_transaksi ? new Date(trx.tanggal_transaksi)
+                                    .toLocaleString('id-ID') : '-';
+                                let detailUrl = `/petugas/lapak/transaksi/${trx.id}`;
+                                tableBody.innerHTML += `
+                                <tr>
+                                    <td>${(idx + 1) + ((currentPage - 1) * limit)}</td>
+                                    <td>${trx.kode_transaksi || '-'}</td>
+                                    <td>${tanggal}</td>
+                                    <td>${jumlah}</td>
+                                    <td>${statusLabel}</td>
+                                    <td>
+                                        <a href="${detailUrl}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Detail Transaksi
+                                        </a>
+                                    </td>
+                                </tr>
+                            `;
+                            });
+                        })
+                        .catch((err) => {
+                            tableBody.innerHTML =
+                                `<tr><td colspan="6" class="text-center text-danger">Gagal memuat data transaksi</td></tr>`;
+                        });
+                }
+
+                searchBtn.addEventListener('click', function() {
+                    currentSearch = searchInput.value;
+                    currentTanggal = searchTanggal.value;
+                    currentPage = 1;
+                    loadTransaksi(currentPage, currentSearch, currentTanggal);
+                });
+                searchInput.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        currentSearch = searchInput.value;
+                        currentTanggal = searchTanggal.value;
+                        currentPage = 1;
+                        loadTransaksi(currentPage, currentSearch, currentTanggal);
+                    }
+                });
+                searchTanggal.addEventListener('change', function() {
+                    currentTanggal = searchTanggal.value;
+                    currentPage = 1;
+                    loadTransaksi(currentPage, currentSearch, currentTanggal);
+                });
+                prevPageBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        loadTransaksi(currentPage, currentSearch, currentTanggal);
+                    }
+                });
+                nextPageBtn.addEventListener('click', function() {
+                    if (currentPage < lastPage) {
+                        currentPage++;
+                        loadTransaksi(currentPage, currentSearch, currentTanggal);
+                    }
+                });
+
+                // Initial load
+                loadTransaksi();
+            });
+        </script>
+    @endpush
+
 @endsection
 
 @push('scripts')

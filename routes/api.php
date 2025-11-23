@@ -1,4 +1,5 @@
  
+
 <?php
 
 use App\Http\Controllers\Api\countConttroller;
@@ -33,6 +34,7 @@ use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
 //     return $request->user();
 // });
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
+Route::get('/lapak/{id}/transaksi', [App\Http\Controllers\Api\LapakTransaksiController::class, 'index']);
 
 Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
 Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
