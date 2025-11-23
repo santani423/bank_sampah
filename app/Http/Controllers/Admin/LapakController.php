@@ -55,11 +55,6 @@ class LapakController extends Controller
     public function approve(string $id)
     {
         $lapak = Lapak::findOrFail($id);
-        
-        if ($lapak->approval_status === 'approved') {
-            Alert::warning('Perhatian', 'Lapak sudah disetujui sebelumnya');
-            return redirect()->back();
-        }
 
         // Ambil petugas (admin) yang sedang login
         $petugas = Petugas::where('email', auth()->user()->email)->first();
@@ -83,14 +78,12 @@ class LapakController extends Controller
     {
         $request->validate([
             'rejection_reason' => 'required|string|max:500'
+        ], [
+            'rejection_reason.required' => 'Alasan penolakan harus diisi',
+            'rejection_reason.max' => 'Alasan penolakan maksimal 500 karakter'
         ]);
 
         $lapak = Lapak::findOrFail($id);
-        
-        if ($lapak->approval_status === 'rejected') {
-            Alert::warning('Perhatian', 'Lapak sudah ditolak sebelumnya');
-            return redirect()->back();
-        }
 
         // Ambil petugas (admin) yang sedang login
         $petugas = Petugas::where('email', auth()->user()->email)->first();

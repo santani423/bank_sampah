@@ -12,6 +12,8 @@
     <link rel="shortcut icon" href="{{ asset('wostin/files/assets/images/resources/logo.png') }}">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/bootstrap.min.css') }}">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- file upload -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/file-upload.css') }}">
     <!-- file upload -->

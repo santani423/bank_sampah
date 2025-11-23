@@ -15,75 +15,44 @@ class LapakSeeder extends Seeder
     public function run(): void
     {
         // Ambil beberapa cabang untuk dijadikan tempat lapak
-        $cabangs = Cabang::limit(5)->get();
+        $cabangs = Cabang::all();
 
         if ($cabangs->count() > 0) {
-            $lapaks = [
-                [
-                    'cabang_id' => $cabangs[0]->id,
-                    'kode_lapak' => 'LPK001',
-                    'nama_lapak' => 'Lapak Sejahtera',
-                    'alamat' => 'Jl. Merdeka No. 123',
-                    'kota' => 'Jakarta',
-                    'provinsi' => 'DKI Jakarta',
-                    'kode_pos' => '12345',
-                    'no_telepon' => '081234567890',
-                    'deskripsi' => 'Lapak sampah terpercaya di Jakarta',
-                    'status' => 'tidak_aktif',
-                    'approval_status' => 'pending',
-                ],
-                [
-                    'cabang_id' => $cabangs[1]->id ?? $cabangs[0]->id,
-                    'kode_lapak' => 'LPK002',
-                    'nama_lapak' => 'Lapak Bersih',
-                    'alamat' => 'Jl. Sudirman No. 456',
-                    'kota' => 'Bandung',
-                    'provinsi' => 'Jawa Barat',
-                    'kode_pos' => '40123',
-                    'no_telepon' => '082345678901',
-                    'deskripsi' => 'Lapak sampah berkualitas',
-                    'status' => 'aktif',
-                ],
-                [
-                    'cabang_id' => $cabangs[2]->id ?? $cabangs[0]->id,
-                    'kode_lapak' => 'LPK003',
-                    'nama_lapak' => 'Lapak Mandiri',
-                    'alamat' => 'Jl. Gatot Subroto No. 789',
-                    'kota' => 'Surabaya',
-                    'provinsi' => 'Jawa Timur',
-                    'kode_pos' => '60123',
-                    'no_telepon' => '083456789012',
-                    'deskripsi' => 'Melayani pembelian sampah dengan harga terbaik',
-                    'status' => 'aktif',
-                ],
-                [
-                    'cabang_id' => $cabangs[3]->id ?? $cabangs[0]->id,
-                    'kode_lapak' => 'LPK004',
-                    'nama_lapak' => 'Lapak Hijau',
-                    'alamat' => 'Jl. Ahmad Yani No. 321',
-                    'kota' => 'Semarang',
-                    'provinsi' => 'Jawa Tengah',
-                    'kode_pos' => '50123',
-                    'no_telepon' => '084567890123',
-                    'deskripsi' => 'Lapak ramah lingkungan',
-                    'status' => 'aktif',
-                ],
-                [
-                    'cabang_id' => $cabangs[4]->id ?? $cabangs[0]->id,
-                    'kode_lapak' => 'LPK005',
-                    'nama_lapak' => 'Lapak Jaya',
-                    'alamat' => 'Jl. Diponegoro No. 654',
-                    'kota' => 'Yogyakarta',
-                    'provinsi' => 'DI Yogyakarta',
-                    'kode_pos' => '55123',
-                    'no_telepon' => '085678901234',
-                    'deskripsi' => 'Lapak sampah terlengkap',
-                    'status' => 'tidak_aktif',
-                ],
-            ];
+            $namaLapak = ['Sejahtera', 'Bersih', 'Mandiri', 'Hijau', 'Jaya', 'Makmur', 'Maju', 'Berkah', 'Sentosa', 'Abadi'];
+            $jalan = ['Merdeka', 'Sudirman', 'Gatot Subroto', 'Ahmad Yani', 'Diponegoro', 'Hasanuddin', 'Kartini', 'Veteran', 'Pemuda', 'Soekarno Hatta'];
+            $kota = ['Jakarta', 'Bandung', 'Surabaya', 'Semarang', 'Yogyakarta', 'Malang', 'Solo', 'Bogor', 'Depok', 'Tangerang'];
+            $provinsi = ['DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Jawa Tengah', 'DI Yogyakarta', 'Banten'];
+            $approvalStatus = ['pending', 'approved', 'rejected'];
 
-            foreach ($lapaks as $lapak) {
-                Lapak::create($lapak);
+            // Generate 50 sample data
+            for ($i = 1; $i <= 50; $i++) {
+                $kodeLapak = 'LPK' . str_pad($i, 3, '0', STR_PAD_LEFT);
+                $randomNama = $namaLapak[array_rand($namaLapak)];
+                $randomJalan = $jalan[array_rand($jalan)];
+                $randomKota = $kota[array_rand($kota)];
+                $randomProvinsi = $provinsi[array_rand($provinsi)];
+                $randomCabang = $cabangs->random();
+                $randomApproval = $approvalStatus[array_rand($approvalStatus)];
+                
+                // Status aktif jika approved, tidak_aktif jika pending atau rejected
+                $status = $randomApproval === 'approved' ? 'aktif' : 'tidak_aktif';
+                
+                Lapak::create([
+                    'cabang_id' => $randomCabang->id,
+                    'kode_lapak' => $kodeLapak,
+                    'nama_lapak' => 'Lapak ' . $randomNama . ' ' . $i,
+                    'alamat' => 'Jl. ' . $randomJalan . ' No. ' . rand(1, 999),
+                    'kota' => $randomKota,
+                    'provinsi' => $randomProvinsi,
+                    'kode_pos' => rand(10000, 99999),
+                    'no_telepon' => '08' . rand(1000000000, 9999999999),
+                    'deskripsi' => 'Lapak sampah ' . strtolower($randomNama) . ' melayani dengan baik',
+                    'status' => $status,
+                    'approval_status' => $randomApproval,
+                    'approved_by' => $randomApproval !== 'pending' ? 1 : null,
+                    'approved_at' => $randomApproval !== 'pending' ? now() : null,
+                    'rejection_reason' => $randomApproval === 'rejected' ? 'Lokasi tidak strategis atau dokumen belum lengkap' : null,
+                ]);
             }
         }
     }

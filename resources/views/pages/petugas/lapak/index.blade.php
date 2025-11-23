@@ -11,6 +11,30 @@
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
         }
+        .pagination {
+            margin: 0;
+        }
+        .pagination .page-item .page-link {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0 0.125rem;
+            color: #1572e8;
+            border: 1px solid #dee2e6;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #1572e8;
+            border-color: #1572e8;
+            color: #fff;
+        }
+        .pagination .page-item:hover:not(.active):not(.disabled) .page-link {
+            background-color: #e9ecef;
+            color: #1572e8;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
     </style>
 @endpush
 
@@ -120,18 +144,18 @@
                                         <td>{{ $lapak->kota ?? '-' }}</td>
                                         <td>
                                             @if($lapak->status == 'aktif')
-                                                <span class="badge badge-success">Aktif</span>
+                                                <span class="badge badge-success" style="color: #000 !important;">Aktif</span>
                                             @else
-                                                <span class="badge badge-danger">Tidak Aktif</span>
+                                                <span class="badge badge-danger" style="color: #000 !important;">Tidak Aktif</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if($lapak->approval_status == 'pending')
-                                                <span class="badge badge-warning">Pending</span>
+                                                <span class="badge badge-warning" style="color: #000 !important;">Pending</span>
                                             @elseif($lapak->approval_status == 'approved')
-                                                <span class="badge badge-success">Approved</span>
+                                                <span class="badge badge-success" style="color: #000 !important;">Approved</span>
                                             @else
-                                                <span class="badge badge-danger">Rejected</span>
+                                                <span class="badge badge-danger" style="color: #000 !important;">Rejected</span>
                                                 @if($lapak->rejection_reason)
                                                     <br><small class="text-danger" title="{{ $lapak->rejection_reason }}">{{ Str::limit($lapak->rejection_reason, 20) }}</small>
                                                 @endif
@@ -139,19 +163,24 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}" 
-                                                   class="btn btn-sm btn-warning" 
-                                                   title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="{{ route('petugas.lapak.show', $lapak->id) }}"
+                                                   class="btn btn-sm btn-info"
+                                                   title="Detail">
+                                                    <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <form action="{{ route('petugas.lapak.destroy', $lapak->id) }}" 
-                                                      method="POST" 
+                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}"
+                                                   class="btn btn-sm btn-warning"
+                                                   title="Edit">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('petugas.lapak.destroy', $lapak->id) }}"
+                                                      method="POST"
                                                       class="d-inline"
                                                       onsubmit="return confirm('Apakah Anda yakin ingin menghapus lapak ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fas fa-trash"></i>
+                                                        <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -169,13 +198,13 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted small">
-                            Menampilkan {{ $lapaks->firstItem() ?? 0 }} - {{ $lapaks->lastItem() ?? 0 }} 
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                        <div class="text-muted small mb-2 mb-md-0">
+                            Menampilkan {{ $lapaks->firstItem() ?? 0 }} - {{ $lapaks->lastItem() ?? 0 }}
                             dari {{ $lapaks->total() }} data
                         </div>
                         <div>
-                            {{ $lapaks->links() }}
+                            {{ $lapaks->appends(request()->query())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>

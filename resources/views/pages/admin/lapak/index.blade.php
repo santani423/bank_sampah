@@ -16,6 +16,30 @@
             gap: 0.5rem;
             flex-wrap: wrap;
         }
+        .pagination {
+            margin: 0;
+        }
+        .pagination .page-item .page-link {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0 0.125rem;
+            color: #1572e8;
+            border: 1px solid #dee2e6;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #1572e8;
+            border-color: #1572e8;
+            color: #fff;
+        }
+        .pagination .page-item:hover:not(.active):not(.disabled) .page-link {
+            background-color: #e9ecef;
+            color: #1572e8;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
     </style>
 @endpush
 
@@ -105,6 +129,19 @@
                         </div>
                     @endif
 
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered table-head-bg-primary">
                             <thead>
@@ -132,18 +169,18 @@
                                         <td>{{ Str::limit($lapak->alamat, 30) }}</td>
                                         <td>
                                             @if($lapak->status == 'aktif')
-                                                <span class="badge badge-success">Aktif</span>
+                                                <span class="badge badge-success" style="color: #000 !important;">Aktif</span>
                                             @else
-                                                <span class="badge badge-danger">Tidak Aktif</span>
+                                                <span class="badge badge-danger" style="color: #000 !important;">Tidak Aktif</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if($lapak->approval_status == 'pending')
-                                                <span class="badge badge-warning">Pending</span>
+                                                <span class="badge badge-warning" style="color: #000 !important;">Pending</span>
                                             @elseif($lapak->approval_status == 'approved')
-                                                <span class="badge badge-success">Approved</span>
+                                                <span class="badge badge-success" style="color: #000 !important;">Approved</span>
                                             @else
-                                                <span class="badge badge-danger">Rejected</span>
+                                                <span class="badge badge-danger" style="color: #000 !important;">Rejected</span>
                                             @endif
                                             @if($lapak->approved_at)
                                                 <br><small class="text-muted">{{ $lapak->approved_at->format('d/m/Y') }}</small>
@@ -151,34 +188,30 @@
                                         </td>
                                         <td>
                                             <div class="action-buttons">
-                                                @if($lapak->approval_status == 'pending')
-                                                    <form action="{{ route('admin.lapak.approve', $lapak->id) }}" 
-                                                          method="POST" 
+                                                <a href="{{ route('admin.lapak.show', $lapak->id) }}" class="btn btn-sm btn-info" title="Detail">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                                
+                                                @if($lapak->approval_status == 'pending' || $lapak->approval_status == 'rejected')
+                                                    <form action="{{ route('admin.lapak.approve', $lapak->id) }}"
+                                                          method="POST"
                                                           class="d-inline"
                                                           onsubmit="return confirm('Apakah Anda yakin ingin menyetujui lapak ini?')">
                                                         @csrf
                                                         <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                                            <i class="fas fa-check"></i> Approve
+                                                            <i class="bi bi-check-circle-fill"></i> Approve
                                                         </button>
                                                     </form>
-                                                    <button type="button" class="btn btn-sm btn-danger" 
-                                                            data-toggle="modal" 
-                                                            data-target="#rejectModal{{ $lapak->id }}" 
+                                                @endif
+
+                                                @if($lapak->approval_status == 'pending' || $lapak->approval_status == 'approved')
+                                                    <button type="button" class="btn btn-sm btn-danger"
+                                                            data-toggle="modal"
+                                                            data-target="#rejectModal{{ $lapak->id }}"
                                                             title="Reject">
-                                                        <i class="fas fa-times"></i> Reject
+                                                        <i class="bi bi-x-circle-fill"></i> Reject
                                                     </button>
                                                 @endif
-                                                
-                                                <form action="{{ route('admin.lapak.destroy', $lapak->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus lapak ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -225,13 +258,13 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted small">
-                            Menampilkan {{ $lapaks->firstItem() ?? 0 }} - {{ $lapaks->lastItem() ?? 0 }} 
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                        <div class="text-muted small mb-2 mb-md-0">
+                            Menampilkan {{ $lapaks->firstItem() ?? 0 }} - {{ $lapaks->lastItem() ?? 0 }}
                             dari {{ $lapaks->total() }} data
                         </div>
                         <div>
-                            {{ $lapaks->links() }}
+                            {{ $lapaks->appends(request()->query())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
