@@ -120,6 +120,7 @@
                             <thead>
                                 <tr>
                                     <th width="5%">#</th>
+                                    <th width="14%">Aksi</th>
                                     <th width="10%">Kode Lapak</th>
                                     <th width="15%">Nama Lapak</th>
                                     <th width="15%">Cabang</th>
@@ -127,13 +128,39 @@
                                     <th width="8%">Kota</th>
                                     <th width="8%">Status</th>
                                     <th width="10%">Approval</th>
-                                    <th width="14%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($lapaks as $index => $lapak)
                                     <tr>
                                         <td>{{ $lapaks->firstItem() + $index }}</td>
+                                        <td>
+                                            <div class="btn-group mb-2" role="group">
+                                                <a href="{{ route('petugas.lapak.show', $lapak->id) }}"
+                                                   class="btn btn-sm btn-info"
+                                                   title="Detail">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}"
+                                                   class="btn btn-sm btn-warning"
+                                                   title="Edit">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('petugas.lapak.destroy', $lapak->id) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus lapak ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <a href="{{ route('petugas.lapak.setor-sampah', $lapak->id) }}" class="btn btn-sm btn-success">
+                                                <i class="bi bi-plus-circle"></i> Setor Sampah
+                                            </a>
+                                        </td>
                                         <td><strong>{{ $lapak->kode_lapak }}</strong></td>
                                         <td>{{ $lapak->nama_lapak }}</td>
                                         <td>
@@ -160,30 +187,6 @@
                                                     <br><small class="text-danger" title="{{ $lapak->rejection_reason }}">{{ Str::limit($lapak->rejection_reason, 20) }}</small>
                                                 @endif
                                             @endif
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('petugas.lapak.show', $lapak->id) }}"
-                                                   class="btn btn-sm btn-info"
-                                                   title="Detail">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                </a>
-                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}"
-                                                   class="btn btn-sm btn-warning"
-                                                   title="Edit">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <form action="{{ route('petugas.lapak.destroy', $lapak->id) }}"
-                                                      method="POST"
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus lapak ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
                                         </td>
                                     </tr>
                                 @empty

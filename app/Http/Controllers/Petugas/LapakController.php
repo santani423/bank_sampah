@@ -14,6 +14,65 @@ use Illuminate\Support\Facades\DB;
 class LapakController extends Controller
 {
     /**
+     * Simpan transaksi setor sampah lapak
+     */
+    public function storeSetorSampah(Request $request, $lapakId)
+    {
+        $request->validate([
+            'kode_transaksi' => 'required|string|unique:transaksi_lapak,kode_transaksi',
+            'tanggal_transaksi' => 'required|date',
+            'detail_transaksi' => 'required|array|min:1',
+            'detail_transaksi.*.sampah_id' => 'required|exists:sampah,id',
+            'detail_transaksi.*.berat_kg' => 'required|numeric|min:0',
+            'detail_transaksi.*.harga_per_kg' => 'required|numeric|min:0',
+        ]);
+
+        $totalTransaksi = 0;
+        foreach ($request->detail_transaksi as $detail) {
+            $totalTransaksi += $detail['berat_kg'] * $detail['harga_per_kg'];
+        }
+
+        $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
+
+        $transaksiLapak = \DB::transaction(function () use ($request, $lapakId, $totalTransaksi, $petugas) {
+            $transaksi = \DB::table('transaksi_lapak')->insertGetId([
+                'lapak_id' => $lapakId,
+                'kode_transaksi' => $request->kode_transaksi,
+                'tanggal_transaksi' => $request->tanggal_transaksi,
+                'total_transaksi' => $totalTransaksi,
+                'approval' => 'pending',
+                'keterangan' => $request->keterangan ?? null,
+                'petugas_id' => $petugas ? $petugas->id : null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            foreach ($request->detail_transaksi as $detail) {
+                \DB::table('detail_transaksi_lapak')->insert([
+                    'transaksi_lapak_id' => $transaksi,
+                    'sampah_id' => $detail['sampah_id'],
+                    'berat_kg' => $detail['berat_kg'],
+                    'harga_per_kg' => $detail['harga_per_kg'],
+                    'total_harga' => $detail['berat_kg'] * $detail['harga_per_kg'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+            return $transaksi;
+        });
+
+        \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Transaksi setor sampah lapak berhasil disimpan dan menunggu approval admin');
+        return redirect()->route('petugas.lapak.index');
+    }
+    /**
+     * Tampilkan halaman setor sampah untuk lapak
+     */
+    public function setorSampah($lapakId)
+    {
+        $lapak = Lapak::findOrFail($lapakId);
+        return view('pages.petugas.lapak.setor-sampah', compact('lapak'));
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

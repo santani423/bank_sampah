@@ -52,6 +52,84 @@
         </div>
     </div>
 
+    <!-- List Data Transaksi Lapak -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card detail-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Data Transaksi Lapak</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="transaksiLapakTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Kode Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="text-center text-muted">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var lapakId = @json($lapak->id);
+            var tableBody = document.querySelector('#transaksiLapakTable tbody');
+            fetch(`/api/lapak/${lapakId}/transaksi`)
+                .then(response => response.json())
+                .then(data => {
+                    tableBody.innerHTML = '';
+                    if (data.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Belum ada data transaksi lapak</td></tr>`;
+                        return;
+                    }
+                    data.forEach(function(trx, idx) {
+                        let statusLabel = '';
+                        if (trx.approval === 'selesai' || trx.status === 'selesai') {
+                            statusLabel = '<span class="badge badge-success">Selesai</span>';
+                        } else if (trx.approval === 'pending' || trx.status === 'pending') {
+                            statusLabel = '<span class="badge badge-warning">Pending</span>';
+                        } else {
+                            statusLabel = '<span class="badge badge-danger">Dibatalkan</span>';
+                        }
+                        let jumlah = trx.total_transaksi ? Number(trx.total_transaksi).toLocaleString('id-ID') : '-';
+                        let tanggal = trx.tanggal_transaksi ? new Date(trx.tanggal_transaksi).toLocaleString('id-ID') : '-';
+                        let detailUrl = `/petugas/lapak/transaksi/${trx.id}`;
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td>${trx.kode_transaksi || '-'}</td>
+                                <td>${tanggal}</td>
+                                <td>${jumlah}</td>
+                                <td>${statusLabel}</td>
+                                <td>
+                                    <a href="${detailUrl}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Detail Transaksi
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(() => {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Gagal memuat data transaksi</td></tr>`;
+                });
+        });
+    </script>
+@endpush
+
     <div class="row">
         <div class="col-md-8">
             <div class="card detail-card">

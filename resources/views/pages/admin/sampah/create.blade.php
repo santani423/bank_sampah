@@ -34,6 +34,10 @@
                                 required>
                         </div>
                         <div class="form-group">
+                            <label>Harga Lapak</label>
+                            <input autocomplete="off" type="number" step="0.01" class="form-control" name="harga_lapak">
+                        </div>
+                        <div class="form-group">
                             <label>Gambar</label>
                             <input type="file" class="form-control" name="gambar" accept="image/*">
                         </div>

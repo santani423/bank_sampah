@@ -76,7 +76,8 @@ class PetugasSeeder extends Seeder
             $email = $faker->unique()->safeEmail;
             $username = 'petugas' . $i;
             $pss = Hash::make('12345678');
-            DB::table('petugas')->insert([
+            // Insert petugas
+            $petugasId = DB::table('petugas')->insertGetId([
                 'nama' => $name,
                 'email' => $email,
                 'username' => $username,
@@ -92,6 +93,34 @@ class PetugasSeeder extends Seeder
                 'username' => $username,
                 'password' => $pss,
                 'role' => 'petugas',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Buat nasabah untuk setiap petugas
+            $nasabahId = DB::table('nasabah')->insertGetId([
+                'cabang_id' => rand(1, 3),
+                'no_registrasi' => 'REG' . $faker->unique()->numberBetween(1000, 9999),
+                'nik' => $faker->numerify('################'),
+                'nama_lengkap' => $name . ' Nasabah',
+                'jenis_kelamin' => $faker->randomElement(['Laki-laki', 'Perempuan']),
+                'tempat_lahir' => $faker->city,
+                'tanggal_lahir' => $faker->date('Y-m-d', '2000-01-01'),
+                'no_hp' => $faker->phoneNumber,
+                'email' => $faker->unique()->safeEmail,
+                'username' => $username . '_nasabah',
+                'password' => Hash::make('12345678'),
+                'alamat_lengkap' => $faker->address,
+                'foto' => 'default.jpg',
+                'status' => 'aktif',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            // Buat saldo untuk nasabah
+            DB::table('saldo')->insert([
+                'nasabah_id' => $nasabahId,
+                'saldo' => rand(10000, 1000000),
+                'tanggal_update' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

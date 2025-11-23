@@ -37,6 +37,7 @@
                                     <th>#</th>
                                     <th>Nama Sampah</th>
                                     <th>Harga per Kg</th>
+                                    <th>Harga Lapak</th>
                                     <th>Gambar</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -47,6 +48,7 @@
                                         <td>{{ $sampahs->firstItem() + $index }}</td>
                                         <td>{{ $sampah->nama_sampah }}</td>
                                         <td>Rp{{ number_format($sampah->harga_per_kg, 2, ',', '.') }}</td>
+                                        <td>Rp{{ number_format($sampah->harga_lapak, 2, ',', '.') }}</td>
                                         <td>
                                             @if ($sampah->gambar)
                                                 <img src="{{ asset('storage/sampah/' . $sampah->gambar) }}"
