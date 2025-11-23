@@ -14,6 +14,49 @@ use Illuminate\Support\Facades\DB;
 class LapakController extends Controller
 {
     /**
+     * Tampilkan detail transaksi lapak
+     */
+    public function showTransaksi($id)
+    {
+        $transaksi = DB::table('transaksi_lapak')->where('id', $id)->first();
+        if (!$transaksi) abort(404);
+        $transaksi->detail_transaksi = DB::table('detail_transaksi_lapak')
+            ->where('transaksi_lapak_id', $id)
+            ->get()
+            ->map(function ($detail) {
+                $detail->sampah = DB::table('sampah')->where('id', $detail->sampah_id)->first();
+                return $detail;
+            });
+        $transaksi->petugas = DB::table('petugas')->where('id', $transaksi->petugas_id)->first();
+        // Pastikan properti status selalu ada
+        if (!property_exists($transaksi, 'status')) {
+            $transaksi->status = $transaksi->approval ?? 'pending';
+        }
+        return view('pages.petugas.lapak.transaksi.detail', compact('transaksi'));
+    }
+
+    /**
+     * Download detail transaksi lapak dalam format khusus
+     */
+    public function downloadTransaksi($id)
+    {
+        $transaksi = DB::table('transaksi_lapak')->where('id', $id)->first();
+        if (!$transaksi) abort(404);
+        $details = DB::table('detail_transaksi_lapak')
+            ->where('transaksi_lapak_id', $id)
+            ->get()
+            ->map(function ($detail) {
+                $detail->sampah = DB::table('sampah')->where('id', $detail->sampah_id)->first();
+                return $detail;
+            });
+        $transaksi->detail_transaksi = $details;
+        $transaksi->petugas = DB::table('petugas')->where('id', $transaksi->petugas_id)->first();
+        $transaksi->status = property_exists($transaksi, 'status') ? $transaksi->status : ($transaksi->approval ?? 'pending');
+        $pdf = \PDF::loadView('pages.petugas.lapak.transaksi.pdf', compact('transaksi'));
+        $filename = 'detail_transaksi_lapak_' . $transaksi->kode_transaksi . '.pdf';
+        return $pdf->download($filename);
+    }
+    /**
      * Simpan transaksi setor sampah lapak
      */
     public function storeSetorSampah(Request $request, $lapakId)

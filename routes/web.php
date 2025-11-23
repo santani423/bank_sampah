@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\Admin\LapakController as AdminLapakController;
+use App\Http\Controllers\Api\LapakTransaksiController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 use App\Http\Controllers\CleanController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiC
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
 use App\Http\Controllers\Petugas\NasabahUserBadanController;
+use App\Http\Controllers\Petugas\LapakController;
 use App\Http\Controllers\TimeController;
 use Illuminate\Support\Facades\Response;
 /*
@@ -163,6 +165,9 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('petugas.pengiriman');
+
+    Route::get('/lapak/transaksi/{id}', [LapakController::class, 'showTransaksi'])->name('petugas.lapak.transaksi.detail');
+    Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('petugas.lapak.transaksi.download');
 });
 
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
