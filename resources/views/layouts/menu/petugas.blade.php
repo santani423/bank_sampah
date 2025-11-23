@@ -24,6 +24,11 @@
                      Data
                      Rekanan </a>
              </li>
+             <li class="sidebar-submenu__item">
+                 <a href="{{ route('petugas.lapak.index') }}" class="sidebar-submenu__link">
+                     Data
+                     Lapak </a>
+             </li>
          </ul>
      </li>
      <li class="sidebar-menu__item has-dropdown">

@@ -31,6 +31,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\Petugas\DashboardController as PetugasDashboardController;
 use App\Http\Controllers\Petugas\TransaksiController as PetugasTransaksiController;
 use App\Http\Controllers\Petugas\NasabahController as PetugasNasabahController;
+use App\Http\Controllers\Petugas\LapakController as PetugasLapakController;
 use App\Http\Controllers\TessController;
 
 use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardController;
@@ -139,6 +140,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
+    Route::resource('/data-lapak', PetugasLapakController::class)->names('petugas.lapak');
     Route::get('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'setorSampah'])->name('petugas.rekanan.setor-sampah');
     Route::post('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'storeSetorSampah'])->name('petugas.rekanan.setor-sampah.store');
     // Import data sampah (Excel/CSV)
