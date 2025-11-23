@@ -87,9 +87,8 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <x-pagination :data="$cabangs" />
                     </div>
-                    
+                    <x-pagination :data="$cabangs" />
                 </div>
             </div>
         </div>

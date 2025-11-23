@@ -313,8 +313,8 @@
                         <div class="card border border-gray-100 rounded-12 box-shadow-custom">
                             <div class="card-body">
                                 <div class="flex-align gap-8 mb-20 pb-20 border-bottom border-gray-100">
-                                    <img src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : asset('images/default-user.png') }}"
-                                        alt="" class="w-54 h-54 rounded-circle">
+                                    <img src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&size=54&background=6366f1&color=ffffff' }}"
+                                        alt="" class="w-54 h-54 rounded-circle" onerror="this.src='https://via.placeholder.com/54/6366f1/ffffff?text={{ substr(Auth::user()->name, 0, 1) }}'">
                                     <div class="">
                                         <h4 class="mb-0">{{ Auth::user()->name }}</h4>
                                         <p class="fw-medium text-13 text-gray-200">{{ Auth::user()->email }}</p>

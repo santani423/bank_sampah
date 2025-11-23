@@ -74,7 +74,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser');
+    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser'); 
 
     // Data Master
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');

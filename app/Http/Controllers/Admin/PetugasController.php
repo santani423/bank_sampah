@@ -18,11 +18,8 @@ class PetugasController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', 10);
-        $page = max(1, (int) $request->get('page', 1));
-        $petugas = Petugas::paginate($perPage, ['*'], 'page', $page);
-        // dd($petugas->hasPages());
-        return view('pages.admin.petugas.index', compact('petugas'));
+        // Return view only, data will be loaded via API
+        return view('pages.admin.petugas.index');
     }
 
     public function create()
@@ -265,5 +262,26 @@ class PetugasController extends Controller
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function apiIndex(Request $request)
+    {
+        $perPage = (int) $request->get('per_page', 10);
+        $page = max(1, (int) $request->get('page', 1));
+        
+        $petugas = Petugas::paginate($perPage, ['*'], 'page', $page);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $petugas->items(),
+            'pagination' => [
+                'current_page' => $petugas->currentPage(),
+                'last_page' => $petugas->lastPage(),
+                'per_page' => $petugas->perPage(),
+                'total' => $petugas->total(),
+                'from' => $petugas->firstItem(),
+                'to' => $petugas->lastItem(),
+            ]
+        ]);
     }
 }

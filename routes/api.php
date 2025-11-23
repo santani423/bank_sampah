@@ -15,6 +15,7 @@ use App\Models\NasabahBadan;
 use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
 use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
+use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,8 @@ Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
 
 // API Nasabah Perorangan (moved to controller)
 Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);
+// Nasabah berdasarkan cabang (perorangan)
+Route::get('/cabangs/{id}/nasabah', [ApiNasabahController::class, 'byCabang']);
 
 Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 
@@ -71,3 +74,6 @@ Route::prefix('teams')->group(function () {
     Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
     Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
 });
+
+// API Petugas
+Route::get('/petugas', [AdminPetugasController::class, 'apiIndex']);

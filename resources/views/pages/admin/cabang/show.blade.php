@@ -146,6 +146,49 @@
         </div>
     </div>
 
+    <!-- Nasabah di Cabang Ini -->
+    <div class="card mb-4" id="nasabah-cabang-card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Nasabah di Cabang Ini</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" id="nasabah-search" class="form-control form-control-sm" placeholder="Cari nama / no registrasi" style="min-width: 260px;">
+                    <select id="nasabah-per-page" class="form-select form-select-sm" style="width: 100px;">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:70px;">No</th>
+                            <th>No. Registrasi</th>
+                            <th>Nama</th>
+                            <th>No HP</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nasabah-tbody">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Memuat data…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted small" id="nasabah-summary"></div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="nasabah-pagination"></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
     <div class="card-container">
         <!-- Anggota Luar Cabang -->
         <div class="drag-card" id="anggota-luar">
@@ -175,6 +218,126 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ========= NASABAH CABANG (API + Pagination) =========
+            const cabangId = "{{ $id }}";
+            const apiBase = `{{ url('/api/cabangs') }}/${cabangId}/nasabah`;
+            const tbody = document.getElementById('nasabah-tbody');
+            const summary = document.getElementById('nasabah-summary');
+            const pagination = document.getElementById('nasabah-pagination');
+            const searchInput = document.getElementById('nasabah-search');
+            const perPageSelect = document.getElementById('nasabah-per-page');
+
+            let state = {
+                page: 1,
+                per_page: parseInt(perPageSelect ? perPageSelect.value : 10, 10) || 10,
+                search: ''
+            };
+
+            function renderRows(items, meta) {
+                if (!items || items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada data nasabah di cabang ini.</td></tr>`;
+                    return;
+                }
+                const startNumber = (meta.current_page - 1) * meta.per_page;
+                tbody.innerHTML = items.map((item, index) => `
+                    <tr>
+                        <td>${startNumber + index + 1}</td>
+                        <td>${item.no_registrasi ?? '-'}</td>
+                        <td>${item.nama_lengkap ?? '-'}</td>
+                        <td>${item.no_hp ?? '-'}</td>
+                        <td>
+                            <span class="badge ${item.status === 'aktif' ? 'bg-success' : 'bg-secondary'}">${(item.status||'-').toString().charAt(0).toUpperCase() + (item.status||'-').toString().slice(1)}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function renderPagination(meta) {
+                // meta: current_page, last_page, total, per_page, from, to
+                pagination.innerHTML = '';
+                const { current_page, last_page } = meta;
+                const createPageItem = (label, page, disabled = false, active = false) => `
+                    <li class="page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}">
+                        <a href="#" class="page-link" data-page="${page}">${label}</a>
+                    </li>`;
+
+                // Prev
+                pagination.insertAdjacentHTML('beforeend', createPageItem('&laquo;', current_page - 1, current_page <= 1));
+
+                // Page numbers (limit window)
+                const windowSize = 5;
+                let start = Math.max(1, current_page - Math.floor(windowSize / 2));
+                let end = Math.min(last_page, start + windowSize - 1);
+                if (end - start + 1 < windowSize) {
+                    start = Math.max(1, end - windowSize + 1);
+                }
+                for (let p = start; p <= end; p++) {
+                    pagination.insertAdjacentHTML('beforeend', createPageItem(p, p, false, p === current_page));
+                }
+
+                // Next
+                pagination.insertAdjacentHTML('beforeend', createPageItem('&raquo;', current_page + 1, current_page >= last_page));
+            }
+
+            function renderSummary(meta) {
+                const from = meta.from ?? 0;
+                const to = meta.to ?? 0;
+                const total = meta.total ?? 0;
+                summary.textContent = `Menampilkan ${from}-${to} dari ${total} nasabah`;
+            }
+
+            async function loadNasabah(page = 1) {
+                state.page = page;
+                const params = new URLSearchParams({
+                    page: state.page,
+                    per_page: state.per_page
+                });
+                if (state.search) params.append('search', state.search);
+                try {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Memuat data…</td></tr>`;
+                    const res = await fetch(`${apiBase}?${params.toString()}`);
+                    const data = await res.json();
+                    renderRows(data.data || [], data);
+                    renderPagination(data);
+                    renderSummary(data);
+                } catch (e) {
+                    console.error(e);
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>`;
+                    pagination.innerHTML = '';
+                    summary.textContent = '';
+                }
+            }
+
+            // Events
+            if (pagination) {
+                pagination.addEventListener('click', (ev) => {
+                    const link = ev.target.closest('a.page-link');
+                    if (!link) return;
+                    ev.preventDefault();
+                    const targetPage = parseInt(link.dataset.page, 10);
+                    if (!isNaN(targetPage)) loadNasabah(targetPage);
+                });
+            }
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', () => {
+                    state.per_page = parseInt(perPageSelect.value, 10) || 10;
+                    loadNasabah(1);
+                });
+            }
+            if (searchInput) {
+                let timer;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        state.search = searchInput.value.trim();
+                        loadNasabah(1);
+                    }, 350);
+                });
+            }
+
+            // Initial load
+            loadNasabah(1);
+
             const dragStatusMessage = document.getElementById('drag-status-message');
 
             function drag(ev) {

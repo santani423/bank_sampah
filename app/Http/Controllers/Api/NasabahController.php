@@ -96,4 +96,44 @@ class NasabahController extends Controller
 
         return response()->json($nasabahs);
     }
+
+    /**
+     * Daftar nasabah berdasarkan cabang (perorangan) dengan pagination & optional search.
+     * Route: GET /api/cabangs/{cabang}/nasabah
+     * Query params: search, page, per_page
+     */
+    public function byCabang(Request $request, $cabangId)
+    {
+        // Validasi per_page agar tidak berlebihan
+        $perPage = (int) $request->get('per_page', 10);
+        if ($perPage <= 0 || $perPage > 100) {
+            $perPage = 10;
+        }
+
+        $query = Nasabah::join('user_nasabahs', 'nasabah.id', '=', 'user_nasabahs.nasabah_id')
+            ->join('cabang_users', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
+            ->join('cabangs', 'cabang_users.cabang_id', '=', 'cabangs.id')
+            ->select(
+                'nasabah.id',
+                'nasabah.no_registrasi',
+                'nasabah.nama_lengkap',
+                'nasabah.no_hp',
+                'nasabah.status',
+                'cabangs.nama_cabang',
+                'cabangs.kode_cabang'
+            )
+            ->where('cabangs.id', $cabangId);
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nasabah.nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
+                  ->orWhere('nasabah.no_hp', 'like', "%{$search}%");
+            });
+        }
+
+        $nasabahs = $query->orderBy('nasabah.nama_lengkap')->paginate($perPage);
+
+        return response()->json($nasabahs);
+    }
 }
