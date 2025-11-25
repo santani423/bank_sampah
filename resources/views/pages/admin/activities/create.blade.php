@@ -48,7 +48,9 @@
 
                     <div class="mb-3">
                         <label for="content" class="form-label">Content</label>
-                        <textarea name="content" id="content" class="form-control">{{ old('content') }}</textarea>
+                            <div id="quill-toolbar"></div>
+                            <div id="quill-editor" style="height: 200px;"></div>
+                            <input type="hidden" name="content" id="content">
                     </div>
 
                     <div class="mb-3">
@@ -104,25 +106,30 @@
 @endsection
 
 @push('scripts')
-<!-- CKEditor 5 Classic -->
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-<script>
-    // ClassicEditor
-    //     .create( document.querySelector( '#description' ) )
-    //     .catch( error => { console.error( error ); } );
-
-    ClassicEditor
-        .create( document.querySelector( '#content' ) )
-        .catch( error => { console.error( error ); } );
-
-    // Preview gambar sebelum submit
-    document.getElementById('image').addEventListener('change', function(event) {
-        const [file] = event.target.files;
-        if (file) {
-            const preview = document.getElementById('imagePreview');
-            preview.src = URL.createObjectURL(file);
-            preview.style.display = 'block';
+    <!-- Quill JS and CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        var quill = new Quill('#quill-editor', {
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block'],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    ['link']
+                ]
+            },
+            theme: 'snow'
+        });
+        // Set initial value if exists
+        var oldContent = @json(old('content'));
+        if (oldContent) {
+            quill.root.innerHTML = oldContent;
         }
-    });
-</script>
+        // On form submit, set hidden input value
+        document.querySelector('form').addEventListener('submit', function(e) {
+            document.getElementById('content').value = quill.root.innerHTML;
+        });
+    </script>
 @endpush
