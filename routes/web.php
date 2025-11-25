@@ -93,7 +93,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-customers', GudangController::class)->names('admin.gudangs');
     Route::post('admin/customers/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
 
-
+    // Approval Setoran Lapak
+    Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
 
     // Lapak Management
@@ -191,8 +192,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 // Xendit Callback (tidak perlu auth)
 Route::post('/xendit/callback/topup', [AdminTopUpController::class, 'callback'])->name('xendit.callback.topup');
 
-// Approval Setoran Lapak
-Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
+
 
 
 

@@ -36,6 +36,9 @@ use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 Route::get('/lapak/{id}/transaksi', [App\Http\Controllers\Api\LapakTransaksiController::class, 'index']);
 
+// Endpoint untuk seluruh data transaksi lapak
+Route::get('/lapak/transaksi', [App\Http\Controllers\Api\AllLapakTransaksiController::class, 'index']);
+
 Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
 Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
 Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
