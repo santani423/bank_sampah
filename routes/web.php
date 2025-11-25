@@ -78,7 +78,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser'); 
+    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser');
 
     // Data Master
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
@@ -95,7 +95,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
 
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
-    
+
     // Lapak Management
     Route::resource('/data-lapak', AdminLapakController::class)->names('admin.lapak');
     Route::post('/data-lapak/{id}/approve', [AdminLapakController::class, 'approve'])->name('admin.lapak.approve');
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     // Feedback
     Route::resource('/data-feedback', AdminFeedbackController::class)->names('admin.feedback');
     Route::resource('/settings', SettingController::class)->names('admin.settings');
-    
+
     // Top Up Saldo Utama
     Route::get('/topup', [AdminTopUpController::class, 'index'])->name('admin.topup.index');
     Route::get('/topup/create', [AdminTopUpController::class, 'create'])->name('admin.topup.create');
@@ -191,6 +191,8 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 // Xendit Callback (tidak perlu auth)
 Route::post('/xendit/callback/topup', [AdminTopUpController::class, 'callback'])->name('xendit.callback.topup');
 
+// Approval Setoran Lapak
+Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
 
 
 
@@ -203,4 +205,3 @@ Route::get('storage/{filename}', function ($filename) {
 
     return Response::file($path);
 });
-

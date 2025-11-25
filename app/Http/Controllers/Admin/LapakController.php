@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Auth;
 class LapakController extends Controller
 {
     /**
+     * Menampilkan daftar setoran lapak untuk approval
+     */
+    public function approvalSetoranLapak()
+    {
+        $lapaks = Lapak::with('cabang')
+            ->where('approval_status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        return view('pages.admin.lapak.approval', compact('lapaks'));
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

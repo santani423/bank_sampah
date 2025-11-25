@@ -19,7 +19,7 @@
     <!-- file upload -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/plyr.css') }}">
     <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
     <!-- full calendar -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/full-calendar.css') }}">
     <!-- jquery Ui -->
@@ -41,7 +41,6 @@
 </head>
 
 <body>
-
     <!--==================== Preloader Start ====================-->
     <div class="preloader">
         <div class="loader"></div>
@@ -84,10 +83,8 @@
 
     </aside>
     <!-- ============================ Sidebar End  ============================ -->
-
     <div class="dashboard-main-wrapper">
         <div class="top-navbar flex-between gap-16">
-
             <div class="flex-align gap-16">
                 <!-- Toggle Button Start -->
                 <button type="button" class="toggle-btn d-xl-none d-flex text-26 text-gray-500"><i
@@ -296,9 +293,9 @@
                         </div>
                     </div> --}}
                     <!-- Language Start -->
+
+
                 </div>
-
-
                 <!-- User Profile Start -->
                 <div class="dropdown">
                     <button
@@ -316,7 +313,7 @@
                             <div class="card-body">
                                 <div class="flex-align gap-8 mb-20 pb-20 border-bottom border-gray-100">
                                     <img src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&size=54&background=6366f1&color=ffffff' }}"
-                                        alt="" class="w-54 h-54 rounded-circle" onerror="this.src='https://via.placeholder.com/54/6366f1/ffffff?text={{ substr(Auth::user()->name, 0, 1) }}'">
+                                        alt="" class="w-54 h-54 rounded-circle"  >
                                     <div class="">
                                         <h4 class="mb-0">{{ Auth::user()->name }}</h4>
                                         <p class="fw-medium text-13 text-gray-200">{{ Auth::user()->email }}</p>
@@ -356,11 +353,9 @@
                     </div>
                 </div>
                 <!-- User Profile Start -->
-
             </div>
+
         </div>
-
-
         <div class="dashboard-body">
             @yield('main')
         </div>
@@ -381,6 +376,8 @@
             </div>
         </div> --}}
     </div>
+    <!-- ============================ Main Wrapper Start ============================ -->
+
     <!-- jQuery Scrollbar -->
     <script src="{{ asset('assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
     <!-- Jquery js -->
@@ -394,7 +391,7 @@
     <!-- file upload -->
     <script src="{{ asset('edmate/assets/js/plyr.js') }}"></script>
     <!-- dataTables -->
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js') }}"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <!-- full calendar -->
     <script src="{{ asset('edmate/assets/js/full-calendar.js') }}"></script>
     <!-- jQuery UI -->
@@ -415,7 +412,6 @@
 
     @yield('scripts')
     @stack('scripts')
-
 
 </body>
 
