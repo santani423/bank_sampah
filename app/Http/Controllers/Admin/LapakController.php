@@ -9,6 +9,7 @@ use App\Models\Petugas;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LapakController extends Controller
 {
@@ -22,6 +23,25 @@ class LapakController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         return view('pages.admin.lapak.approval', compact('lapaks'));
+    }
+
+    public function approvalSetoranLapakDetail($code)
+    {
+        $transaksi = DB::table('transaksi_lapak')->where('kode_transaksi', $code)->first();
+        if (!$transaksi) abort(404);
+        $transaksi->detail_transaksi = DB::table('detail_transaksi_lapak')
+            ->where('transaksi_lapak_id', $transaksi->id)
+            ->get()
+            ->map(function ($detail) {
+                $detail->sampah = DB::table('sampah')->where('id', $detail->sampah_id)->first();
+                return $detail;
+            });
+        $transaksi->petugas = DB::table('petugas')->where('id', $transaksi->petugas_id)->first();
+        // Pastikan properti status selalu ada
+        if (!property_exists($transaksi, 'status')) {
+            $transaksi->status = $transaksi->approval ?? 'pending';
+        }
+        return view('pages.admin.lapak.approvalSetoranLapakDetail', compact('transaksi'));
     }
     /**
      * Display a listing of the resource.
@@ -47,7 +67,7 @@ class LapakController extends Controller
 
         $lapaks = $query->orderBy('created_at', 'desc')->paginate(10);
         $cabangs = Cabang::where('status', 'aktif')->orderBy('nama_cabang')->get();
-        
+
         return view('pages.admin.lapak.index', compact('lapaks', 'cabangs'));
     }
 
@@ -69,7 +89,7 @@ class LapakController extends Controller
 
         // Ambil petugas (admin) yang sedang login
         $petugas = Petugas::where('email', auth()->user()->email)->first();
-        
+
         $lapak->update([
             'approval_status' => 'approved',
             'approved_by' => $petugas->id,
@@ -98,7 +118,7 @@ class LapakController extends Controller
 
         // Ambil petugas (admin) yang sedang login
         $petugas = Petugas::where('email', auth()->user()->email)->first();
-        
+
         $lapak->update([
             'approval_status' => 'rejected',
             'approved_by' => $petugas->id,

@@ -1,15 +1,11 @@
 @extends('layouts.template')
+@section('title', 'Approval Setoran Lapak')
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
             <h3 class="fw-bold mb-3">Approval Setoran Lapak</h3>
             <h6 class="op-7 mb-2">Daftar setoran lapak yang menunggu approval.
             </h6>
-        </div>
-        <div class="ms-md-auto py-2 py-md-0">
-            <div class="section-header-button">
-                <a href="{{ route('admin.time.create') }}" class="btn btn-primary btn-round">Tambah Anggota Tim</a>
-            </div>
         </div>
     </div>
 
@@ -42,7 +38,7 @@
                     <div class="clearfix mb-3"></div>
 
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table class="table table-striped align-middle" style="color:#000;">
                             <thead>
                                 <tr>
                                     <th>Kode Transaksi</th>
@@ -64,7 +60,7 @@
         </div>
     </div>
 
- 
+
 @endsection
 
 @push('scripts')
@@ -79,7 +75,7 @@
                         res.data.forEach(trx => {
                             let detailHtml = '';
                             if (trx.detail_transaksi && trx.detail_transaksi.length > 0) {
-                                detailHtml = '<ul style="padding-left:16px">';
+                                detailHtml = '<ul style="padding-left:16px;color:#000">';
                                 trx.detail_transaksi.forEach(d => {
                                     detailHtml +=
                                         `<li>Berat: ${d.berat_kg} kg, Harga/kg: Rp${parseInt(d.harga_per_kg).toLocaleString()}, Total: Rp${parseInt(d.total_harga).toLocaleString()}</li>`;
@@ -90,34 +86,35 @@
                             }
                             tbody.innerHTML += `
                         <tr>
-                            <td>${trx.kode_transaksi ?? '-'}</td>
-                            <td>${trx.tanggal_transaksi ?? '-'}</td>
-                            <td>Rp${parseInt(trx.total_transaksi).toLocaleString()}</td>
-                            <td>${trx.status ?? '-'}</td>
-                            <td>${detailHtml}</td>
+                            <td style="color:#000">${trx.kode_transaksi ?? '-'}</td>
+                            <td style="color:#000">${trx.tanggal_transaksi ?? '-'}</td>
+                            <td style="color:#000">Rp${parseInt(trx.total_transaksi).toLocaleString()}</td>
+                            <td style="color:#000">${trx.status ?? '-'}</td>
+                            <td style="color:#000">${detailHtml}</td>
                             <td>
-                                <a href="/admin/lapak/${trx.lapak_id ?? ''}" class="btn btn-info btn-sm">Detail</a>
+                                <a href="/admin/setor-lapak/${trx.kode_transaksi ?? ''}" class="btn btn-info btn-sm">Detail</a>
                                 ${trx.status === 'pending' ? `
-                                                                <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/approve" method="POST" style="display:inline-block;">
-                                                                    @csrf
-                                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                                                </form>
-                                                                <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/reject" method="POST" style="display:inline-block;">
-                                                                    @csrf
-                                                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                                                </form>
-                                                            ` : ''}
+                                                                    <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/approve" method="POST" style="display:inline-block;">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                                    </form>
+                                                                    <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/reject" method="POST" style="display:inline-block;">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                                                    </form>
+                                                                ` : ''}
                             </td>
                         </tr>
                     `;
                         });
                     } else {
-                        tbody.innerHTML = '<tr><td colspan="6">Tidak ada data transaksi.</td></tr>';
+                        tbody.innerHTML =
+                            '<tr><td colspan="6" style="color:#000">Tidak ada data transaksi.</td></tr>';
                     }
                 })
                 .catch(() => {
                     document.getElementById('lapak-table-body').innerHTML =
-                        '<tr><td colspan="3">Gagal memuat data.</td></tr>';
+                        '<tr><td colspan="3" style="color:#000">Gagal memuat data.</td></tr>';
                 });
         });
     </script>

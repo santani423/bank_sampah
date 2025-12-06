@@ -95,6 +95,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
     // Approval Setoran Lapak
     Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
+    Route::get('/setor-lapak/{code}', [AdminLapakController::class, 'approvalSetoranLapakDetail'])->name('admin.setor-lapak.detail');
+    // Data Clean
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
 
     // Lapak Management
@@ -141,6 +143,10 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::post('/topup/store', [AdminTopUpController::class, 'store'])->name('admin.topup.store');
     Route::get('/topup/success', [AdminTopUpController::class, 'success'])->name('admin.topup.success');
     Route::get('/topup/{id}', [AdminTopUpController::class, 'show'])->name('admin.topup.show');
+
+
+    
+    Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('admin.lapak.transaksi.download');
 });
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
