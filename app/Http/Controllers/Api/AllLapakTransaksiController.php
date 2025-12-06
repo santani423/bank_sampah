@@ -9,7 +9,7 @@ class AllLapakTransaksiController extends Controller
     // GET /api/lapak/transaksi
     public function index(Request $request)
     {
-        $query = DB::table('transaksi_lapak');
+        $query = DB::table('transaksi_lapak')->where("approval", "pending");
 
         // Search by kode transaksi
         if ($request->filled('search')) {
@@ -38,8 +38,7 @@ class AllLapakTransaksiController extends Controller
                 ->where('transaksi_lapak_id', $trx->id)
                 ->get();
             $trx->detail_transaksi = $details;
-            $trx->status = $trx->status ?? 'pending';
-            $trx->approval = $trx->approval_status ?? 'pending';
+            $trx->status = $trx->status ?? 'pending'; 
             return $trx;
         });
 

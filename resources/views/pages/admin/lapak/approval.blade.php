@@ -93,16 +93,8 @@
                             <td style="color:#000">${detailHtml}</td>
                             <td>
                                 <a href="/admin/setor-lapak/${trx.kode_transaksi ?? ''}" class="btn btn-info btn-sm">Detail</a>
-                                ${trx.status === 'pending' ? `
-                                                                    <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/approve" method="POST" style="display:inline-block;">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                                                    </form>
-                                                                    <form action="/admin/data-lapak/${trx.lapak_id ?? ''}/reject" method="POST" style="display:inline-block;">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                                                    </form>
-                                                                ` : ''}
+                              
+                                                            
                             </td>
                         </tr>
                     `;

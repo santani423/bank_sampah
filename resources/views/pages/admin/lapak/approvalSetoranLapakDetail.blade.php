@@ -93,6 +93,7 @@
                         if(data.status) {
                             alert('Bukti transfer berhasil diupload!');
                             document.getElementById('modalTransfer').querySelector('.btn-close').click();
+                            window.location.href = '/admin/setor-lapak'; // Redirect ke halaman admin/setor-lapak
                         } else {
                             alert('Gagal upload: ' + (data.message || 'Cek file dan coba lagi.'));
                         }
