@@ -1,5 +1,3 @@
- 
-
 <?php
 
 use App\Http\Controllers\Api\countConttroller;
@@ -18,6 +16,7 @@ use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
 use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
+use App\Http\Controllers\Api\LapakTransaksiBuktiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('api.admin.topup.store');
     });
 
-
+    
     Route::prefix('teams')->group(function () {
         Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
         Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
@@ -82,6 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
     });
     Route::get('/petugas', [AdminPetugasController::class, 'apiIndex']);
+    Route::post('/transaksi-lapak/{id}/upload-bukti-transfer', [LapakTransaksiBuktiController::class, 'uploadBuktiTransfer']);
 });
+ 
 
 // API Petugas
