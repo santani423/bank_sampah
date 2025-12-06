@@ -38,14 +38,14 @@
                     <div class="clearfix mb-3"></div>
 
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle" style="color:#000;">
+                        <table class="table table-striped table-bordered align-middle" style="color:#000;">
                             <thead>
                                 <tr>
                                     <th>Kode Transaksi</th>
                                     <th>Tanggal</th>
                                     <th>Total</th>
                                     <th>Status</th>
-                                    <th>Detail Transaksi</th>
+                                    {{-- <th>Detail Transaksi</th> --}}
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -89,8 +89,7 @@
                             <td style="color:#000">${trx.kode_transaksi ?? '-'}</td>
                             <td style="color:#000">${trx.tanggal_transaksi ?? '-'}</td>
                             <td style="color:#000">Rp${parseInt(trx.total_transaksi).toLocaleString()}</td>
-                            <td style="color:#000">${trx.status ?? '-'}</td>
-                            <td style="color:#000">${detailHtml}</td>
+                            <td style="color:#000">${trx.status ?? '-'}</td> 
                             <td>
                                 <a href="/admin/setor-lapak/${trx.kode_transaksi ?? ''}" class="btn btn-info btn-sm">Detail</a>
                               
