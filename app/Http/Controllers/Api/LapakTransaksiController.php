@@ -1,8 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Models\SaldoUtama;
+use App\Models\TransaksiLapak;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use App\Services\WhatsAppService; // ✅ Tambahkan ini
 
 class LapakTransaksiController extends Controller
 {
@@ -50,5 +58,45 @@ class LapakTransaksiController extends Controller
             'current_page' => (int)$page,
             'last_page' => (int)$lastPage
         ]);
+    }
+
+    // POST /api/transaksi-lapak/{id}/ambil-saldo
+    public function ambilSaldo(Request $request, $id)
+    {
+        // Validasi dan proses ambil saldo
+
+        $trx = TransaksiLapak::with('lapak')->where('id', $id)->first();
+        $lapak = $trx ? $trx->lapak : null;
+        if (!$trx) {
+            return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+        }
+        $saldoUtama = SaldoUtama::first();
+        if ($saldoUtama->saldo < $trx->total_transaksi) {
+            return response()->json(['status' => false, 'message' => 'Saldo utama tidak mencukupi'], 400);
+        }
+
+        // Generate external_id unik
+        $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
+        // Buat payload sesuai format disbursement Xendit
+        $payload = [
+            'external_id' => $externalId,
+            'amount' => (int) $trx->total_transaksi,
+            'bank_code' => 'DANA', // ✅ HARUS: gunakan DANA sebagai bank_code
+            'account_holder_name' => $lapak->nama_lapak,
+            'account_number' =>  $lapak->no_telepon, // ✅ HARUS: ini nomor telepon penerima
+            'description' =>  'Disbursement ke DANA'
+        ];
+        $response = Http::withBasicAuth(config('xendit.api_key'), '')
+            ->post('https://api.xendit.co/disbursements', $payload);
+        // // Contoh logika: update status dan approval
+        // DB::table('transaksi_lapak')->where('id', $id)->update([
+        //     'approval' => 'approved', 
+        // ]); 
+        // return response()->json(['status' => true, 'message' => 'Saldo berhasil diambil']);
+
+
+        // // TODO: Tambahkan logika pengurangan saldo lapak jika diperlukan
+
+        return response()->json(['status' => true, 'message' => 'Saldo berhasil diambil']);
     }
 }

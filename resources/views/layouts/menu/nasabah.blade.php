@@ -1,14 +1,14 @@
  <ul class="sidebar-menu">
      <li class="sidebar-menu__item">
          <a href="{{ route('nasabah.dashboard') }}" class="sidebar-menu__link">
-             <span class="icon"><i class="ph ph-users-three"></i></span>
+             <span class="icon"><i class="bi bi-speedometer2"></i></span>
              <span class="text">Dashboard</span>
          </a>
      </li>
 
      <li class="sidebar-menu__item has-dropdown">
          <a href="javascript:void(0)" class="sidebar-menu__link">
-             <span class="icon"><i class="ph ph-squares-four"></i></span>
+             <span class="icon"><i class="bi bi-cash-stack"></i></span>
              <span class="text">Transaksi</span>
              {{-- <span class="link-badge">3</span> --}}
          </a>
@@ -30,7 +30,7 @@
      </li>
      <li class="sidebar-menu__item">
          <a href="{{ route('nasabah.cabang.index') }}" class="sidebar-menu__link">
-             <span class="icon"><i class="ph ph-users-three"></i></span>
+             <span class="icon"><i class="bi bi-geo-alt"></i></span>
              <span class="text">Cabang</span>
          </a>
      </li>

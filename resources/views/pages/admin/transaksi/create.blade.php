@@ -75,17 +75,15 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </td>
-                                        <td><input type="number" name="detail_transaksi[0][berat_kg]"
+                                            <td><input type="number" name="detail_transaksi[0][berat_kg]"
+                                                    class="form-control berat-kg" placeholder="Berat (kg)" required></td>
                                                 class="form-control berat-kg" placeholder="Berat (kg)" required>
                                         </td>
                                         <td>
                                             <input type="number" name="detail_transaksi[0][harga_per_kg]"
                                                 class="form-control harga-per-kg" placeholder="Harga per kg" required
                                                 readonly>
-                                        </td>
-                                        <td class="total-harga">0</td>
-                                        <td>
+                                            <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                             <button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button>
                                         </td>
                                     </tr>
@@ -142,7 +140,7 @@
                         <td><input type="number" name="detail_transaksi[${rowIndex}][berat_kg]" class="form-control berat-kg" placeholder="Berat (kg)" required></td>
                         <td><input type="number" name="detail_transaksi[${rowIndex}][harga_per_kg]" class="form-control harga-per-kg" placeholder="Harga per kg" required readonly></td>
                         <td class="total-harga">0</td>
-                        <td><button type="button" class="btn btn-danger btn-sm remove-row">Hapus</button></td>
+                            <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                     </tr>`;
                 $('#setoran-details').append(newRow);
                 $('.select2').select2();

@@ -12,15 +12,44 @@
                 <a href="{{ route('admin.lapak.transaksi.download', $transaksi->id) }}" class="btn btn-success btn-sm mb-2"><i
                         class="bi bi-download"></i> Download Detail</a>
                 <!-- Tombol Pencairan Data -->
+                <!-- Loading Spinner -->
+                <div id="loadingApi" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);z-index:9999;align-items:center;justify-content:center;">
+                    <div class="spinner-border text-primary" role="status" style="width:4rem;height:4rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
                 @if ($transaksi->approval === 'pending')
                     <fieldset class="mb-2">
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#modalTransfer">
                             <i class="bi bi-bank"></i> Transfer
                         </button>
-                        <button type="button" class="btn btn-info btn-sm" onclick="handlePencairan('saldo')">
+                        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalAmbilSaldo">
                             <i class="bi bi-wallet2"></i> Ambil dari Saldo
                         </button>
+                        <!-- Modal Konfirmasi Ambil Saldo -->
+                        <div class="modal fade" id="modalAmbilSaldo" tabindex="-1" aria-labelledby="modalAmbilSaldoLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalAmbilSaldoLabel">Konfirmasi Ambil Saldo</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Apakah Anda yakin ingin mengambil saldo untuk transaksi ini?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-info" id="btnKonfirmasiAmbilSaldo">Ya, Ambil
+                                            Saldo</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </fieldset>
                 @endif
                 <!-- Modal Upload Bukti Transfer -->
@@ -56,12 +85,38 @@
                 </div>
 
                 <script>
-                    function handlePencairan(type) {
-                        if (type === 'saldo') {
-                            alert('Pencairan dari saldo dipilih.');
-                            // TODO: Implementasi aksi ambil dari saldo
-                        }
+                    function showLoading(show) {
+                        var loading = document.getElementById('loadingApi');
+                        if (loading) loading.style.display = show ? 'flex' : 'none';
                     }
+
+                    document.getElementById('btnKonfirmasiAmbilSaldo').addEventListener('click', function() {
+                        var transaksiId = {{ $transaksi->id }};
+                        var url = '/api/transaksi-lapak/' + transaksiId + '/ambil-saldo';
+                        showLoading(true);
+                        fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                showLoading(false);
+                                if (data.status) {
+                                    alert('Saldo berhasil diambil!');
+                                    document.getElementById('modalAmbilSaldo').querySelector('.btn-close').click();
+                                    // window.location.reload();
+                                } else {
+                                    alert('Gagal ambil saldo: ' + (data.message || 'Coba lagi.'));
+                                }
+                            })
+                            .catch(err => {
+                                showLoading(false);
+                                alert('Terjadi kesalahan saat ambil saldo.');
+                            });
+                    });
 
                     function previewBuktiTransfer(event) {
                         const input = event.target;
@@ -88,6 +143,7 @@
                         var url = '/api/transaksi-lapak/' + transaksiId + '/upload-bukti-transfer';
                         var btnUpload = form.querySelector('button[type="submit"]');
                         btnUpload.disabled = true;
+                        showLoading(true);
                         fetch(url, {
                                 method: 'POST',
                                 body: formData,
@@ -98,6 +154,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 btnUpload.disabled = false;
+                                showLoading(false);
                                 if (data.status) {
                                     alert('Bukti transfer berhasil diupload!');
                                     document.getElementById('modalTransfer').querySelector('.btn-close').click();
@@ -108,6 +165,7 @@
                             })
                             .catch(err => {
                                 btnUpload.disabled = false;
+                                showLoading(false);
                                 alert('Terjadi kesalahan saat upload.');
                             });
                     });
