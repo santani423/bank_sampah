@@ -187,7 +187,7 @@ class LapakController extends Controller
         ]);
 
         $data = $request->all();
-        
+
         // Upload foto jika ada
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
@@ -195,23 +195,23 @@ class LapakController extends Controller
             $file->move(public_path('uploads/lapak'), $filename);
             $data['foto'] = $filename;
         }
-        
+
         // Set default approval status ke pending dan status ke tidak_aktif
         $data['approval_status'] = 'pending';
         $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin 
 
-        Lapak::create($data); 
+        Lapak::create($data);
         Alert::success('Berhasil', 'Data lapak berhasil ditambahkan dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
-    
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $lapak = Lapak::with('cabang','jenisMetodePenarikan')->findOrFail($id);
-        dd($lapak);
+        $lapak = Lapak::with('cabang', 'jenisMetodePenarikan')->findOrFail($id);
+        // dd($lapak);
         return view('pages.petugas.lapak.show', compact('lapak'));
     }
 
@@ -228,8 +228,9 @@ class LapakController extends Controller
             ->where('status', 'aktif')
             ->orderBy('nama_cabang')
             ->get();
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
 
-        return view('pages.petugas.lapak.edit', compact('lapak', 'cabangs'));
+        return view('pages.petugas.lapak.edit', compact('lapak', 'cabangs', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -251,6 +252,9 @@ class LapakController extends Controller
             'deskripsi' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
+            'jenis_metode_penarikan_id' => 'required|exists:jenis_metode_penarikans,id',
+            'nama_rekening' => 'required|string|max:100',
+            'nomor_rekening' => 'required|string|max:50',
         ]);
 
         $data = $request->all();
@@ -270,9 +274,13 @@ class LapakController extends Controller
             unset($data['foto']);
         }
 
+        // Set approval_status ke pending dan status ke tidak_aktif setiap update
+        $data['approval_status'] = 'pending';
+        $data['status'] = 'tidak_aktif';
+
         $lapak->update($data);
 
-        Alert::success('Berhasil', 'Data lapak berhasil diperbarui');
+        Alert::success('Berhasil', 'Data lapak berhasil diperbarui dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
 

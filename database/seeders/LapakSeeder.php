@@ -33,10 +33,10 @@ class LapakSeeder extends Seeder
                 $randomProvinsi = $provinsi[array_rand($provinsi)];
                 $randomCabang = $cabangs->random();
                 $randomApproval = $approvalStatus[array_rand($approvalStatus)];
-                
+
                 // Status aktif jika approved, tidak_aktif jika pending atau rejected
                 $status = $randomApproval === 'approved' ? 'aktif' : 'tidak_aktif';
-                
+
                 Lapak::create([
                     'cabang_id' => $randomCabang->id,
                     'kode_lapak' => $kodeLapak,
@@ -48,6 +48,9 @@ class LapakSeeder extends Seeder
                     'no_telepon' => '08' . rand(1000000000, 9999999999),
                     'deskripsi' => 'Lapak sampah ' . strtolower($randomNama) . ' melayani dengan baik',
                     'status' => $status,
+                    'jenis_metode_penarikan_id' => 1,
+                    'nama_rekening' =>  $kodeLapak,
+                    'nomor_rekening' =>  rand(10000, 99999),
                     'approval_status' => $randomApproval,
                     'approved_by' => $randomApproval !== 'pending' ? 1 : null,
                     'approved_at' => $randomApproval !== 'pending' ? now() : null,

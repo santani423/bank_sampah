@@ -131,15 +131,15 @@
                     <div class="row mt-5">
                         <div class="col-md-4">
                             <div class="detail-label">Bank</div>
-                            <div class="detail-value">{{ $lapak->kota ?? '-' }}</div>
+                            <div class="detail-value">{{ $lapak->jenisMetodePenarikan->nama ?? '-' }}</div>
                         </div>
                         <div class="col-md-4">
                             <div class="detail-label">Atas Nama</div>
-                            <div class="detail-value">{{ $lapak->nama_metode_pencairan ?? '-' }}</div>
+                            <div class="detail-value">{{ $lapak->nama_rekening ?? '-' }}</div>
                         </div> 
                         <div class="col-md-4">
                             <div class="detail-label">No. Rekening</div>
-                            <div class="detail-value">{{ $lapak->no_rek ?? '-' }}</div>
+                            <div class="detail-value">{{ $lapak->nomor_rekening ?? '-' }}</div>
                         </div>
                     </div>
                 </div>
