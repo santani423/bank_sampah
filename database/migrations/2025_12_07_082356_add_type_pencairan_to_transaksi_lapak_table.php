@@ -8,6 +8,7 @@ return new class extends Migration {
     {
         Schema::table('transaksi_lapak', function (Blueprint $table) {
             $table->enum('type_pencairan', ['TRANSFER', 'SALDO'])->nullable()->after('approval');
+            $table->string('bukti_transfer')->nullable()->after('type_pencairan');
         });
     }
 
