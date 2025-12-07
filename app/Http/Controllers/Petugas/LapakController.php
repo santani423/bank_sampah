@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\Lapak;
 use App\Models\Cabang;
+use App\Models\JenisMetodePenarikan;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -122,7 +123,7 @@ class LapakController extends Controller
     {
         // Ambil cabang petugas yang sedang login
         $petugasCabangIds = $this->getPetugasCabangIds();
-        
+
         $query = Lapak::with('cabang')
             ->whereIn('cabang_id', $petugasCabangIds);
 
@@ -137,8 +138,9 @@ class LapakController extends Controller
         }
 
         $lapaks = $query->paginate(10);
-        
-        return view('pages.petugas.lapak.index', compact('lapaks'));
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
+
+        return view('pages.petugas.lapak.index', compact('lapaks', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -152,13 +154,14 @@ class LapakController extends Controller
             ->where('status', 'aktif')
             ->orderBy('nama_cabang')
             ->get();
-        
+
         // Generate kode lapak otomatis
         $lastLapak = Lapak::latest('id')->first();
         $nextNumber = $lastLapak ? intval(substr($lastLapak->kode_lapak, 3)) + 1 : 1;
         $kodeLapak = 'LPK' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
 
-        return view('pages.petugas.lapak.create', compact('cabangs', 'kodeLapak'));
+        return view('pages.petugas.lapak.create', compact('cabangs', 'kodeLapak', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -178,10 +181,13 @@ class LapakController extends Controller
             'deskripsi' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
+            'jenis_metode_penarikan_id' => 'required|exists:jenis_metode_penarikans,id',
+            'nama_rekening' => 'required|string|max:100',
+            'nomor_rekening' => 'required|string|max:50',
         ]);
 
         $data = $request->all();
-
+        
         // Upload foto jika ada
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
@@ -189,23 +195,23 @@ class LapakController extends Controller
             $file->move(public_path('uploads/lapak'), $filename);
             $data['foto'] = $filename;
         }
-
+        
         // Set default approval status ke pending dan status ke tidak_aktif
         $data['approval_status'] = 'pending';
-        $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin
+        $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin 
 
-        Lapak::create($data);
-
+        Lapak::create($data); 
         Alert::success('Berhasil', 'Data lapak berhasil ditambahkan dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
-
+    
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $lapak = Lapak::with('cabang')->findOrFail($id);
+        $lapak = Lapak::with('cabang','jenisMetodePenarikan')->findOrFail($id);
+        dd($lapak);
         return view('pages.petugas.lapak.show', compact('lapak'));
     }
 
@@ -215,14 +221,14 @@ class LapakController extends Controller
     public function edit(string $id)
     {
         $lapak = Lapak::findOrFail($id);
-        
+
         // Ambil cabang yang terkait dengan petugas yang sedang login
         $petugasCabangIds = $this->getPetugasCabangIds();
         $cabangs = Cabang::whereIn('id', $petugasCabangIds)
             ->where('status', 'aktif')
             ->orderBy('nama_cabang')
             ->get();
-        
+
         return view('pages.petugas.lapak.edit', compact('lapak', 'cabangs'));
     }
 
@@ -294,7 +300,7 @@ class LapakController extends Controller
     private function getPetugasCabangIds()
     {
         $petugas = Petugas::where('email', auth()->user()->email)->first();
-        
+
         if (!$petugas) {
             return [];
         }

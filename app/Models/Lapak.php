@@ -26,7 +26,10 @@ class Lapak extends Model
         'approval_status',
         'approved_by',
         'approved_at',
-        'rejection_reason'
+        'rejection_reason',
+        'jenis_metode_penarikan_id',
+        'nama_rekening',
+        'nomor_rekening'
     ];
 
     protected $casts = [
@@ -40,5 +43,10 @@ class Lapak extends Model
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'cabang_id');
+    }
+
+    public function jenisMetodePenarikan()
+    {
+        return $this->belongsTo(JenisMetodePenarikan::class, 'jenis_metode_penarikan_id');
     }
 }

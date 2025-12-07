@@ -128,6 +128,20 @@
                             </div>
                         </div>
                     @endif
+                    <div class="row mt-5">
+                        <div class="col-md-4">
+                            <div class="detail-label">Bank</div>
+                            <div class="detail-value">{{ $lapak->kota ?? '-' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="detail-label">Atas Nama</div>
+                            <div class="detail-value">{{ $lapak->nama_metode_pencairan ?? '-' }}</div>
+                        </div> 
+                        <div class="col-md-4">
+                            <div class="detail-label">No. Rekening</div>
+                            <div class="detail-value">{{ $lapak->no_rek ?? '-' }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -293,11 +307,14 @@
                             data.forEach(function(trx, idx) {
                                 let statusLabel = '';
                                 if (trx.approval === 'selesai' || trx.status === 'selesai') {
-                                    statusLabel = '<span class="badge badge-success" style="color:#000 !important;">Selesai</span>';
+                                    statusLabel =
+                                        '<span class="badge badge-success" style="color:#000 !important;">Selesai</span>';
                                 } else if (trx.approval === 'pending' || trx.status === 'pending') {
-                                    statusLabel = '<span class="badge badge-warning" style="color:#000 !important;">Pending</span>';
+                                    statusLabel =
+                                        '<span class="badge badge-warning" style="color:#000 !important;">Pending</span>';
                                 } else {
-                                    statusLabel = '<span class="badge badge-danger" style="color:#000 !important;">Dibatalkan</span>';
+                                    statusLabel =
+                                        '<span class="badge badge-danger" style="color:#000 !important;">Dibatalkan</span>';
                                 }
                                 let jumlah = trx.total_transaksi ? Number(trx.total_transaksi)
                                     .toLocaleString('id-ID') : '-';
