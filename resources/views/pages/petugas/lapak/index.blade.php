@@ -141,7 +141,8 @@
                                                    title="Detail">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <a href="{{ route('petugas.lapak.edit', $lapak->id) }}"
+                                             
+                                                {{-- <a href="{{ route('petugas.lapak.edit', $lapak->id) }}"
                                                    class="btn btn-sm btn-warning"
                                                    title="Edit">
                                                     <i class="bi bi-pencil-square"></i>
@@ -155,8 +156,11 @@
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
-                                                </form>
+                                                </form> --}}
                                             </div>
+                                                <a href="{{ route('petugas.lapak.kirim-sampah', $lapak->id) }}" class="btn btn-sm btn-primary" style="margin-bottom: 4px;">
+                                                    <i class="bi bi-truck"></i> Kirim Sampah
+                                                </a>
                                             <a href="{{ route('petugas.lapak.setor-sampah', $lapak->id) }}" class="btn btn-sm btn-success">
                                                 <i class="bi bi-plus-circle"></i> Setor Sampah
                                             </a>

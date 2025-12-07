@@ -15,6 +15,40 @@ use Illuminate\Support\Facades\DB;
 class LapakController extends Controller
 {
     /**
+     * Proses kirim sampah dari lapak
+     */
+    public function prosesKirimSampah(Request $request, $lapakId)
+    {
+        // Validasi data
+        $request->validate([
+            'tanggal_pengiriman' => 'required|date',
+            'jenis_sampah' => 'required|string',
+            'berat' => 'required|numeric|min:0.01',
+        ]);
+
+        // Simpan data pengiriman ke database (contoh, sesuaikan dengan struktur tabel Anda)
+        DB::table('pengiriman_sampah')->insert([
+            'lapak_id' => $lapakId,
+            'tanggal_pengiriman' => $request->tanggal_pengiriman,
+            'jenis_sampah' => $request->jenis_sampah,
+            'berat' => $request->berat,
+            'catatan' => $request->catatan,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Alert::success('Berhasil', 'Pengiriman sampah berhasil disimpan');
+        return redirect()->route('petugas.lapak.index');
+    }
+    /**
+     * Tampilkan halaman pengiriman sampah dari lapak
+     */
+    public function kirimSampah($lapakId)
+    {
+        $lapak = Lapak::findOrFail($lapakId);
+        return view('pages.petugas.lapak.kirim-sampah', compact('lapak'));
+    }
+    /**
      * Tampilkan detail transaksi lapak
      */
     public function showTransaksi($id)

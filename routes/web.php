@@ -150,14 +150,15 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 });
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
+        Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
 
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
     Route::resource('/data-lapak', PetugasLapakController::class)->names('petugas.lapak');
-    Route::get('/
-    {lapak}/setor-sampah', [PetugasLapakController::class, 'setorSampah'])->name('petugas.lapak.setor-sampah');
+    Route::get('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'kirimSampah'])->name('petugas.lapak.kirim-sampah');
+    Route::get('/data-lapak/{lapak}/setor-sampah', [PetugasLapakController::class, 'setorSampah'])->name('petugas.lapak.setor-sampah');
     Route::post('/data-lapak/{lapak}/setor-sampah', [PetugasLapakController::class, 'storeSetorSampah'])->name('petugas.lapak.setor-sampah.store');
     Route::get('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'setorSampah'])->name('petugas.rekanan.setor-sampah');
     Route::post('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'storeSetorSampah'])->name('petugas.rekanan.setor-sampah.store');
@@ -168,7 +169,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');
-    Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');
+    // Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');
     Route::post('/midtrans/token', [PetugasTransaksiController::class, 'createTransaction'])->name('bayar.proses');
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
