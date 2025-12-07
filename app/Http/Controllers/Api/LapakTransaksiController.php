@@ -75,6 +75,9 @@ class LapakTransaksiController extends Controller
             return response()->json(['status' => false, 'message' => 'Saldo utama tidak mencukupi'], 400);
         }
 
+        $saldoUtama->saldo -= $trx->total_transaksi;
+        $saldoUtama->save();
+
         // Generate external_id unik
         $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
         // Buat payload sesuai format disbursement Xendit

@@ -201,6 +201,11 @@ Route::post('/xendit/callback/topup', [AdminTopUpController::class, 'callback'])
 
 
 
+// Halaman testing TessController
+Route::get('/testing', [TessController::class, 'testing'])->name('testing');
+
+// Route proses top up Xendit
+Route::post('/topup/proses', [TessController::class, 'proses'])->name('topup.proses');
 
 Route::get('storage/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);

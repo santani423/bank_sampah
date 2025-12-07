@@ -45,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Endpoint untuk seluruh data transaksi lapak
     Route::get('/lapak/transaksi', [App\Http\Controllers\Api\AllLapakTransaksiController::class, 'index'])->middleware('auth:sanctum');
 
+    // API Ambil Saldo Lapak
+    Route::post('/transaksi-lapak/{id}/ambil-saldo', [App\Http\Controllers\Api\LapakTransaksiController::class, 'ambilSaldo']);
+
     Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
     Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
     Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);

@@ -22,6 +22,13 @@ class TessController extends Controller
 {
     protected InvoiceApi $invoiceApi;
 
+    /**
+     * Halaman testing sederhana
+     */
+    public function testing()
+    {
+        return view('testing');
+    }
 
     public function __construct()
     {
@@ -144,4 +151,3 @@ class TessController extends Controller
 //   "phone_number": "6285778674418",
 //   "account_holder_name": "Santani"
 // }
-

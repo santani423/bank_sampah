@@ -108,6 +108,7 @@
                                     alert('Saldo berhasil diambil!');
                                     document.getElementById('modalAmbilSaldo').querySelector('.btn-close').click();
                                     // window.location.reload();
+                                    window.location.href = '/admin/setor-lapak'; // Redirect ke halaman admin/setor-lapak
                                 } else {
                                     alert('Gagal ambil saldo: ' + (data.message || 'Coba lagi.'));
                                 }
