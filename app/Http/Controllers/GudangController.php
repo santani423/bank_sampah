@@ -53,7 +53,7 @@ class GudangController extends Controller
 
         Gudang::create($request->all());
 
-        return redirect()->route('admin.gudangs.index')->with('success', 'Gudang berhasil ditambahkan!');
+        return redirect()->route('admin.gudangs.index')->with('success', 'Customer berhasil ditambahkan!');
     }
 
     /**
@@ -87,7 +87,7 @@ class GudangController extends Controller
 
         $gudang->update($request->all());
 
-        return redirect()->route('admin.gudangs.index')->with('success', 'Gudang berhasil diperbarui!');
+        return redirect()->route('admin.gudangs.index')->with('success', 'Customer berhasil diperbarui!');
     }
 
     /**
