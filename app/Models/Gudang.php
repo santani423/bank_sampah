@@ -8,7 +8,12 @@ use App\Traits\LogsActivity;
 
 class Gudang extends Model
 {
-     use HasFactory, LogsActivity; 
+    use HasFactory, LogsActivity;
 
-    protected   $guarded = ['id'];
+    protected $guarded = ['id'];
+
+    public function cabang()
+    {
+        return $this->belongsTo(\App\Models\cabang::class, 'cabang_id');
+    }
 }
