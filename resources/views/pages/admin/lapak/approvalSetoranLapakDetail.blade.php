@@ -13,7 +13,8 @@
                         class="bi bi-download"></i> Download Detail</a>
                 <!-- Tombol Pencairan Data -->
                 <!-- Loading Spinner -->
-                <div id="loadingApi" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);z-index:9999;align-items:center;justify-content:center;">
+                <div id="loadingApi"
+                    style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);z-index:9999;align-items:center;justify-content:center;">
                     <div class="spinner-border text-primary" role="status" style="width:4rem;height:4rem;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -186,6 +187,13 @@
                         <div><strong>Jumlah Total:</strong> Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                         </div>
                         <div><strong>Petugas:</strong> {{ $transaksi->petugas->nama ?? '-' }}</div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <div><strong>Bank</strong> {{ $transaksi->jenisMetodePenarikan->nama ?? '-' }}</div>
+                        <div><strong>Atas Nama:</strong> {{ $transaksi->lapak->nama_rekening ?? '-' }}</div>
+                        <div><strong>No Rekening:</strong> {{ $transaksi->lapak->nomor_rekening ?? '-' }}</div>
                     </div>
                 </div>
                 <hr>

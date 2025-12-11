@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Models\TransaksiLapak;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,7 +12,7 @@ class AllLapakTransaksiController extends Controller
     // GET /api/lapak/transaksi
     public function index(Request $request)
     {
-        $query = DB::table('transaksi_lapak')->where("approval", "pending");
+        $query = TransaksiLapak::with('lapak')->where("approval", "pending");
 
         // Search by kode transaksi
         if ($request->filled('search')) {
@@ -38,7 +41,7 @@ class AllLapakTransaksiController extends Controller
                 ->where('transaksi_lapak_id', $trx->id)
                 ->get();
             $trx->detail_transaksi = $details;
-            $trx->status = $trx->status ?? 'pending'; 
+            $trx->status = $trx->status ?? 'pending';
             return $trx;
         });
 

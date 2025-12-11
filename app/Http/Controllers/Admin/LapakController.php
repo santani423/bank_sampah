@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Lapak;
 use App\Models\Cabang;
 use App\Models\Petugas;
+use App\Models\TransaksiLapak;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,8 @@ class LapakController extends Controller
 
     public function approvalSetoranLapakDetail($code)
     {
-        $transaksi = DB::table('transaksi_lapak')->where('kode_transaksi', $code)->first();
+        $transaksi = TransaksiLapak::with('lapak','jenisMetodePenarikan')->where('kode_transaksi', $code)->first();
+        // dd($transaksi);
         if (!$transaksi) abort(404);
         $transaksi->detail_transaksi = DB::table('detail_transaksi_lapak')
             ->where('transaksi_lapak_id', $transaksi->id)

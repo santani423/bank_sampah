@@ -42,6 +42,7 @@
                             <thead>
                                 <tr>
                                     <th>Kode Transaksi</th>
+                                    <th>Lapak</th>
                                     <th>Tanggal</th>
                                     <th>Total</th>
                                     <th>Status</th>
@@ -87,6 +88,7 @@
                             tbody.innerHTML += `
                         <tr>
                             <td style="color:#000">${trx.kode_transaksi ?? '-'}</td>
+                            <td style="color:#000">${trx.lapak?.nama_lapak ?? '-'}</td>
                             <td style="color:#000">${trx.tanggal_transaksi ?? '-'}</td>
                             <td style="color:#000">Rp${parseInt(trx.total_transaksi).toLocaleString()}</td>
                             <td style="color:#000">${trx.status ?? '-'}</td> 
