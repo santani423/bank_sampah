@@ -16,7 +16,10 @@ use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
 use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
+use App\Http\Controllers\Api\AllLapakTransaksiController;
 use App\Http\Controllers\Api\LapakTransaksiBuktiController;
+use App\Http\Controllers\Api\LapakTransaksiController;
+use App\Http\Controllers\Api\NasabahBadanTransaksiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,13 +43,14 @@ Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
 
-    Route::get('/lapak/{id}/transaksi', [App\Http\Controllers\Api\LapakTransaksiController::class, 'index']);
+    Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
+    Route::get('/lapak/{id}/transaksi/ready-to-ships', [LapakTransaksiController::class, 'readyToShips']);
 
     // Endpoint untuk seluruh data transaksi lapak
-    Route::get('/lapak/transaksi', [App\Http\Controllers\Api\AllLapakTransaksiController::class, 'index'])->middleware('auth:sanctum');
+    Route::get('/lapak/transaksi', [AllLapakTransaksiController::class, 'index'])->middleware('auth:sanctum');
 
     // API Ambil Saldo Lapak
-    Route::post('/transaksi-lapak/{id}/ambil-saldo', [App\Http\Controllers\Api\LapakTransaksiController::class, 'ambilSaldo']);
+    Route::post('/transaksi-lapak/{id}/ambil-saldo', [LapakTransaksiController::class, 'ambilSaldo']);
 
     Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
     Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
@@ -64,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 
     // API Nasabah Badan Transaction History
-    Route::get('/nasabah-badan/{id}/transactions', [App\Http\Controllers\Api\NasabahBadanTransaksiController::class, 'getTransactionHistory']);
+    Route::get('/nasabah-badan/{id}/transactions', [NasabahBadanTransaksiController::class, 'getTransactionHistory']);
 
     Route::post('/user-face/create', [UserFaceController::class, 'create'])
         ->withoutMiddleware(['throttle:api']);
@@ -75,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('api.admin.topup.store');
     });
 
-    
+
     Route::prefix('teams')->group(function () {
         Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
         Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id

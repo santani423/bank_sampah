@@ -176,6 +176,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('petugas.pengiriman');
 
     Route::get('/lapak/transaksi/{id}', [LapakController::class, 'showTransaksi'])->name('petugas.lapak.transaksi.detail');
+    Route::get('/lapak/transaksi/ready-to-ship/{id}', [LapakController::class, 'readyToShip'])->name('petugas.lapak.transaksi.ready-to-ship');
     Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('petugas.lapak.transaksi.download');
 });
 

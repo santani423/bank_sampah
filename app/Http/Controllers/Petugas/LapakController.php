@@ -70,6 +70,8 @@ class LapakController extends Controller
         return view('pages.petugas.lapak.transaksi.detail', compact('transaksi'));
     }
 
+ 
+
     /**
      * Download detail transaksi lapak dalam format khusus
      */

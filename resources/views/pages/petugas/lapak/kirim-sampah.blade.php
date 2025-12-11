@@ -11,7 +11,59 @@
                         <h4 class="mb-0" style="color: #fff;">Form Pengiriman Sampah</h4>
                     </div>
                     <div class="card-body">
-                                                <div id="transaksi-detail" class="mb-4"></div>
+                            <div id="transaksi-detail" class="mb-4"></div>
+                            {{-- Tabel hanya detail_transaksi --}}
+                            @php
+                                $detailList = [];
+                                if(isset($data) && count($data) > 0) {
+                                    foreach($data as $transaksi) {
+                                        foreach($transaksi['detail_transaksi'] as $detail) {
+                                            $detailList[] = [
+                                                'kode_transaksi' => $transaksi['kode_transaksi'],
+                                                'tanggal_transaksi' => $transaksi['tanggal_transaksi'],
+                                                'sampah_id' => $detail['sampah_id'],
+                                                'berat_kg' => $detail['berat_kg'],
+                                                'harga_per_kg' => $detail['harga_per_kg'],
+                                                'total_harga' => $detail['total_harga'],
+                                                'status' => $transaksi['status'],
+                                            ];
+                                        }
+                                    }
+                                }
+                            @endphp
+                            @if(count($detailList) > 0)
+                            <div class="mb-4">
+                                <h5 class="mb-3">Detail Transaksi Sampah</h5>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Kode Transaksi</th>
+                                            <th>Tanggal</th>
+                                            <th>Nama Sampah</th>
+                                            <th>Berat (kg)</th>
+                                            <th>Harga/kg</th>
+                                            <th>Total Harga</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($detailList as $detail)
+                                            <tr>
+                                                <td>{{ $detail['kode_transaksi'] }}</td>
+                                                <td>{{ $detail['tanggal_transaksi'] }}</td>
+                                                <td>{{ $detail['sampah_id'] }}</td>  
+                                                <td>{{ $detail['berat_kg'] }}</td>
+                                                <td>{{ $detail['harga_per_kg'] }}</td>
+                                                <td>{{ $detail['total_harga'] }}</td>
+                                                <td>{{ $detail['status'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @else
+                                <div class="alert alert-info">Belum ada detail transaksi sampah untuk lapak ini.</div>
+                            @endif
                         @push('scripts')
                         <script>
                         document.addEventListener('DOMContentLoaded', function() {
