@@ -69,9 +69,9 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label>Pilih Gudang</label>
+                            <label>Pilih Customer</label>
                             <select name="gudang_id" class="form-control @error('gudang_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Gudang --</option>
+                                <option value="">-- Pilih Customer --</option>
                                 @foreach ($gudang as $gdg)
                                     <option value="{{ $gdg->id }}"
                                         {{ old('gudang_id') == $gdg->id ? 'selected' : '' }}>

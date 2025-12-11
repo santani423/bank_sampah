@@ -46,7 +46,14 @@ class LapakController extends Controller
     public function kirimSampah($lapakId)
     {
         $lapak = Lapak::findOrFail($lapakId);
-        return view('pages.petugas.lapak.kirim-sampah', compact('lapak'));
+        $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
+        $cabangIds = [];
+        $cabangs = collect();
+        if ($petugas) {
+            $cabangIds = \DB::table('petugas_cabangs')->where('petugas_id', $petugas->id)->pluck('cabang_id')->toArray();
+            $cabangs = \App\Models\cabang::whereIn('id', $cabangIds)->get();
+        }
+        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs'));
     }
     /**
      * Tampilkan detail transaksi lapak
