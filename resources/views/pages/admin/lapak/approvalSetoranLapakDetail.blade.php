@@ -176,47 +176,49 @@
         </div>
         <div class="card mb-4">
             <div class="card-body">
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                        <div><strong>Kode Transaksi:</strong> {{ $transaksi->kode_transaksi }}</div>
-                        <div><strong>Tanggal:</strong> {{ $transaksi->tanggal_transaksi }}</div>
-                        <div><strong>Status:</strong> <span class="badge badge-warning"
-                                style="color:#000 !important;">{{ $transaksi->status }}</span></div>
-                    </div>
-                    <div class="col-md-6">
-                        <div><strong>Jumlah Total:</strong> Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
+                <div class="row g-3 mb-2">
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-2 h-100 bg-light">
+                            <div class="mb-1"><i class="bi bi-upc-scan"></i> <strong>Kode Transaksi:</strong><br> <span class="text-muted">{{ $transaksi->kode_transaksi }}</span></div>
+                            <div class="mb-1"><i class="bi bi-calendar-event"></i> <strong>Tanggal:</strong><br> <span class="text-muted">{{ $transaksi->tanggal_transaksi }}</span></div>
+                            <div><i class="bi bi-info-circle"></i> <strong>Status:</strong><br> <span class="badge bg-warning text-dark">{{ $transaksi->status }}</span></div>
                         </div>
-                        <div><strong>Petugas:</strong> {{ $transaksi->petugas->nama ?? '-' }}</div>
                     </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                        <div><strong>Bank</strong> {{ $transaksi->jenisMetodePenarikan->nama ?? '-' }}</div>
-                        <div><strong>Atas Nama:</strong> {{ $transaksi->lapak->nama_rekening ?? '-' }}</div>
-                        <div><strong>No Rekening:</strong> {{ $transaksi->lapak->nomor_rekening ?? '-' }}</div>
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-2 h-100 bg-light">
+                            <div class="mb-1"><i class="bi bi-cash-coin"></i> <strong>Jumlah Total:</strong><br> <span class="text-success fw-bold">Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</span></div>
+                            <div><i class="bi bi-person-badge"></i> <strong>Petugas:</strong><br> <span class="text-muted">{{ $transaksi->petugas->nama ?? '-' }}</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-2 h-100 bg-light">
+                            <div class="mb-1"><i class="bi bi-bank2"></i> <strong>Bank:</strong><br> <span class="text-muted">{{ $transaksi->jenisMetodePenarikan->nama ?? '-' }}</span></div>
+                            <div class="mb-1"><i class="bi bi-person"></i> <strong>Atas Nama:</strong><br> <span class="text-muted">{{ $transaksi->lapak->nama_rekening ?? '-' }}</span></div>
+                            <div><i class="bi bi-credit-card-2-front"></i> <strong>No Rekening:</strong><br> <span class="text-muted">{{ $transaksi->lapak->nomor_rekening ?? '-' }}</span></div>
+                        </div>
                     </div>
                 </div>
                 <hr>
-                <h5>Detail Item Transaksi</h5>
+                <h5 class="mb-3"><i class="bi bi-list-ul"></i> Detail Item Transaksi</h5>
                 <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <th>#</th>
+                                <th class="text-center">#</th>
                                 <th>Nama Sampah</th>
-                                <th>Berat (kg)</th>
-                                <th>Harga per Kg</th>
-                                <th>Total Harga</th>
+                                <th class="text-center">Berat (kg)</th>
+                                <th class="text-end">Harga per Kg</th>
+                                <th class="text-end">Total Harga</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($transaksi->detail_transaksi as $idx => $detail)
                                 <tr>
-                                    <td>{{ $idx + 1 }}</td>
+                                    <td class="text-center">{{ $idx + 1 }}</td>
                                     <td>{{ $detail->sampah->nama_sampah ?? '-' }}</td>
-                                    <td>{{ $detail->berat_kg }}</td>
-                                    <td>Rp {{ number_format($detail->harga_per_kg, 0, ',', '.') }}</td>
-                                    <td>Rp {{ number_format($detail->total_harga, 0, ',', '.') }}</td>
+                                    <td class="text-center">{{ $detail->berat_kg }}</td>
+                                    <td class="text-end">Rp {{ number_format($detail->harga_per_kg, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($detail->total_harga, 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
