@@ -119,6 +119,28 @@
                     <div id="transaksiLapakList" class="row g-3">
                         <div class="col-12 text-center text-muted">Memuat data...</div>
                     </div>
+                    <style>
+                        .transaksi-card {
+                            transition: box-shadow 0.2s, transform 0.2s;
+                            border-radius: 16px;
+                            border: 1px solid #e5e7eb;
+                        }
+                        .transaksi-card:hover {
+                            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+                            transform: translateY(-4px) scale(1.01);
+                            border-color: #458EFF;
+                        }
+                        .transaksi-badge {
+                            font-size: 0.95em;
+                            padding: 0.4em 1em;
+                            border-radius: 12px;
+                        }
+                        .transaksi-icon {
+                            font-size: 1.5em;
+                            margin-right: 0.5em;
+                            vertical-align: middle;
+                        }
+                    </style>
 
                     {{-- PAGINATION --}}
                     <div class="d-flex justify-content-between align-items-center mt-4">
@@ -181,26 +203,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 data.forEach(trx => {
-
                     let badge =
-                        trx.status === 'selesai' ? 'bg-success' :
-                        trx.status === 'pending' ? 'bg-warning text-dark' :
-                        'bg-danger';
-
+                        trx.status === 'selesai' ? 'bg-success transaksi-badge' :
+                        trx.status === 'pending' ? 'bg-warning text-dark transaksi-badge' :
+                        'bg-danger transaksi-badge';
+                    let icon =
+                        trx.status === 'selesai' ? '<i class="bi bi-check-circle-fill text-success transaksi-icon"></i>' :
+                        trx.status === 'pending' ? '<i class="bi bi-hourglass-split text-warning transaksi-icon"></i>' :
+                        '<i class="bi bi-x-circle-fill text-danger transaksi-icon"></i>';
                     list.innerHTML += `
-                    <div class="col-md-12 col-lg-12  ">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header d-flex justify-content-between">
-                                <strong>${trx.kode_transaksi}</strong>
-                                <span class="badge ${badge}">${trx.status}</span>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card transaksi-card shadow-sm h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 pb-2">
+                                <div>${icon}<strong>${trx.kode_transaksi}</strong></div>
+                                <span class="${badge}">${trx.status.charAt(0).toUpperCase() + trx.status.slice(1)}</span>
                             </div>
-                            <div class="card-body">
-                                <p class="mb-1"><b>Tanggal:</b> ${trx.tanggal_transaksi}</p>
-                                <p class="mb-1"><b>Total:</b> Rp ${Number(trx.total_transaksi).toLocaleString('id-ID')}</p>
+                            <div class="card-body pt-2 pb-2">
+                                <div class="d-flex flex-column gap-1">
+                                    <span><i class="bi bi-calendar-event me-1 text-primary"></i> <b>Tanggal:</b> ${trx.tanggal_transaksi}</span>
+                                    <span><i class="bi bi-cash-coin me-1 text-success"></i> <b>Total:</b> Rp ${Number(trx.total_transaksi).toLocaleString('id-ID')}</span>
+                                </div>
                             </div>
-                            <div class="card-footer text-end">
-                                <a href="/petugas/lapak/transaksi/${trx.id}" class="btn btn-sm btn-info">
-                                    Detail
+                            <div class="card-footer bg-white border-0 text-end pt-0">
+                                <a href="/petugas/lapak/transaksi/${trx.id}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-eye"></i> Detail
                                 </a>
                             </div>
                         </div>
