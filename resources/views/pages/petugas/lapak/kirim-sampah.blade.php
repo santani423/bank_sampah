@@ -11,27 +11,27 @@
                         <h4 class="mb-0" style="color: #fff;">Form Pengiriman Sampah</h4>
                     </div>
                     <div class="card-body">
-                            <div id="transaksi-detail" class="mb-4"></div>
-                            {{-- Tabel hanya detail_transaksi --}}
-                            @php
-                                $detailList = [];
-                                if(isset($data) && count($data) > 0) {
-                                    foreach($data as $transaksi) {
-                                        foreach($transaksi['detail_transaksi'] as $detail) {
-                                            $detailList[] = [
-                                                'kode_transaksi' => $transaksi['kode_transaksi'],
-                                                'tanggal_transaksi' => $transaksi['tanggal_transaksi'],
-                                                'sampah_id' => $detail['sampah_id'],
-                                                'berat_kg' => $detail['berat_kg'],
-                                                'harga_per_kg' => $detail['harga_per_kg'],
-                                                'total_harga' => $detail['total_harga'],
-                                                'status' => $transaksi['status'],
-                                            ];
-                                        }
+                        <div id="transaksi-detail" class="mb-4"></div>
+                        {{-- Tabel hanya detail_transaksi --}}
+                        @php
+                            $detailList = [];
+                            if (isset($data) && count($data) > 0) {
+                                foreach ($data as $transaksi) {
+                                    foreach ($transaksi['detail_transaksi'] as $detail) {
+                                        $detailList[] = [
+                                            'kode_transaksi' => $transaksi['kode_transaksi'],
+                                            'tanggal_transaksi' => $transaksi['tanggal_transaksi'],
+                                            'sampah_id' => $detail['sampah_id'],
+                                            'berat_kg' => $detail['berat_kg'],
+                                            'harga_per_kg' => $detail['harga_per_kg'],
+                                            'total_harga' => $detail['total_harga'],
+                                            'status' => $transaksi['status'],
+                                        ];
                                     }
                                 }
-                            @endphp
-                            @if(count($detailList) > 0)
+                            }
+                        @endphp
+                        @if (count($detailList) > 0)
                             <div class="mb-4">
                                 <h5 class="mb-3">Detail Transaksi Sampah</h5>
                                 <table class="table table-bordered table-striped">
@@ -47,11 +47,11 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($detailList as $detail)
+                                        @foreach ($detailList as $detail)
                                             <tr>
                                                 <td>{{ $detail['kode_transaksi'] }}</td>
                                                 <td>{{ $detail['tanggal_transaksi'] }}</td>
-                                                <td>{{ $detail['sampah_id'] }}</td>  
+                                                <td>{{ $detail['sampah_id'] }}</td>
                                                 <td>{{ $detail['berat_kg'] }}</td>
                                                 <td>{{ $detail['harga_per_kg'] }}</td>
                                                 <td>{{ $detail['total_harga'] }}</td>
@@ -61,48 +61,50 @@
                                     </tbody>
                                 </table>
                             </div>
-                            @else
-                                <div class="alert alert-info">Belum ada detail transaksi sampah untuk lapak ini.</div>
-                            @endif
+                        @else
+                            <div class="alert alert-info">Belum ada detail transaksi sampah untuk lapak ini.</div>
+                        @endif
                         @push('scripts')
-                        <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var lapakId = {{ $lapak->id }};
-                            var detailDiv = document.getElementById('transaksi-detail');
-                            detailDiv.innerHTML = '<div class="text-center text-muted py-3">Memuat detail transaksi...</div>';
-                            fetch(`/api/lapak/${lapakId}/transaksi`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (!data.transaksi || data.transaksi.length === 0) {
-                                        detailDiv.innerHTML = '<div class="alert alert-info">Belum ada transaksi sampah untuk lapak ini.</div>';
-                                        return;
-                                    }
-                                    let html = '<h5 class="mb-3">Detail Transaksi Sampah</h5>';
-                                    data.transaksi.forEach(function(trx, idx) {
-                                        html += `<div class='card mb-2'>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    var lapakId = {{ $lapak->id }};
+                                    var detailDiv = document.getElementById('transaksi-detail');
+                                    detailDiv.innerHTML = '<div class="text-center text-muted py-3">Memuat detail transaksi...</div>';
+                                    fetch(`/api/lapak/${lapakId}/transaksi`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (!data.transaksi || data.transaksi.length === 0) {
+                                                detailDiv.innerHTML =
+                                                    '<div class="alert alert-info">Belum ada transaksi sampah untuk lapak ini.</div>';
+                                                return;
+                                            }
+                                            let html = '<h5 class="mb-3">Detail Transaksi Sampah</h5>';
+                                            data.transaksi.forEach(function(trx, idx) {
+                                                html +=
+                                                    `<div class='card mb-2'>
                                             <div class='card-header bg-light'>
                                                 <b>Kode Transaksi:</b> ${trx.kode_transaksi ?? '-'} | <b>Tanggal:</b> ${trx.tanggal_transaksi ?? '-'}
                                             </div>
                                             <div class='card-body'>
                                                 <table class='table table-sm table-bordered mb-0'>
                                                     <thead><tr><th>Nama Sampah</th><th>Berat (kg)</th><th>Harga/kg</th><th>Total</th></tr></thead><tbody>`;
-                                        trx.detail_transaksi.forEach(function(item) {
-                                            html += `<tr>
+                                                trx.detail_transaksi.forEach(function(item) {
+                                                    html += `<tr>
                                                 <td>${item.sampah_id ?? '-'}</td>
                                                 <td>${item.berat_kg ?? '-'}</td>
                                                 <td>${item.harga_per_kg ?? '-'}</td>
                                                 <td>${item.total_harga ?? '-'}</td>
                                             </tr>`;
+                                                });
+                                                html += `</tbody></table></div></div>`;
+                                            });
+                                            detailDiv.innerHTML = html;
+                                        })
+                                        .catch(() => {
+                                            detailDiv.innerHTML = '<div class="alert alert-danger">Gagal memuat data transaksi.</div>';
                                         });
-                                        html += `</tbody></table></div></div>`;
-                                    });
-                                    detailDiv.innerHTML = html;
-                                })
-                                .catch(() => {
-                                    detailDiv.innerHTML = '<div class="alert alert-danger">Gagal memuat data transaksi.</div>';
                                 });
-                        });
-                        </script>
+                            </script>
                         @endpush
                         <div class="mb-4">
                             <div class="card shadow-sm border-0">
@@ -140,26 +142,33 @@
                         </div>
                         <form action="{{ route('petugas.lapak.proses-kirim-sampah', $lapak->id ?? '') }}" method="POST">
                             @csrf
-                            <div class="mb-3">
-                                <label for="tanggal_pengiriman" class="form-label">Tanggal Pengiriman</label>
-                                <input type="date" name="tanggal_pengiriman" id="tanggal_pengiriman" class="form-control"
-                                    required>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="kode_pengiriman" class="form-label">Kode Pengiriman</label>
+                                    <input type="text" name="kode_pengiriman" id="kode_pengiriman" class="form-control" value="{{ $kodePengiriman ?? '' }}" readonly required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="tanggal_pengiriman" class="form-label">Tanggal Pengiriman</label>
+                                    <input type="date" name="tanggal_pengiriman" id="tanggal_pengiriman" class="form-control" value="{{ date('Y-m-d') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="customer" class="form-label">Customer</label>
+                                    <select name="customer" id="customer" class="form-control" required>
+                                        <option value="" disabled selected>Pilih Customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}">({{ $customer->nama_gudang }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="catatan" class="form-label">Catatan</label>
+                                    <textarea name="catatan" id="catatan" class="form-control" rows="2"></textarea>
+                                </div>
+                                <div class="col-12 d-flex gap-2 mt-2">
+                                    <button type="submit" class="btn btn-success">Kirim Sampah</button>
+                                    <a href="{{ route('petugas.lapak.index') }}" class="btn btn-secondary">Batal</a>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="jenis_sampah" class="form-label">Jenis Sampah</label>
-                                <input type="text" name="jenis_sampah" id="jenis_sampah" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="berat" class="form-label">Berat (kg)</label>
-                                <input type="number" name="berat" id="berat" class="form-control" step="0.01"
-                                    required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="catatan" class="form-label">Catatan</label>
-                                <textarea name="catatan" id="catatan" class="form-control" rows="2"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-success">Kirim Sampah</button>
-                            <a href="{{ route('petugas.lapak.index') }}" class="btn btn-secondary">Batal</a>
                         </form>
                     </div>
                 </div>

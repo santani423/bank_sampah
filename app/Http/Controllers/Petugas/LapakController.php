@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\Lapak;
 use App\Models\Cabang;
+use App\Models\Gudang;
 use App\Models\JenisMetodePenarikan;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
@@ -21,18 +22,21 @@ class LapakController extends Controller
     {
         // Validasi data
         $request->validate([
+            'kode_pengiriman' => 'required|string|unique:pengiriman_petugas,kode_pengiriman',
             'tanggal_pengiriman' => 'required|date',
             'jenis_sampah' => 'required|string',
             'berat' => 'required|numeric|min:0.01',
         ]);
 
-        // Simpan data pengiriman ke database (contoh, sesuaikan dengan struktur tabel Anda)
-        DB::table('pengiriman_sampah')->insert([
+        // Simpan data pengiriman ke database (tabel pengiriman_petugas)
+        DB::table('pengiriman_petugas')->insert([
+            'kode_pengiriman' => $request->kode_pengiriman,
             'lapak_id' => $lapakId,
             'tanggal_pengiriman' => $request->tanggal_pengiriman,
             'jenis_sampah' => $request->jenis_sampah,
             'berat' => $request->berat,
             'catatan' => $request->catatan,
+            'petugas_id' => auth()->user()->id ?? null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -45,7 +49,11 @@ class LapakController extends Controller
      */
     public function kirimSampah($lapakId)
     {
-        $lapak = Lapak::findOrFail($lapakId);
+        $lapak = Lapak::with([
+            'cabang',
+            'gudangs'
+        ])->findOrFail($lapakId);
+
         $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
         $cabangIds = [];
         $cabangs = collect();
@@ -53,7 +61,13 @@ class LapakController extends Controller
             $cabangIds = \DB::table('petugas_cabangs')->where('petugas_id', $petugas->id)->pluck('cabang_id')->toArray();
             $cabangs = \App\Models\cabang::whereIn('id', $cabangIds)->get();
         }
-        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs'));
+
+        // Generate kode pengiriman otomatis (format: KRM + tanggal + 4 digit random)
+        $kodePengiriman = 'KRM' . date('ymd') . strtoupper(substr(uniqid(), -4));
+        $customers = $lapak->gudangs;
+        // dd($customers);
+
+        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs', 'cabangIds', 'kodePengiriman', 'customers'));
     }
     /**
      * Tampilkan detail transaksi lapak
@@ -77,7 +91,7 @@ class LapakController extends Controller
         return view('pages.petugas.lapak.transaksi.detail', compact('transaksi'));
     }
 
- 
+
 
     /**
      * Download detail transaksi lapak dalam format khusus

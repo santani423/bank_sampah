@@ -36,10 +36,8 @@ class Lapak extends Model
         'approved_at' => 'datetime'
     ];
 
-    /**
-     * Relasi ke tabel cabang
-     * Satu lapak dimiliki oleh satu cabang
-     */
+    /* ================= RELATIONSHIP ================= */
+
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'cabang_id');
@@ -48,5 +46,20 @@ class Lapak extends Model
     public function jenisMetodePenarikan()
     {
         return $this->belongsTo(JenisMetodePenarikan::class, 'jenis_metode_penarikan_id');
+    }
+
+    /**
+     * Cabang -> Gudangs (melalui cabang)
+     */
+    public function gudangs()
+    {
+        return $this->hasManyThrough(
+            Gudang::class,
+            Cabang::class,
+            'id',         // FK di cabang
+            'cabang_id',  // FK di gudang
+            'cabang_id',  // FK di lapak
+            'id'          // PK di cabang
+        );
     }
 }
