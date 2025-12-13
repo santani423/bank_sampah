@@ -211,6 +211,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         trx.status === 'selesai' ? '<i class="bi bi-check-circle-fill text-success transaksi-icon"></i>' :
                         trx.status === 'pending' ? '<i class="bi bi-hourglass-split text-warning transaksi-icon"></i>' :
                         '<i class="bi bi-x-circle-fill text-danger transaksi-icon"></i>';
+                    let detailRows = '';
+                    if (trx.detail_transaksi && trx.detail_transaksi.length > 0) {
+                        trx.detail_transaksi.forEach((item, idx) => {
+                            detailRows += `
+                                <tr>
+                                    <td>${idx + 1}</td>
+                                    <td>${item.sampah ? item.sampah.nama_sampah : '-'}</td>
+                                    <td>${parseFloat(item.berat_kg).toLocaleString('id-ID')} kg</td>
+                                    <td>Rp ${parseFloat(item.harga_per_kg).toLocaleString('id-ID')}</td>
+                                    <td>Rp ${parseFloat(item.total_harga).toLocaleString('id-ID')}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        detailRows = `<tr><td colspan="5" class="text-center text-muted">Tidak ada detail</td></tr>`;
+                    }
                     list.innerHTML += `
                     <div class="col-md-6 col-lg-4">
                         <div class="card transaksi-card shadow-sm h-100">
@@ -219,9 +235,25 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <span class="${badge}">${trx.status.charAt(0).toUpperCase() + trx.status.slice(1)}</span>
                             </div>
                             <div class="card-body pt-2 pb-2">
-                                <div class="d-flex flex-column gap-1">
+                                <div class="d-flex flex-column gap-1 mb-2">
                                     <span><i class="bi bi-calendar-event me-1 text-primary"></i> <b>Tanggal:</b> ${trx.tanggal_transaksi}</span>
                                     <span><i class="bi bi-cash-coin me-1 text-success"></i> <b>Total:</b> Rp ${Number(trx.total_transaksi).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Sampah</th>
+                                                <th>Berat</th>
+                                                <th>Harga/Kg</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${detailRows}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                             <div class="card-footer bg-white border-0 text-end pt-0">
