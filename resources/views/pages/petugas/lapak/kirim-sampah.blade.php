@@ -115,6 +115,7 @@
 
                 <div class="card-body">
 
+                    <!-- REKAP JUMLAH SAMPAH PER JENIS dipindah ke bawah -->
                     {{-- CARD LIST --}}
                     <div id="transaksiLapakList" class="row g-3">
                         <div class="col-12 text-center text-muted">Memuat data...</div>
@@ -179,6 +180,8 @@
                             <button id="nextPage" class="btn btn-outline-secondary btn-sm">Next &raquo;</button>
                         </div>
                     </div>
+                    {{-- REKAP JUMLAH SAMPAH PER JENIS (sekarang di bawah) --}}
+                    <div id="rekapSampahTable" class="mt-4"></div>
 
                 </div>
             </div>
@@ -210,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadData() {
 
         list.innerHTML = `<div class="col-12 text-center text-muted">Memuat data...</div>`;
+        document.getElementById('rekapSampahTable').innerHTML = '';
 
         let url = `/api/lapak/${lapakId}/transaksi?page=${page}&limit=${limit}`;
         if (search) url += `&search=${search}`;
@@ -225,6 +229,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 info.textContent = `Halaman ${page} dari ${lastPage}`;
 
                 list.innerHTML = '';
+
+                // Rekap jumlah sampah per jenis
+                let rekap = {};
+                data.forEach(trx => {
+                    if (trx.detail_transaksi && trx.detail_transaksi.length > 0) {
+                        trx.detail_transaksi.forEach(item => {
+                            let nama = item.sampah ? item.sampah.nama_sampah : '-';
+                            let berat = parseFloat(item.berat_kg) || 0;
+                            if (!rekap[nama]) rekap[nama] = 0;
+                            rekap[nama] += berat;
+                        });
+                    }
+                });
+                // Render tabel rekap
+                let rekapHtml = '';
+                if (Object.keys(rekap).length > 0) {
+                    rekapHtml += `<div class="table-responsive"><table class="table table-bordered table-sm mb-0"><thead class="table-light"><tr><th colspan="2" class="text-center">Rekap Jumlah Sampah per Jenis</th></tr><tr><th>Jenis Sampah</th><th>Total Berat (kg)</th></tr></thead><tbody>`;
+                    Object.entries(rekap).forEach(([nama, berat]) => {
+                        rekapHtml += `<tr><td>${nama}</td><td>${berat.toLocaleString('id-ID')}</td></tr>`;
+                    });
+                    rekapHtml += `</tbody></table></div>`;
+                } else {
+                    rekapHtml = '<div class="text-muted text-center">Tidak ada data rekap sampah</div>';
+                }
+                document.getElementById('rekapSampahTable').innerHTML = rekapHtml;
 
                 if (!data.length) {
                     list.innerHTML = `<div class="col-12 text-center text-muted">Tidak ada data</div>`;
