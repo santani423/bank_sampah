@@ -3,6 +3,9 @@
 @section('title', 'Pengiriman Sampah')
 
 @section('main')
+    @push('style')
+        <link rel="stylesheet" href="{{ asset('edmate/assets/css/kirim-sampah-responsive.css') }}">
+    @endpush
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-12">
