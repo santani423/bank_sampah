@@ -104,7 +104,7 @@
 
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Data Transaksi Lapak</h4>
+                    <h4 class="mb-0 text-break text-center text-md-start" style="white-space:normal;word-break:break-word;">Data Transaksi Lapak</h4>
                     <div class="d-flex gap-2">
                         <input type="text" id="searchTransaksi" class="form-control"
                             placeholder="Cari kode..." style="max-width:180px;">
@@ -124,6 +124,10 @@
                             transition: box-shadow 0.2s, transform 0.2s;
                             border-radius: 16px;
                             border: 1px solid #e5e7eb;
+                            min-width: 0;
+                            display: flex;
+                            flex-direction: column;
+                            height: 100%;
                         }
                         .transaksi-card:hover {
                             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
@@ -139,6 +143,31 @@
                             font-size: 1.5em;
                             margin-right: 0.5em;
                             vertical-align: middle;
+                        }
+                        @media (max-width: 991.98px) {
+                            #transaksiLapakList .col-md-6, #transaksiLapakList .col-lg-4 {
+                                flex: 0 0 100%;
+                                max-width: 100%;
+                            }
+                        }
+                        @media (max-width: 575.98px) {
+                            .transaksi-card {
+                                border-radius: 10px;
+                                padding: 0.5rem;
+                            }
+                            .transaksi-card .card-header, .transaksi-card .card-body, .transaksi-card .card-footer {
+                                padding-left: 0.5rem !important;
+                                padding-right: 0.5rem !important;
+                            }
+                            .transaksi-card .table {
+                                font-size: 0.85em;
+                            }
+                        }
+                        .transaksi-card .table-responsive {
+                            overflow-x: auto;
+                        }
+                        .transaksi-card .table {
+                            min-width: 420px;
                         }
                     </style>
 
@@ -228,8 +257,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         detailRows = `<tr><td colspan="5" class="text-center text-muted">Tidak ada detail</td></tr>`;
                     }
                     list.innerHTML += `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card transaksi-card shadow-sm h-100">
+                    <div class="col-12 col-md-6 col-lg-4 d-flex">
+                        <div class="card transaksi-card shadow-sm flex-fill">
                             <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 pb-2">
                                 <div>${icon}<strong>${trx.kode_transaksi}</strong></div>
                                 <span class="${badge}">${trx.status.charAt(0).toUpperCase() + trx.status.slice(1)}</span>
