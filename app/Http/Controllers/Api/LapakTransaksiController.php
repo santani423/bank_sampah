@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\SaldoUtama;
 use App\Models\TransaksiLapak;
+use App\Models\DetailTransaksiLapak;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,8 +18,7 @@ class LapakTransaksiController extends Controller
     // GET /api/lapak/{id}/transaksi
     public function index(Request $request, $id)
     {
-        $query = DB::table('transaksi_lapak')
-            ->where('lapak_id', $id);
+        $query = TransaksiLapak::where('lapak_id', $id);
 
         // Search by kode transaksi
         if ($request->filled('search')) {
@@ -43,8 +43,7 @@ class LapakTransaksiController extends Controller
 
         // Map detail transaksi
         $transaksi = $transaksi->map(function ($trx) {
-            $details = DB::table('detail_transaksi_lapak')
-                ->where('transaksi_lapak_id', $trx->id)
+            $details = DetailTransaksiLapak::with('sampah')->where('transaksi_lapak_id', $trx->id)
                 ->get();
             $trx->detail_transaksi = $details;
             $trx->status = $trx->status ?? 'pending';
