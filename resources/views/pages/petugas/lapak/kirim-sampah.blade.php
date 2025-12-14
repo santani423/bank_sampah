@@ -105,10 +105,15 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0 text-break text-center text-md-start" style="white-space:normal;word-break:break-word;">Data Transaksi Lapak</h4>
+                  
+                </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  
                     <div class="d-flex gap-2">
                         <input type="text" id="searchTransaksi" class="form-control"
                             placeholder="Cari kode..." style="max-width:180px;">
                         <input type="date" id="searchTanggal" class="form-control" style="max-width:160px;">
+                        <br>
                         <button id="searchBtn" class="btn btn-primary">Cari</button>
                     </div>
                 </div>
