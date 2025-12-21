@@ -204,7 +204,7 @@
                 <div class="row g-4">
                     <div class="col-md-4">
                         <label class="form-label">Kode Pengiriman</label>
-                        <input type="text" class="form-control bg-light fw-bold" name="kode_pengiriman" value="{{ $kodePengiriman }}" readonly>
+                        <input type="text" class="form-control bg-light fw-bold" name="kode_pengiriman" value="{{ $kodePengiriman }}" readonly required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Tanggal Kirim</label>
@@ -213,7 +213,7 @@
                     <div class="col-md-4">
                         <label class="form-label">Gudang Tujuan</label>
                         <select name="customer" class="form-select" required>
-                            <option value="">-- Pilih Customer --</option>
+                            <option value="" disabled selected>-- Pilih Customer --</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->nama_gudang }}</option>
                             @endforeach

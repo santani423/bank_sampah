@@ -145,12 +145,12 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::get('/topup/{id}', [AdminTopUpController::class, 'show'])->name('admin.topup.show');
 
 
-    
+
     Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('admin.lapak.transaksi.download');
 });
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
-        Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
+    Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
 
     // Data Master
