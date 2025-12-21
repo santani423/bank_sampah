@@ -5,7 +5,6 @@
 @section('main')
 
 @push('style')
-{{-- Menggunakan Google Fonts untuk tampilan lebih modern --}}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('edmate/assets/css/kirim-sampah-responsive.css') }}">
 <style>
@@ -14,7 +13,6 @@
         background-color: #f4f7fa;
     }
 
-    /* Card Styling */
     .card {
         border: none;
         border-radius: 16px;
@@ -27,7 +25,6 @@
         padding: 1.25rem 1.5rem;
     }
 
-    /* Form Styling */
     .form-label {
         font-weight: 600;
         color: #4a5568;
@@ -42,12 +39,25 @@
         transition: all 0.2s;
     }
 
-    .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    /* Styling Table dengan Border Tegas */
+    .table-bordered-custom {
+        border: 1px solid #e2e8f0;
     }
 
-    /* Informasi Lapak Pill */
+    .table-bordered-custom th {
+        background-color: #f8fafc;
+        border-bottom: 2px solid #e2e8f0 !important;
+        color: #4a5568;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .table-bordered-custom td, .table-bordered-custom th {
+        border: 1px solid #e2e8f0 !important;
+        vertical-align: middle;
+    }
+
     .info-lapak-box {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -55,58 +65,77 @@
         padding: 1rem;
     }
 
-    /* Transaction Card */
+    .preview-container {
+        width: 100%;
+        height: 180px;
+        border: 2px dashed #cbd5e0;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #f8fafc;
+        position: relative;
+    }
+
+    .preview-mini {
+        width: 80px;
+        height: 60px;
+        border: 1px dashed #cbd5e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-container img, .preview-mini img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-placeholder {
+        color: #a0aec0;
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
     .transaksi-card {
         background: #ffffff;
         border: 1px solid #edf2f7;
         transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .transaksi-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Table Detail Styling */
-    .table-detail-custom {
-        background: #f8fafc;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #eef2f7;
-    }
-
-    .table-detail-custom table {
-        margin-bottom: 0;
-    }
-
-    .table-detail-custom thead th {
-        background: #f1f5f9;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 0.05em;
-        color: #64748b;
-        border: none;
-    }
-
-    .table-detail-custom tbody td {
-        border-color: #f1f5f9;
-        vertical-align: middle;
-        font-size: 0.9rem;
-    }
-
-    /* Badge Custom */
     .badge-status {
         padding: 6px 14px;
         border-radius: 8px;
         font-weight: 600;
         font-size: 0.75rem;
-        letter-spacing: 0.025em;
     }
 
-    /* Utility */
     .text-primary-dark { color: #2c5282; }
     .btn-primary { background-color: #3182ce; border: none; border-radius: 10px; padding: 0.6rem 1.5rem; }
     .btn-success { background-color: #38a169; border: none; border-radius: 10px; }
+    
+    /* Tombol Simpan Akhir */
+    .btn-save-final {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        color: white;
+        border: none;
+        padding: 12px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+
+    .btn-save-final:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        color: #fff;
+    }
 
     @media (max-width: 768px) {
         .responsive-card-table tr {
@@ -120,6 +149,8 @@
             display: flex;
             justify-content: space-between;
             padding: 8px 12px !important;
+            border: none !important;
+            border-bottom: 1px solid #f1f5f9 !important;
         }
         .responsive-card-table td::before {
             content: attr(data-label);
@@ -132,7 +163,7 @@
 
 <div class="container py-4">
 
-    {{-- FORM HEADER --}}
+    {{-- FORM UTAMA --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
             <div class="d-flex align-items-center">
@@ -147,7 +178,6 @@
         </div>
 
         <div class="card-body p-4">
-            {{-- INFO LAPAK --}}
             <div class="info-lapak-box mb-4">
                 <div class="row g-3">
                     <div class="col-md-3">
@@ -156,7 +186,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="text-muted small d-block">Kode Lapak</label>
-                        <span class="badge bg-soft-primary text-primary px-2">{{ $lapak->kode_lapak }}</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-2">{{ $lapak->kode_lapak }}</span>
                     </div>
                     <div class="col-md-3">
                         <label class="text-muted small d-block">Cabang</label>
@@ -169,7 +199,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('petugas.lapak.proses-kirim-sampah', $lapak->id) }}" method="POST">
+            <form action="{{ route('petugas.lapak.proses-kirim-sampah', $lapak->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row g-4">
                     <div class="col-md-4">
@@ -189,14 +219,49 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label">Catatan Tambahan (Opsional)</label>
-                        <textarea name="catatan" class="form-control" rows="2" placeholder="Tulis instruksi atau catatan pengiriman di sini..."></textarea>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Nama Driver / Supir</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-person-badge"></i></span>
+                            <input type="text" name="nama_driver" class="form-control" placeholder="Nama pengemudi" required>
+                        </div>
                     </div>
+                    <div class="col-md-4">
+                        <label class="form-label">No. Telepon Driver</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-whatsapp"></i></span>
+                            <input type="tel" name="telp_driver" class="form-control" placeholder="08xxxx" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">No. Plat Kendaraan</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-truck"></i></span>
+                            <input type="text" name="plat_nomor" class="form-control" placeholder="B 1234 ABC" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Foto Sampah (Muatan)</label>
+                        <div class="preview-container mb-2" id="preview-container-sampah">
+                            <div class="preview-placeholder"><i class="bi bi-camera fs-1 d-block"></i>Pratinjau Foto</div>
+                        </div>
+                        <input type="file" name="foto_sampah" class="form-control" accept="image/*" onchange="previewImage(this, 'preview-container-sampah')" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Foto Plat Nomor Mobil</label>
+                        <div class="preview-container mb-2" id="preview-container-plat">
+                            <div class="preview-placeholder"><i class="bi bi-truck-flatbed fs-1 d-block"></i>Pratinjau Plat</div>
+                        </div>
+                        <input type="file" name="foto_plat" class="form-control" accept="image/*" onchange="previewImage(this, 'preview-container-plat')" required>
+                    </div>
+
                     <div class="col-12 text-end">
                         <hr class="my-4">
                         <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-semibold">
-                            <i class="bi bi-check2-circle me-2"></i>Kirim Sampah Sekarang
+                            <i class="bi bi-plus-circle me-2"></i>Tambah Ke Riwayat Sementara
                         </button>
                     </div>
                 </div>
@@ -206,42 +271,57 @@
 
     {{-- LIST TRANSAKSI --}}
     <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-        <h4 class="fw-bold text-primary-dark mb-0">Riwayat Transaksi Lapak</h4>
+        <h4 class="fw-bold text-primary-dark mb-0">Daftar Pengiriman (Halaman Ini)</h4>
         <div class="d-flex gap-2">
             <input type="text" id="searchTransaksi" class="form-control form-control-sm" placeholder="Cari Kode..." style="width: 150px;">
-            <input type="date" id="searchTanggal" class="form-control form-control-sm" style="width: 150px;">
             <button id="searchBtn" class="btn btn-primary btn-sm px-3">Cari</button>
         </div>
     </div>
 
-    <div id="transaksiLapakList" class="row g-4">
-        {{-- Data dimuat via JS --}}
-    </div>
+    <div id="transaksiLapakList" class="row g-4"></div>
 
     {{-- PAGINATION --}}
-    <div class="card mt-4 border-0 shadow-none bg-transparent">
-        <div class="card-body p-0 d-flex justify-content-between align-items-center">
-            <p id="paginationInfo" class="text-muted small mb-0"></p>
-            <nav>
-                <ul class="pagination mb-0">
-                    <li class="page-item"><button id="prevPage" class="btn btn-white btn-sm border me-2 px-3">Previous</button></li>
-                    <li class="page-item"><button id="nextPage" class="btn btn-white btn-sm border px-3">Next</button></li>
-                </ul>
-            </nav>
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+        <p id="paginationInfo" class="text-muted small mb-0"></p>
+        <div class="btn-group">
+            <button id="prevPage" class="btn btn-outline-secondary btn-sm px-3">Prev</button>
+            <button id="nextPage" class="btn btn-outline-secondary btn-sm px-3">Next</button>
         </div>
     </div>
 
-    {{-- REKAP TABLE --}}
-    <div id="rekapSampahTable" class="mt-5"></div>
+    {{-- REKAP TABEL --}}
+    <div id="rekapSampahTable" class="mt-5 mb-5"></div>
+
+    {{-- TOMBOL SIMPAN AKHIR --}}
+    <div class="card border-0 bg-transparent mb-5">
+        <div class="card-body p-0 text-center">
+            <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i> Pastikan semua data pengiriman di atas sudah benar sebelum menyimpan secara permanen.
+            </div>
+            <a href="{{ route('petugas.lapak.index') }}" class="btn btn-save-final">
+                <i class="bi bi-cloud-check-fill me-2"></i> SIMPAN SEMUA DATA & SELESAI
+            </a>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
 <script>
+function previewImage(input, containerId) {
+    const container = document.getElementById(containerId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            container.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const lapakId = @json($lapak->id);
     const list = document.getElementById('transaksiLapakList');
     const searchInput = document.getElementById('searchTransaksi');
-    const searchTanggal = document.getElementById('searchTanggal');
     const searchBtn = document.getElementById('searchBtn');
     const prevBtn = document.getElementById('prevPage');
     const nextBtn = document.getElementById('nextPage');
@@ -253,75 +333,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function loadData() {
         list.innerHTML = `<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>`;
-        
         let url = `/api/lapak/${lapakId}/transaksi?page=${page}&limit=${limit}`;
         if (searchInput.value) url += `&search=${searchInput.value}`;
-        if (searchTanggal.value) url += `&tanggal=${searchTanggal.value}`;
 
         fetch(url)
             .then(res => res.json())
             .then(res => {
                 const data = res.data || res;
                 lastPage = res.last_page || 1;
-                info.textContent = `Menampilkan halaman ${page} dari ${lastPage}`;
+                info.textContent = `Halaman ${page} dari ${lastPage}`;
                 list.innerHTML = '';
-
-                // Render Rekap
                 updateRekap(data);
 
                 if (!data.length) {
-                    list.innerHTML = `<div class="col-12 text-center py-5 text-muted">Belum ada riwayat transaksi.</div>`;
+                    list.innerHTML = `<div class="col-12 text-center py-5 text-muted">Belum ada riwayat.</div>`;
                     return;
                 }
 
                 data.forEach(trx => {
-                    let statusColor = trx.status === 'selesai' ? 'bg-success text-white' : (trx.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger text-white');
-                    
+                    let statusColor = trx.status === 'selesai' ? 'bg-success text-white' : 'bg-warning text-dark';
                     let detailRows = '';
                     trx.detail_transaksi.forEach((item, idx) => {
                         detailRows += `
                             <tr>
                                 <td data-label="#">${idx + 1}</td>
-                                <td data-label="Jenis Sampah"><strong>${item.sampah ? item.sampah.nama_sampah : '-'}</strong></td>
-                                <td data-label="Berat">${parseFloat(item.berat_kg).toLocaleString('id-ID')} kg</td>
-                                <td data-label="Harga/Kg">Rp ${parseFloat(item.harga_per_kg).toLocaleString('id-ID')}</td>
-                                <td data-label="Subtotal" class="text-md-end fw-bold text-primary">Rp ${parseFloat(item.total_harga).toLocaleString('id-ID')}</td>
+                                <td data-label="Jenis">${item.sampah ? item.sampah.nama_sampah : '-'}</td>
+                                <td data-label="Berat">${parseFloat(item.berat_kg)} kg</td>
+                                <td data-label="Harga">Rp ${parseFloat(item.harga_per_kg).toLocaleString()}</td>
+                                <td data-label="Total" class="text-md-end fw-bold">Rp ${parseFloat(item.total_harga).toLocaleString()}</td>
                             </tr>`;
                     });
 
                     list.innerHTML += `
                     <div class="col-12">
-                        <div class="card transaksi-card">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="text-muted x-small d-block">ID Transaksi</span>
-                                    <h6 class="mb-0 fw-bold">${trx.kode_transaksi}</h6>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge-status ${statusColor}">${trx.status.toUpperCase()}</span>
-                                    <span class="d-block small text-muted mt-1">${trx.tanggal_transaksi}</span>
-                                </div>
+                        <div class="card transaksi-card border shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between">
+                                <span class="fw-bold text-primary">${trx.kode_transaksi}</span>
+                                <span class="badge ${statusColor}">${trx.status.toUpperCase()}</span>
                             </div>
                             <div class="card-body">
-                                <div class="table-detail-custom p-1">
-                                    <table class="table responsive-card-table">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th><th>Jenis Sampah</th><th>Berat</th><th>Harga/Kg</th><th class="text-end">Subtotal</th>
-                                            </tr>
-                                        </thead>
+                                <div class="row mb-3 bg-light p-2 rounded mx-0 small">
+                                    <div class="col-md-4 border-end"><b>Driver:</b> ${trx.nama_driver || '-'}</div>
+                                    <div class="col-md-4 border-end"><b>Telp:</b> ${trx.telp_driver || '-'}</div>
+                                    <div class="col-md-4"><b>Plat:</b> ${trx.plat_nomor || '-'}</div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered-custom responsive-card-table mb-0">
+                                        <thead><tr><th>#</th><th>Jenis</th><th>Berat</th><th>Harga</th><th class="text-end">Total</th></tr></thead>
                                         <tbody>${detailRows}</tbody>
                                     </table>
                                 </div>
                             </div>
-                            <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
-                                <div>
-                                    <span class="text-muted small">Total Pembayaran</span>
-                                    <h5 class="mb-0 fw-bold text-success">Rp ${Number(trx.total_transaksi).toLocaleString('id-ID')}</h5>
+                            <div class="card-footer bg-white border-top py-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                         <form action="/petugas/lapak/update-foto-transaksi/${trx.id}" method="POST" enctype="multipart/form-data">
+                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="preview-mini" id="preview-update-${trx.id}"><i class="bi bi-image"></i></div>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="file" name="foto_sampah_update" class="form-control" onchange="previewImage(this, 'preview-update-${trx.id}')" required>
+                                                    <button type="submit" class="btn btn-dark"><i class="bi bi-upload"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-5 text-md-end mt-2 mt-md-0">
+                                        <h6 class="mb-0 fw-bold text-success">Total: Rp ${Number(trx.total_transaksi).toLocaleString('id-ID')}</h6>
+                                    </div>
                                 </div>
-                                <a href="/petugas/lapak/transaksi/${trx.id}" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">
-                                    Lihat Bukti <i class="bi bi-chevron-right ms-1"></i>
-                                </a>
                             </div>
                         </div>
                     </div>`;
@@ -332,26 +412,21 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateRekap(data) {
         let rekap = {};
         data.forEach(trx => {
-            if (trx.detail_transaksi) {
-                trx.detail_transaksi.forEach(item => {
-                    let nama = item.sampah ? item.sampah.nama_sampah : '-';
-                    rekap[nama] = (rekap[nama] || 0) + (parseFloat(item.berat_kg) || 0);
-                });
-            }
+            trx.detail_transaksi?.forEach(item => {
+                let nama = item.sampah ? item.sampah.nama_sampah : '-';
+                rekap[nama] = (rekap[nama] || 0) + (parseFloat(item.berat_kg) || 0);
+            });
         });
-
         let rekapHtml = '';
         if (Object.keys(rekap).length > 0) {
             rekapHtml = `
-                <div class="card border-0 bg-dark shadow-sm overflow-hidden">
-                    <div class="card-header bg-dark border-0 py-3">
-                        <h6 class="text-white mb-0 fw-bold"><i class="bi bi-pie-chart-fill me-2"></i>Rekap Berat Per Jenis (Halaman Ini)</h6>
-                    </div>
+                <div class="card border-0 bg-dark shadow overflow-hidden">
+                    <div class="card-header bg-dark border-0"><h6 class="text-white mb-0">Rekapitulasi Berat Halaman Ini</h6></div>
                     <div class="card-body p-0">
-                        <table class="table table-dark table-hover mb-0 small">
-                            <thead><tr class="text-muted"><th>Jenis Sampah</th><th class="text-end">Total Berat</th></tr></thead>
+                        <table class="table table-dark table-bordered border-secondary mb-0 small">
+                            <thead><tr><th class="border-secondary">Jenis Sampah</th><th class="text-end border-secondary">Total Berat</th></tr></thead>
                             <tbody>
-                                ${Object.entries(rekap).map(([n, b]) => `<tr><td class="ps-3">${n}</td><td class="text-end pe-3 fw-bold text-warning">${b.toLocaleString('id-ID')} kg</td></tr>`).join('')}
+                                ${Object.entries(rekap).map(([n, b]) => `<tr><td class="border-secondary">${n}</td><td class="text-end text-warning border-secondary">${b.toLocaleString()} kg</td></tr>`).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -363,7 +438,6 @@ document.addEventListener('DOMContentLoaded', function () {
     searchBtn.onclick = () => { page = 1; loadData(); }
     prevBtn.onclick = () => { if (page > 1) { page--; loadData(); } }
     nextBtn.onclick = () => { if (page < lastPage) { page++; loadData(); } }
-
     loadData();
 });
 </script>
