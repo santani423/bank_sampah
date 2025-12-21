@@ -22,6 +22,10 @@ use App\Http\Controllers\Api\LapakTransaksiController;
 use App\Http\Controllers\Api\NasabahBadanTransaksiController;
 use App\Http\Controllers\GudangController;
 
+use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\PengirimanLapakController;
+use App\Models\PengirimanLapak;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -45,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
 
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
+    Route::get('/lapak/transaksi/index', [PengirimanLapakController::class, 'index'])->name('api.lapak.transaksi.index');
     Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);
     Route::get('/lapak/{id}/transaksi/ready-to-ships', [LapakTransaksiController::class, 'readyToShips']);
 

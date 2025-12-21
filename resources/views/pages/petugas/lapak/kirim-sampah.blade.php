@@ -263,6 +263,9 @@
                         <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-semibold">
                             <i class="bi bi-plus-circle me-2"></i>Tambah Ke Riwayat Sementara
                         </button>
+                            <button type="button" id="ajaxSubmit" class="btn btn-success shadow-sm px-5 py-2 fw-semibold">
+                                <i class="bi bi-plus-circle me-2"></i>Tambah Ke Riwayat Sementara
+                            </button>
                     </div>
                 </div>
             </form>
