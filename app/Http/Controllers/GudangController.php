@@ -111,4 +111,10 @@ class GudangController extends Controller
 
         return redirect()->route('admin.gudangs.index')->with('success', 'Data gudang berhasil diimpor!');
     }
+
+    public function gudangByCabang($id)
+    {
+        $gudangs = Gudang::where('cabang_id', $id)->get();
+        return response()->json($gudangs);
+    }
 }

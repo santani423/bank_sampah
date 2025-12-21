@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\AllLapakTransaksiController;
 use App\Http\Controllers\Api\LapakTransaksiBuktiController;
 use App\Http\Controllers\Api\LapakTransaksiController;
 use App\Http\Controllers\Api\NasabahBadanTransaksiController;
+use App\Http\Controllers\GudangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
 
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
+    Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);
     Route::get('/lapak/{id}/transaksi/ready-to-ships', [LapakTransaksiController::class, 'readyToShips']);
 
     // Endpoint untuk seluruh data transaksi lapak
