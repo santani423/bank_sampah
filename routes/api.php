@@ -47,9 +47,9 @@ Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
-
+    
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
-    Route::get('/lapak/transaksi/index', [PengirimanLapakController::class, 'index'])->name('api.lapak.transaksi.index');
+    Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);
     Route::get('/lapak/{id}/transaksi/ready-to-ships', [LapakTransaksiController::class, 'readyToShips']);
 

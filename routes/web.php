@@ -40,6 +40,7 @@ use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardControll
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
+use App\Http\Controllers\PengirimanLapakController;
 use App\Http\Controllers\Petugas\NasabahUserBadanController;
 use App\Http\Controllers\Petugas\LapakController;
 use App\Http\Controllers\TimeController;
@@ -219,3 +220,5 @@ Route::get('storage/{filename}', function ($filename) {
 
     return Response::file($path);
 });
+
+Route::post('/upload-gambar', [PengirimanLapakController::class, 'upload'])->name('image.upload');
