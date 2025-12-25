@@ -241,7 +241,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">$request->hasFile('foto_sampah')
+                        <div class="col-md-6"> 
                             <label class="form-label" for="foto_sampah">Foto Sampah (Muatan)</label>
                             <div class="preview-container mb-2" id="preview-container-sampah">
                                 <div class="preview-placeholder"><i class="bi bi-camera fs-1 d-block"></i>Pratinjau Foto
