@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\File;
 use App\Helpers\FileHelper;
 use App\Models\DetailPengirimanLapak;
 use App\Models\Lapak;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PengirimanLapakController extends Controller
 {
@@ -33,13 +36,7 @@ class PengirimanLapakController extends Controller
 
         return response()->json(['error' => 'Gagal upload gambar.'], 400);
     }
-    /**
-     * Display a listing of the resource.
-     */
-    use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\DB;
-    use Illuminate\Support\Facades\Log;
-    use Carbon\Carbon;
+
 
     public function finalisasi(Request $request, $id)
     {

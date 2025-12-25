@@ -241,7 +241,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6"> 
+                        <div class="col-md-6">
                             <label class="form-label" for="foto_sampah">Foto Sampah (Muatan)</label>
                             <div class="preview-container mb-2" id="preview-container-sampah">
                                 <div class="preview-placeholder"><i class="bi bi-camera fs-1 d-block"></i>Pratinjau Foto
@@ -261,7 +261,7 @@
                                 onchange="previewImage(this, 'preview-container-plat')" required>
                         </div>
 
-                         
+
                     </div>
                 </form>
             </div>
@@ -271,9 +271,9 @@
         <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
             <h4 class="fw-bold text-primary-dark mb-0">Daftar Pengiriman (Halaman Ini)</h4>
             <div class="d-flex gap-2">
-                <input type="hidden" id="searchTransaksi"  class="form-control form-control-sm"
+                <input type="hidden" id="searchTransaksi" class="form-control form-control-sm"
                     placeholder="Cari Kode..." style="width: 150px;">
-                    <div id="searchBtn"></div> 
+                <div id="searchBtn"></div>
             </div>
         </div>
 
@@ -299,19 +299,17 @@
                     menyelesaikan sesi ini.
                 </div>
                 <button type="button" id="btnSaveFinal" class="btn btn-save-final">
-                    <i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD
+                    <i class="bi bi-cloud-check-fill me-2"></i> Kirim Sampah
                 </button>
             </div>
         </div>
     </div>
 
-   
+
 
 
 
     @push('scripts')
-         
-
         <script>
             // Fungsi Pratinjau Gambar
             function previewImage(input, containerId) {
