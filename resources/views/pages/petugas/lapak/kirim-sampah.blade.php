@@ -191,9 +191,9 @@
                     </div>
                 </div>
 
-                <form id="mainDeliveryForm" enctype="multipart/form-data" novalidate>
-                    <input type="hidden" name="kode_lapak" value="{{ $lapak->kode_lapak }}" required>
-                    <input type="hidden" name="petugas_id" value="{{ $petugas->id }}" required>
+                <form id="mainDeliveryForm" enctype="multipart/form-data">
+                    <input type="hidden" name="kode_lapak" value="{{ $lapak->kode_lapak }}">
+                    <input type="hidden" name="petugas_id" value="{{ $petugas->id }}">
                     @csrf
                     <div class="row g-4">
                         <div class="col-md-4">
@@ -298,7 +298,6 @@
                     <i class="bi bi-info-circle-fill me-2"></i> Pastikan semua data pengiriman di atas sudah benar sebelum
                     menyelesaikan sesi ini.
                 </div>
-                <div id="alert-finalisasi-error"></div>
                 <button type="button" id="btnSaveFinal" class="btn btn-save-final">
                     <i class="bi bi-cloud-check-fill me-2"></i> Kirim Sampah
                 </button>
@@ -496,53 +495,40 @@
 
                 // Simpan Akhir & Redirect
                 document.getElementById('btnSaveFinal').onclick = function() {
+                    // if (confirm('Pastikan semua data sudah benar. Kirim data dan kembali ke dashboard?')) {
                     const btn = this;
                     btn.disabled = true;
-                    document.getElementById('alert-finalisasi-error').innerHTML = '';
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-                    // Disable all inputs in the form
-                    Array.from(deliveryForm.elements).forEach(el => {
-                        el.disabled = true;
-                    });
+                    // Ambil seluruh input dari form utama, termasuk file
                     const formData = new FormData(deliveryForm);
                     fetch(`/api/lapak/${lapakId}/finalisasi`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                        },
-                        body: formData
-                    })
-                    .then(res => res.json())
-                    .then(res => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                        // Enable all inputs in the form
-                        Array.from(deliveryForm.elements).forEach(el => {
-                            el.disabled = false;
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                                // Jangan set Content-Type, biarkan browser mengatur multipart/form-data
+                            },
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(res => {
+                            btn.disabled = false;
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                            if (res.status === 'success') {
+                                alert('Berhasil: ' + res.message);
+                                // window.location.href = "{{ route('petugas.lapak.index') }}";
+                            } else {
+                                alert('Gagal: ' + (res.message || 'Tidak dapat menyimpan.'));
+                            }
+                        })
+                        .catch(() => {
+                            btn.disabled = false;
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                            alert('Terjadi kesalahan sistem/jaringan.');
                         });
-                        if (res.status === 'success') {
-                            alert('Berhasil: ' + res.message);
-                            // window.location.href = "{{ route('petugas.lapak.index') }}";
-                        } else {
-                            document.getElementById('alert-finalisasi-error').innerHTML = `<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                                <strong>Gagal!</strong> ${res.message || 'Tidak dapat menyimpan.'}
-                                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                            </div>`;
-                        }
-                    })
-                    .catch(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                        // Enable all inputs in the form
-                        Array.from(deliveryForm.elements).forEach(el => {
-                            el.disabled = false;
-                        });
-                        document.getElementById('alert-finalisasi-error').innerHTML = `<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                            <strong>Gagal!</strong> Terjadi kesalahan sistem/jaringan.
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                        </div>`;
-                    });
+                    // }
                 };
 
                 // Initial Load
