@@ -18,7 +18,7 @@ class LapakTransaksiController extends Controller
     // GET /api/lapak/{id}/transaksi
     public function index(Request $request, $id)
     {
-         $query = TransaksiLapak::where('lapak_id', $id)->where('approval', 'pending');
+        $query = TransaksiLapak::where('lapak_id', $id)->where('approval', 'pending')->where('status_transaksi', 'pending');
 
         // Search by kode transaksi
         if ($request->filled('search')) {

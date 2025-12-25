@@ -76,6 +76,7 @@ class Lapak extends Model
     public function transaksiPending()
     {
         return $this->transaksiLapak()
-            ->where('approval', 'pending');
+            ->where('approval', 'pending')
+            ->where('status_transaksi', 'pending');
     }
 }

@@ -73,7 +73,7 @@ class PengirimanLapakController extends Controller
 
         // Simpan ke database
         $pengiriman->save();
-
+        
 
         foreach ($transaksiPending as $transaksi) {
 
@@ -83,7 +83,7 @@ class PengirimanLapakController extends Controller
             $detailPengirimanLapak->transaksi_lapak_id =  $transaksi->id;
             $detailPengirimanLapak->save();
 
-            $transaksi->approval = 'dikirim';
+            $transaksi->status_transaksi = 'dikirim';
             $transaksi->save();
         }
 
