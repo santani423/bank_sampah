@@ -62,4 +62,20 @@ class Lapak extends Model
             'id'          // PK di cabang
         );
     }
+
+    /* ================= RELATIONSHIP ================= */
+
+    public function transaksiLapak()
+    {
+        return $this->hasMany(TransaksiLapak::class, 'lapak_id');
+    }
+
+    /**
+     * Ambil transaksi lapak dengan approval pending
+     */
+    public function transaksiPending()
+    {
+        return $this->transaksiLapak()
+            ->where('approval', 'pending');
+    }
 }

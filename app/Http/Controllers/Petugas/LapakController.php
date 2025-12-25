@@ -8,6 +8,7 @@ use App\Models\Cabang;
 use App\Models\Gudang;
 use App\Models\JenisMetodePenarikan;
 use App\Models\Petugas;
+use App\Models\petugasCabang;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
@@ -54,20 +55,20 @@ class LapakController extends Controller
             'gudangs'
         ])->findOrFail($lapakId);
 
-        $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
+        $petugas = Petugas::where('email', auth()->user()->email)->first();
         $cabangIds = [];
         $cabangs = collect();
         if ($petugas) {
-            $cabangIds = \DB::table('petugas_cabangs')->where('petugas_id', $petugas->id)->pluck('cabang_id')->toArray();
-            $cabangs = \App\Models\cabang::whereIn('id', $cabangIds)->get();
+            $cabangIds = petugasCabang::where('petugas_id', $petugas->id)->pluck('cabang_id')->toArray();
+            $cabangs = cabang::whereIn('id', $cabangIds)->get();
         }
 
         // Generate kode pengiriman otomatis (format: KRM + tanggal + 4 digit random)
-        $kodePengiriman = 'KRM' . date('ymd') . strtoupper(substr(uniqid(), -4));
+        $kodePengiriman = 'KRM' . date('ymd') . strtoupper(substr(uniqid(), -5));
         $customers = $lapak->gudangs;
         // dd($customers);
 
-        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs', 'cabangIds', 'kodePengiriman', 'customers'));
+        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs', 'cabangIds', 'kodePengiriman', 'customers','petugas'));
     }
     /**
      * Tampilkan detail transaksi lapak

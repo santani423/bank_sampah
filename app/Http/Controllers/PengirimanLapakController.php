@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Helpers\FileHelper;
+use App\Models\DetailPengirimanLapak;
+use App\Models\Lapak;
 
 class PengirimanLapakController extends Controller
 {
@@ -37,6 +39,10 @@ class PengirimanLapakController extends Controller
     public function finalisasi(Request $request, $id)
     {
         // Cari data pengiriman (atau buat baru jika perlu)
+        $lapak = Lapak::where('kode_lapak', $request->kode_lapak)->firstOrFail();
+
+        $transaksiPending = $lapak->transaksiPending()->get();
+
         $pengiriman =   new PengirimanLapak();
 
         // Upload foto sampah jika ada
@@ -44,7 +50,7 @@ class PengirimanLapakController extends Controller
             $path = FileHelper::storeImageByDate($request->file('foto_sampah'), 'pengiriman');
 
             // Simpan path relatif ke database
-            $pengiriman->foto_sampah = $path;
+            $pengiriman->foto_muatan = $path;
         }
 
 
@@ -52,19 +58,41 @@ class PengirimanLapakController extends Controller
         // Upload foto plat nomor jika ada
         if ($request->hasFile('foto_plat')) {
             $path = FileHelper::storeImageByDate($request->file('foto_plat'), 'pengiriman');
-            $pengiriman->foto_plat = $path;
+            $pengiriman->foto_plat_nomor = $path;
         }
 
         // Update status
+        $pengiriman->kode_pengiriman = $request->kode_pengiriman;
+        $pengiriman->tanggal_pengiriman = date('Y-m-d', strtotime($request->tanggal_pengiriman));
+        $pengiriman->driver = $request->driver;
+        $pengiriman->driver_hp = $request->driver_hp;
+        $pengiriman->plat_nomor = $request->plat_nomor;
+        $pengiriman->petugas_id = $request->petugas_id;
+        $pengiriman->gudang_id = $request->gudang_id;
         $pengiriman->status_pengiriman = 'dikirim';
 
         // Simpan ke database
-        // $pengiriman->save();
+        $pengiriman->save();
+
+
+        foreach ($transaksiPending as $transaksi) {
+
+            $detailPengirimanLapak = new DetailPengirimanLapak();
+            $detailPengirimanLapak->pengiriman_lapak_id = $pengiriman->id;
+            $detailPengirimanLapak->petugas_id =  $request->petugas_id;
+            $detailPengirimanLapak->transaksi_lapak_id =  $transaksi->id;
+            $detailPengirimanLapak->save();
+
+            $transaksi->approval = 'dikirim';
+            $transaksi->save();
+        }
+
 
         return response()->json([
             'status' => 'success',
             'message' => 'Pengiriman berhasil difinalisasi.',
-            'data' => $request->all()
+            'data' => $request->all(),
+            'pengiriman' => $pengiriman
         ]);
     }
 

@@ -192,6 +192,8 @@
                 </div>
 
                 <form id="mainDeliveryForm" enctype="multipart/form-data">
+                    <input type="hidden" name="kode_lapak" value="{{ $lapak->kode_lapak }}">
+                    <input type="hidden" name="petugas_id" value="{{ $petugas->id }}">
                     @csrf
                     <div class="row g-4">
                         <div class="col-md-4">
@@ -205,8 +207,8 @@
                                 value="{{ date('Y-m-d') }}" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="customer">Gudang Tujuan</label>
-                            <select id="customer" name="customer" class="form-select" required>
+                            <label class="form-label" for="gudang_id">Gudang Tujuan</label>
+                            <select id="gudang_id" name="gudang_id" class="form-select" required>
                                 <option value="" disabled selected>-- Pilih Customer --</option>
                                 @foreach ($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->nama_gudang }}</option>
@@ -215,18 +217,18 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label" for="nama_driver">Nama Driver / Supir</label>
+                            <label class="form-label" for="driver">Nama Driver / Supir</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="bi bi-person-badge"></i></span>
-                                <input type="text" id="nama_driver" name="nama_driver" class="form-control"
+                                <input type="text" id="driver" name="driver" class="form-control"
                                     placeholder="Nama pengemudi" required>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label" for="telp_driver">No. Telepon Driver</label>
+                            <label class="form-label" for="driver_hp">No. Telepon Driver</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="bi bi-whatsapp"></i></span>
-                                <input type="tel" id="telp_driver" name="telp_driver" class="form-control"
+                                <input type="tel" id="driver_hp" name="driver_hp" class="form-control"
                                     placeholder="08xxxx" required>
                             </div>
                         </div>
@@ -448,11 +450,7 @@
                                 <span class="badge ${statusColor}">${trx.status.toUpperCase()}</span>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-3 bg-light p-2 rounded mx-0 small">
-                                    <div class="col-md-4 border-end"><b>Driver:</b> ${trx.nama_driver || '-'}</div>
-                                    <div class="col-md-4 border-end"><b>Telp:</b> ${trx.telp_driver || '-'}</div>
-                                    <div class="col-md-4"><b>Plat:</b> ${trx.plat_nomor || '-'}</div>
-                                </div>
+                                 
                                 <div class="table-responsive">
                                     <table class="table table-bordered-custom responsive-card-table mb-0">
                                         <thead><tr><th>#</th><th>Jenis</th><th>Berat</th><th>Harga</th><th class="text-end">Total</th></tr></thead>
@@ -560,13 +558,13 @@
 
                 // Simpan Akhir & Redirect
                 document.getElementById('btnSaveFinal').onclick = function() {
-                    if (confirm('Pastikan semua data sudah benar. Kirim data dan kembali ke dashboard?')) {
-                        const btn = this;
-                        btn.disabled = true;
-                        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-                        // Ambil seluruh input dari form utama, termasuk file
-                        const formData = new FormData(deliveryForm);
-                        fetch(`/api/lapak/${lapakId}/finalisasi`, {
+                    // if (confirm('Pastikan semua data sudah benar. Kirim data dan kembali ke dashboard?')) {
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+                    // Ambil seluruh input dari form utama, termasuk file
+                    const formData = new FormData(deliveryForm);
+                    fetch(`/api/lapak/${lapakId}/finalisasi`, {
                             method: 'POST',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -578,7 +576,8 @@
                         .then(res => res.json())
                         .then(res => {
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
                             if (res.status === 'success') {
                                 alert('Berhasil: ' + res.message);
                                 // window.location.href = "{{ route('petugas.lapak.index') }}";
@@ -588,10 +587,11 @@
                         })
                         .catch(() => {
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
                             alert('Terjadi kesalahan sistem/jaringan.');
                         });
-                    }
+                    // }
                 };
 
                 // Initial Load
