@@ -261,13 +261,7 @@
                                 onchange="previewImage(this, 'preview-container-plat')" required>
                         </div>
 
-                        <div class="col-12 text-end">
-                            <hr class="my-4">
-                            <button type="submit" id="btnSubmitTemp"
-                                class="btn btn-success shadow-sm px-5 py-2 fw-semibold">
-                                <i class="bi bi-plus-circle me-2"></i>Tambah Ke Riwayat Sementara
-                            </button>
-                        </div>
+                         
                     </div>
                 </form>
             </div>
@@ -289,8 +283,8 @@
         <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
             <p id="paginationInfo" class="text-muted small mb-0"></p>
             <div class="btn-group">
-                <button id="prevPage" class="btn btn-outline-secondary btn-sm px-3">Prev</button>
-                <button id="nextPage" class="btn btn-outline-secondary btn-sm px-3">Next</button>
+                <button id="prevPage" class="btn btn-outline-secondary btn-sm px-3"> </button>
+                <button id="nextPage" class="btn btn-outline-secondary btn-sm px-3"> </button>
             </div>
         </div>
 
