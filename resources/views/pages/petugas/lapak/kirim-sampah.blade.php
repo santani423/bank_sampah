@@ -271,9 +271,9 @@
         <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
             <h4 class="fw-bold text-primary-dark mb-0">Daftar Pengiriman (Halaman Ini)</h4>
             <div class="d-flex gap-2">
-                <input type="text" id="searchTransaksi" class="form-control form-control-sm"
+                <input type="hidden" id="searchTransaksi"  class="form-control form-control-sm"
                     placeholder="Cari Kode..." style="width: 150px;">
-                <button id="searchBtn" class="btn btn-primary btn-sm px-3">Cari</button>
+                    <div id="searchBtn"></div> 
             </div>
         </div>
 
@@ -305,68 +305,12 @@
         </div>
     </div>
 
-    <form id="uploadForm">
-        <input type="file" id="fileInput">
-        <button type="button" class="btn btn-primary" id="uploadBtn">Klik untuk Upload</button>
-    </form>
-
-    <div id="status" style="margin-top: 10px;"></div>
-    <div id="preview"></div>
+   
 
 
 
     @push('scripts')
-        <script>
-            $(document).ready(function() {
-                // CSRF Token Setup
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                $('#uploadBtn').on('click', function() {
-                    // 1. Ambil file dari input
-                    let fileInput = $('#fileInput')[0];
-                    let file = fileInput.files[0];
-
-                    // Cek jika file belum dipilih
-                    if (!file) {
-                        alert("Silakan pilih file terlebih dahulu!");
-                        return;
-                    }
-
-                    // 2. Bungkus ke dalam FormData
-                    let formData = new FormData();
-                    formData.append('image', file);
-
-                    // UI Feedback
-                    $('#status').text('Sedang memproses...');
-                    $(this).prop('disabled', true); // Matikan tombol sementara
-
-                    // 3. Eksekusi AJAX
-                    $.ajax({
-                        url: "{{ route('image.upload') }}",
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            $('#status').html('<span style="color:green">Upload Berhasil!</span>');
-                            $('#preview').html(
-                                `<img src="/images/${response.image_name}" width="200">`);
-                            $('#uploadBtn').prop('disabled', false); // Aktifkan tombol kembali
-                        },
-                        error: function(xhr) {
-                            let errorMsg = xhr.responseJSON ? xhr.responseJSON.message :
-                                'Terjadi kesalahan';
-                            $('#status').html(`<span style="color:red">Gagal: ${errorMsg}</span>`);
-                            $('#uploadBtn').prop('disabled', false);
-                        }
-                    });
-                });
-            });
-        </script>
+         
 
         <script>
             // Fungsi Pratinjau Gambar
@@ -407,7 +351,8 @@
                         .then(res => {
                             const data = res.data || res.data.data;
                             lastPage = res.last_page || res.meta?.last_page || 1;
-                            info.textContent = `Halaman ${page} dari ${lastPage}`;
+                            // info.textContent = `Halaman ${page} dari ${lastPage}`;
+                            info.textContent = ` `;
                             list.innerHTML = '';
 
                             updateRekap(data);
