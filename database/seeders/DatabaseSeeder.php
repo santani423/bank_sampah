@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -31,6 +32,9 @@ class DatabaseSeeder extends Seeder
         $this->call(TokenWhatsappSeeder::class);
         $this->call(JenisBadanSeeder::class);
         $this->call(LapakSeeder::class);
+
+
+        $this->call(Dev\SetorSampahLapak::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

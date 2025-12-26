@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PengirimanLapak;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use App\Helpers\FileHelper;
 use App\Models\DetailPengirimanLapak;
 use App\Models\Lapak;
@@ -123,10 +123,35 @@ class PengirimanLapakController extends Controller
         ]);
     }
 
-    public function index()
+    public function pengirimanPending(Request $request)
     {
-        //
+        // Jumlah data per halaman (default 10)
+        $perPage = $request->get('per_page', 10);
+
+        $pengiriman = PengirimanLapak::with([
+            'detailPengirimanLapaks.transaksiLapak.lapak',
+            'gudang',
+            'petugas'
+        ])
+            ->where('status_pengiriman', 'dikirim')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
+        return response()->json([
+            'success'  => true,
+            'message' => 'Data pengiriman pending berhasil diambil.',
+            'data'    => $pengiriman->items(),
+            'pagination' => [
+                'current_page' => $pengiriman->currentPage(),
+                'last_page' => $pengiriman->lastPage(),
+                'per_page' => $pengiriman->perPage(),
+                'total' => $pengiriman->total(),
+                'from' => $pengiriman->firstItem(),
+                'to' => $pengiriman->lastItem(),
+            ]
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

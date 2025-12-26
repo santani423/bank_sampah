@@ -1,17 +1,18 @@
 @extends('layouts.template')
 
 @section('title', 'Petugas')
- 
+
+@push('style')
+    <!-- CSS Libraries -->
+@endpush
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Manajem Petugas</h3>
+            <h3 class="fw-bold mb-3">Pengiriman Lapak</h3>
         </div>
         <div class="ms-md-auto py-2 py-md-0">
-            <div class="section-header-button">
-                <a href="{{ route('admin.petugas.create') }}" class="btn btn-primary btn-round">Tambah Petugas</a>
-            </div>
+
         </div>
     </div>
     <div class="row">
@@ -37,11 +38,11 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Nama</th>
-                                    <th>Email</th>
-                                    <th>Username</th>
-                                    <th>Role</th>
-                                    <th>Aksi</th>
+                                    <th>Kode Pengiriman</th>
+                                    <th>Tanggal Pengiriman</th>
+                                    <th>Driver</th>
+                                    <th>Driver HP</th>
+                                    <th>Plat Nomor</th>
                                 </tr>
                             </thead>
                             <tbody id="petugas-tbody">
@@ -78,13 +79,13 @@
             table.style.display = 'none';
             paginationWrapper.style.display = 'none';
 
-            fetch(`/api/petugas?page=${page}&per_page=${perPage}`)
+            fetch(`/api/lapak/pengiriman/pending?page=${page}&per_page=${perPage}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("data",data);
                     if (data.success) {
                         currentPage = data.pagination.current_page;
                         totalPages = data.pagination.last_page;
-
                         renderTable(data.data, data.pagination);
                         renderPagination(data.pagination);
 
@@ -105,44 +106,30 @@
             const tbody = document.getElementById('petugas-tbody');
             tbody.innerHTML = '';
 
+            console.log("data pagination",pagination);
+            
+
             if (data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center">
-                            Belum ada petugas.
+                            Belum ada data pengiriman.
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-            data.forEach((petugas, index) => {
+            data.forEach((data, index) => {
                 const rowNumber = pagination.from + index;
                 const row = `
                     <tr>
                         <td>${rowNumber}</td>
-                        <td>${petugas.nama}</td>
-                        <td>${petugas.email}</td>
-                        <td>${petugas.username}</td>
-                        <td>${petugas.role.charAt(0).toUpperCase() + petugas.role.slice(1)}</td>
-                        <td>
-                            <form onsubmit="return confirm('Apakah Anda yakin?');"
-                                action="/admin/data-petugas/${petugas.id}" method="POST">
-                                <a href="/admin/data-petugas/${petugas.id}"
-                                    class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                                <a href="/admin/data-petugas/${petugas.id}/edit"
-                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-pencil-alt"></i> Edit
-                                </a>
-                                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </form>
-                        </td>
+                        <td>${data.kode_pengiriman}</td>
+                        <td>${data.tanggal_pengiriman}</td>
+                        <td>${data.driver}</td>
+                        <td>${data.driver_hp}</td>
+                        <td>${data.plat_nomor}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
