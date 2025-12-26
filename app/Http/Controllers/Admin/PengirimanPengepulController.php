@@ -58,7 +58,7 @@ class PengirimanPengepulController extends Controller
                 ->get();
         }
 
-        
+
 
         return view('pages.admin.pengiriman.index', compact('pengirimanSampah'));
     }
@@ -365,5 +365,10 @@ class PengirimanPengepulController extends Controller
                 'error' => 'Terjadi kesalahan saat memperbarui pengiriman: ' . $e->getMessage()
             ])->withInput();
         }
+    }
+
+    public function lapak()
+    {
+        return view('pages.admin.pengiriman.lapak.index');
     }
 }

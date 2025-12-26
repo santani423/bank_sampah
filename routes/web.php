@@ -40,6 +40,7 @@ use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardControll
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PengirimanLapakController;
 use App\Http\Controllers\Petugas\NasabahUserBadanController;
 use App\Http\Controllers\Petugas\LapakController;
@@ -125,6 +126,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::post('/tarik-saldo/tolak/{id}', [AdminTarikSaldoController::class, 'tolak'])->name('admin.tarik-saldo.tolak');
 
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('admin.pengiriman');
+    Route::get('/pengiriman/sampah-lapak', [AdminPengirimanPengepulController::class, 'lapak'])->name('admin.pengiriman.lapak');
 
     // Pengaturan
     Route::get('/token-whatsapp', [AdminTokenWhatsAppController::class, 'index'])->name('admin.token-whatsapp.index');
@@ -149,6 +151,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
     Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('admin.lapak.transaksi.download');
 });
+
+Route::get('/invoic/kirim-sampah-lapak/{kode}', [PDFController::class, 'invoiceKirimSampahLapak'])->name('pdf.invoic.kirim-sampah-lapak');
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
     Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
@@ -223,3 +227,7 @@ Route::get('storage/{filename}', function ($filename) {
 });
 
 Route::post('/upload-gambar', [PengirimanLapakController::class, 'upload'])->name('image.upload');
+
+
+
+// composer require barryvdh/laravel-dompdf

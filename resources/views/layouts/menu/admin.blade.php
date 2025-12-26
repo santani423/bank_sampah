@@ -96,6 +96,10 @@
                     Pengiriman Sampah </a>
             </li>
             <li class="sidebar-submenu__item">
+                <a href="{{ route('admin.pengiriman.lapak') }}" class="sidebar-submenu__link">
+                    Pengiriman Sampah Lapak</a>
+            </li>
+            <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.setor-lapak.index') }}" class="sidebar-submenu__link">
                     Setor Lapak (Approval)
                 </a>

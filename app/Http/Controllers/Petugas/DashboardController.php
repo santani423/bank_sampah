@@ -94,6 +94,6 @@ class DashboardController extends Controller
 
 
         // dd($invoice);
-        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice'));
+        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice','kode'));
     }
 }
