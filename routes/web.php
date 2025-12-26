@@ -153,6 +153,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
     Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
+    Route::get('/invoic/kirim-sampah-lapak/{kode}', [PetugasDashboardController::class, 'invoicKirimSampahLapoak'])->name('petugas.invoic.kirim-sampah-lapak');
 
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');

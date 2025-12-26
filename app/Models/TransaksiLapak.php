@@ -35,4 +35,15 @@ class TransaksiLapak extends Model
             'jenis_metode_penarikan_id'   // foreign key di Lapak
         );
     }
+
+    /**
+     * Mendapatkan data detail pengiriman lapak terkait.
+     */
+    public function detailTransaksiLapak()
+    {
+        return $this->hasMany(
+            DetailTransaksiLapak::class,
+            'transaksi_lapak_id'
+        );
+    }
 }

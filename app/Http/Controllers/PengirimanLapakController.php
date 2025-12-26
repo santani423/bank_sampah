@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PengirimanLapak;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\Request; 
 use App\Helpers\FileHelper;
 use App\Models\DetailPengirimanLapak;
 use App\Models\Lapak;
@@ -38,85 +36,91 @@ class PengirimanLapakController extends Controller
      */
     public function finalisasi(Request $request, $id)
     {
-        // Validasi input dengan pesan bahasa Indonesia
         $request->validate([
-            'kode_lapak' => 'required|exists:lapaks,kode_lapak',
-            'kode_pengiriman' => 'required',
-            'tanggal_pengiriman' => 'required|date',
-            'driver' => 'required',
-            'driver_hp' => 'required',
-            'plat_nomor' => 'required',
-            'petugas_id' => 'required|exists:users,id',
-            'gudang_id' => 'required|exists:gudangs,id',
+            'kode_lapak'          => 'required|exists:lapak,kode_lapak',
+            'kode_pengiriman'     => 'required|string|unique:pengiriman_lapaks,kode_pengiriman',
+            'tanggal_pengiriman'  => 'required|date',
+            'driver'              => 'required|string|max:100',
+            'driver_hp'           => 'required|string|max:20',
+            'plat_nomor'          => 'required|string|max:20',
+            'petugas_id'          => 'required|exists:users,id',
+            'gudang_id'           => 'required|exists:gudangs,id',
+            'foto_sampah'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto_plat'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'kode_lapak.required' => 'Kode lapak wajib diisi.',
-            'kode_lapak.exists' => 'Kode lapak tidak ditemukan.',
-            'kode_pengiriman.required' => 'Kode pengiriman wajib diisi.',
+            // Pesan validasi
+            'kode_lapak.required'         => 'Kode lapak wajib diisi.',
+            'kode_lapak.exists'           => 'Kode lapak tidak ditemukan.',
+            'kode_pengiriman.required'    => 'Kode pengiriman wajib diisi.',
+            'kode_pengiriman.unique'      => 'Kode pengiriman sudah digunakan.',
             'tanggal_pengiriman.required' => 'Tanggal pengiriman wajib diisi.',
-            'tanggal_pengiriman.date' => 'Format tanggal pengiriman tidak valid.',
-            'driver.required' => 'Nama driver wajib diisi.',
-            'driver_hp.required' => 'Nomor HP driver wajib diisi.',
-            'plat_nomor.required' => 'Plat nomor wajib diisi.',
-            'petugas_id.required' => 'Petugas wajib diisi.',
-            'petugas_id.exists' => 'Petugas tidak ditemukan.',
-            'gudang_id.required' => 'Gudang wajib diisi.',
-            'gudang_id.exists' => 'Gudang tidak ditemukan.',
+            'tanggal_pengiriman.date'     => 'Format tanggal pengiriman tidak valid.',
+            'driver.required'             => 'Nama sopir wajib diisi.',
+            'driver_hp.required'          => 'Nomor HP sopir wajib diisi.',
+            'plat_nomor.required'         => 'Nomor plat kendaraan wajib diisi.',
+            'petugas_id.required'         => 'Petugas wajib dipilih.',
+            'petugas_id.exists'           => 'Petugas tidak ditemukan.',
+            'gudang_id.required'          => 'Gudang tujuan wajib dipilih.',
+            'gudang_id.exists'            => 'Gudang tujuan tidak ditemukan.',
+            'foto_sampah.image'           => 'Foto muatan harus berupa gambar.',
+            'foto_plat.image'             => 'Foto plat nomor harus berupa gambar.',
         ]);
+        // Cari data pengiriman (atau buat baru jika perlu)
+        $lapak = Lapak::where('kode_lapak', $request->kode_lapak)->firstOrFail();
 
-        try {
-            // Cari data pengiriman (atau buat baru jika perlu)
-            $lapak = Lapak::where('kode_lapak', $request->kode_lapak)->firstOrFail();
-            $transaksiPending = $lapak->transaksiPending()->get();
-            $pengiriman = new PengirimanLapak();
+        $transaksiPending = $lapak->transaksiPending()->get();
 
-            // Upload foto sampah jika ada
-            if ($request->hasFile('foto_sampah')) {
-                $path = FileHelper::storeImageByDate($request->file('foto_sampah'), 'pengiriman');
-                $pengiriman->foto_muatan = $path;
-            }
+        $pengiriman =   new PengirimanLapak();
 
-            // Upload foto plat nomor jika ada
-            if ($request->hasFile('foto_plat')) {
-                $path = FileHelper::storeImageByDate($request->file('foto_plat'), 'pengiriman');
-                $pengiriman->foto_plat_nomor = $path;
-            }
+        // Upload foto sampah jika ada
+        if ($request->hasFile('foto_sampah')) {
+            $path = FileHelper::storeImageByDate($request->file('foto_sampah'), 'pengiriman');
 
-            // Update status
-            $pengiriman->kode_pengiriman = $request->kode_pengiriman;
-            $pengiriman->tanggal_pengiriman = date('Y-m-d', strtotime($request->tanggal_pengiriman));
-            $pengiriman->driver = $request->driver;
-            $pengiriman->driver_hp = $request->driver_hp;
-            $pengiriman->plat_nomor = $request->plat_nomor;
-            $pengiriman->petugas_id = $request->petugas_id;
-            $pengiriman->gudang_id = $request->gudang_id;
-            $pengiriman->status_pengiriman = 'dikirim';
-
-            // Simpan ke database
-            $pengiriman->save();
-
-            foreach ($transaksiPending as $transaksi) {
-                $detailPengirimanLapak = new DetailPengirimanLapak();
-                $detailPengirimanLapak->pengiriman_lapak_id = $pengiriman->id;
-                $detailPengirimanLapak->petugas_id =  $request->petugas_id;
-                $detailPengirimanLapak->transaksi_lapak_id =  $transaksi->id;
-                $detailPengirimanLapak->save();
-
-                $transaksi->status_transaksi = 'dikirim';
-                $transaksi->save();
-            }
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Pengiriman berhasil difinalisasi.',
-                'data' => $request->all(),
-                'pengiriman' => $pengiriman
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Terjadi kesalahan saat memproses finalisasi pengiriman: ' . $e->getMessage(),
-            ], 500);
+            // Simpan path relatif ke database
+            $pengiriman->foto_muatan = $path;
         }
+
+
+
+        // Upload foto plat nomor jika ada
+        if ($request->hasFile('foto_plat')) {
+            $path = FileHelper::storeImageByDate($request->file('foto_plat'), 'pengiriman');
+            $pengiriman->foto_plat_nomor = $path;
+        }
+
+        // Update status
+        $pengiriman->kode_pengiriman = $request->kode_pengiriman;
+        $pengiriman->tanggal_pengiriman = date('Y-m-d', strtotime($request->tanggal_pengiriman));
+        $pengiriman->driver = $request->driver;
+        $pengiriman->driver_hp = $request->driver_hp;
+        $pengiriman->plat_nomor = $request->plat_nomor;
+        $pengiriman->petugas_id = $request->petugas_id;
+        $pengiriman->gudang_id = $request->gudang_id;
+        $pengiriman->status_pengiriman = 'dikirim';
+
+        // Simpan ke database
+        $pengiriman->save();
+
+
+        foreach ($transaksiPending as $transaksi) {
+
+            $detailPengirimanLapak = new DetailPengirimanLapak();
+            $detailPengirimanLapak->pengiriman_lapak_id = $pengiriman->id;
+            $detailPengirimanLapak->petugas_id =  $request->petugas_id;
+            $detailPengirimanLapak->transaksi_lapak_id =  $transaksi->id;
+            $detailPengirimanLapak->save();
+
+            $transaksi->status_transaksi = 'dikirim';
+            $transaksi->save();
+        }
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pengiriman berhasil difinalisasi.',
+            'data' => $request->all(),
+            'pengiriman' => $pengiriman
+        ]);
     }
 
     public function index()

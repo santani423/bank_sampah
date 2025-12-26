@@ -298,6 +298,7 @@
                     <i class="bi bi-info-circle-fill me-2"></i> Pastikan semua data pengiriman di atas sudah benar sebelum
                     menyelesaikan sesi ini.
                 </div>
+                <div id="alertFinalisasi" style="display:none;"></div>
                 <button type="button" id="btnSaveFinal" class="btn btn-save-final">
                     <i class="bi bi-cloud-check-fill me-2"></i> Kirim Sampah
                 </button>
@@ -495,40 +496,51 @@
 
                 // Simpan Akhir & Redirect
                 document.getElementById('btnSaveFinal').onclick = function() {
-                    // if (confirm('Pastikan semua data sudah benar. Kirim data dan kembali ke dashboard?')) {
                     const btn = this;
+                    const alertBox = document.getElementById('alertFinalisasi');
+                    alertBox.style.display = 'none';
+                    alertBox.innerHTML = '';
                     btn.disabled = true;
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-                    // Ambil seluruh input dari form utama, termasuk file
                     const formData = new FormData(deliveryForm);
                     fetch(`/api/lapak/${lapakId}/finalisasi`, {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                                // Jangan set Content-Type, biarkan browser mengatur multipart/form-data
-                            },
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(res => {
-                            btn.disabled = false;
-                            btn.innerHTML =
-                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                            if (res.status === 'success') {
-                                alert('Berhasil: ' + res.message);
-                                // window.location.href = "{{ route('petugas.lapak.index') }}";
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        },
+                        body: formData
+                    })
+                    .then(async res => {
+                        let data;
+                        try {
+                            data = await res.json();
+                        } catch {
+                            data = { status: 'error', message: 'Gagal parsing response server.' };
+                        }
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                        if (data.status === 'success') {
+                            alertBox.style.display = 'none';
+                            alert('Berhasil: ' + data.message);
+                            // window.location.href = "{{ route('petugas.lapak.index') }}";
+                        } else {
+                            let pesan = '';
+                            if (data.errors) {
+                                pesan = Object.values(data.errors).map(errArr => errArr.join('<br>')).join('<br>');
                             } else {
-                                alert('Gagal: ' + (res.message || 'Tidak dapat menyimpan.'));
+                                pesan = data.message || 'Tidak dapat menyimpan.';
                             }
-                        })
-                        .catch(() => {
-                            btn.disabled = false;
-                            btn.innerHTML =
-                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                            alert('Terjadi kesalahan sistem/jaringan.');
-                        });
-                    // }
+                            alertBox.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">${pesan}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                            alertBox.style.display = 'block';
+                        }
+                    })
+                    .catch(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                        alertBox.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan sistem/jaringan.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                        alertBox.style.display = 'block';
+                    });
                 };
 
                 // Initial Load
