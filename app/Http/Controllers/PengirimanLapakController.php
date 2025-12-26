@@ -117,8 +117,7 @@ class PengirimanLapakController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Pengiriman berhasil difinalisasi.',
-            'data' => $request->all(),
+            'message' => 'Pengiriman berhasil difinalisasi.', 
             'pengiriman' => $pengiriman
         ]);
     }

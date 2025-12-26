@@ -3,46 +3,6 @@
 @section('title', 'Data Lapak')
 
 @push('style')
-    <style>
-        .table td,
-        .table th {
-            vertical-align: middle;
-        }
-
-        .badge {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
-
-        .pagination {
-            margin: 0;
-        }
-
-        .pagination .page-item .page-link {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            margin: 0 0.125rem;
-            color: #1572e8;
-            border: 1px solid #dee2e6;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #1572e8;
-            border-color: #1572e8;
-            color: #fff;
-        }
-
-        .pagination .page-item:hover:not(.active):not(.disabled) .page-link {
-            background-color: #e9ecef;
-            color: #1572e8;
-        }
-
-        .pagination .page-item.disabled .page-link {
-            color: #6c757d;
-            background-color: #fff;
-            border-color: #dee2e6;
-        }
-    </style>
 @endpush
 
 @section('main')
@@ -144,7 +104,7 @@
                                         <td>{{ $lapaks->firstItem() + $index }}</td>
                                         <td>
                                             <div class="btn-group mb-2" role="group">
-                                                <a href="{{ route('petugas.lapak.show', $lapak->id) }}"
+                                                <a href="{{ route('petugas.lapak.show', $lapak->kode_lapak) }}"
                                                     class="btn btn-sm btn-info" title="Detail">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
@@ -165,12 +125,12 @@
                                                     </button>
                                                 </form> --}}
                                             </div>
-                                            <a href="{{ route('petugas.lapak.kirim-sampah', $lapak->id) }}"
+                                            <a href="{{ route('petugas.lapak.kirim-sampah', $lapak->kode_lapak) }}"
                                                 class="btn btn-sm btn-primary" style="margin-bottom: 4px;">
                                                 <i class="bi bi-truck"></i>
                                                 {{-- Kirim Sampah --}}
                                             </a>
-                                            <a href="{{ route('petugas.lapak.setor-sampah', $lapak->id) }}"
+                                            <a href="{{ route('petugas.lapak.setor-sampah', $lapak->kode_lapak) }}"
                                                 class="btn btn-sm btn-success">
                                                 <i class="bi bi-plus-circle"></i>
                                                 {{-- Setor Sampah --}}

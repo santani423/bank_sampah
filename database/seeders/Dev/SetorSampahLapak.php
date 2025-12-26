@@ -35,7 +35,7 @@ class SetorSampahLapak extends Seeder
                 $sampahs = Sampah::inRandomOrder()->limit(rand(1, 5))->get();
 
                 foreach ($sampahs as $sampah) {
-                    $berat = rand(1, 10);
+                    $berat = rand(10, 100);
                     $subtotal = $berat * $sampah->harga_lapak;
 
                     $transaksi->detailTransaksiLapak()->create([

@@ -178,7 +178,7 @@
             var kode = @json($invoice->kode_pengiriman ?? '');
             var btn = document.getElementById('btnPrintPDF');
             if (kode && btn) {
-                btn.href = '/pdf/invoic/kirim-sampah-lapa/' + kode;
+                btn.href = '/invoic/kirim-sampah-lapak/' + kode;
             } else if (btn) {
                 btn.href = '#';
                 btn.onclick = function(e) {

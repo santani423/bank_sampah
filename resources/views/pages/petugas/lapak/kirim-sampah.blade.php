@@ -504,43 +504,54 @@
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
                     const formData = new FormData(deliveryForm);
                     fetch(`/api/lapak/${lapakId}/finalisasi`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                        },
-                        body: formData
-                    })
-                    .then(async res => {
-                        let data;
-                        try {
-                            data = await res.json();
-                        } catch {
-                            data = { status: 'error', message: 'Gagal parsing response server.' };
-                        }
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                        if (data.status === 'success') {
-                            alertBox.style.display = 'none';
-                            alert('Berhasil: ' + data.message);
-                            // window.location.href = "{{ route('petugas.lapak.index') }}";
-                        } else {
-                            let pesan = '';
-                            if (data.errors) {
-                                pesan = Object.values(data.errors).map(errArr => errArr.join('<br>')).join('<br>');
-                            } else {
-                                pesan = data.message || 'Tidak dapat menyimpan.';
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                            },
+                            body: formData
+                        })
+                        .then(async res => {
+                            let data;
+                            try {
+                                data = await res.json();
+                            } catch {
+                                data = {
+                                    status: 'error',
+                                    message: 'Gagal parsing response server.'
+                                };
                             }
-                            alertBox.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">${pesan}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                            btn.disabled = false;
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
+                            if (data.status === 'success') {
+                                alertBox.style.display = 'none';
+
+                                let url = "{{ route('petugas.invoic.kirim-sampah-lapak', ':kode') }}";
+                                url = url.replace(':kode', data?.pengiriman?.kode_pengiriman);
+
+                                window.location.href = url;
+                            } else {
+                                let pesan = '';
+                                if (data.errors) {
+                                    pesan = Object.values(data.errors).map(errArr => errArr.join('<br>'))
+                                        .join('<br>');
+                                } else {
+                                    pesan = data.message || 'Tidak dapat menyimpan.';
+                                }
+                                alertBox.innerHTML =
+                                    `<div class="alert alert-danger alert-dismissible fade show" role="alert">${pesan}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                                alertBox.style.display = 'block';
+                            }
+                        })
+                        .catch(() => {
+                            btn.disabled = false;
+                            btn.innerHTML =
+                                '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI  ';
+                            alertBox.innerHTML =
+                                `<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan sistem/jaringan.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
                             alertBox.style.display = 'block';
-                        }
-                    })
-                    .catch(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> SELESAI & KEMBALI KE DASHBOARD';
-                        alertBox.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">Terjadi kesalahan sistem/jaringan.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
-                        alertBox.style.display = 'block';
-                    });
+                        });
                 };
 
                 // Initial Load

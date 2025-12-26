@@ -53,7 +53,7 @@ class LapakController extends Controller
         $lapak = Lapak::with([
             'cabang',
             'gudangs'
-        ])->findOrFail($lapakId);
+        ])->where('kode_lapak', $lapakId)->firstOrFail();
 
         $petugas = Petugas::where('email', auth()->user()->email)->first();
         $cabangIds = [];
@@ -171,7 +171,7 @@ class LapakController extends Controller
      */
     public function setorSampah($lapakId)
     {
-        $lapak = Lapak::findOrFail($lapakId);
+        $lapak = Lapak::where('kode_lapak', $lapakId)->firstOrFail();
         return view('pages.petugas.lapak.setor-sampah', compact('lapak'));
     }
     /**
@@ -268,7 +268,7 @@ class LapakController extends Controller
      */
     public function show(string $id)
     {
-        $lapak = Lapak::with('cabang', 'jenisMetodePenarikan')->findOrFail($id);
+        $lapak = Lapak::with('cabang', 'jenisMetodePenarikan')->where('kode_lapak', $id)->firstOrFail();
         // dd($lapak);
         return view('pages.petugas.lapak.show', compact('lapak'));
     }

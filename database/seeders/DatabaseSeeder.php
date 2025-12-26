@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LapakSeeder::class);
 
 
+        $this->call(Dev\CabangPetugas::class);
         $this->call(Dev\SetorSampahLapak::class);
         // \App\Models\User::factory(10)->create();
 
