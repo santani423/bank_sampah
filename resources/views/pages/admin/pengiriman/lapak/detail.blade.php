@@ -11,9 +11,12 @@
         <div>
             <h3 class="fw-bold mb-3">Detail Pengiriman Lapak</h3>
         </div>
-        <div class="ms-md-auto py-2 py-md-0">
+        <div class="ms-md-auto py-2 py-md-0 d-flex gap-2">
             <a href="{{ route('admin.pengiriman.lapak') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i>
                 Kembali</a>
+            <a href="{{ route('pdf.invoic.kirim-sampah-lapak', $pengiriman->kode_pengiriman ?? 0) }}" target="_blank" class="btn btn-primary">
+                <i class="bi bi-file-earmark-text"></i> Invoice
+            </a>
         </div>
     </div>
 
@@ -78,8 +81,11 @@
     </div>
     @foreach($pengiriman->detailPengirimanLapaks ?? [] as $index => $detailPengirimanLapaks)
         <div class="card border-0 shadow bg-white">
-            <div class="card-header bg-gradient bg-primary text-white">
-                <h6 class="mb-0"><i class="bi bi-trash"></i> {{$detailPengirimanLapaks->transaksiLapak->kode_transaksi ?? '-'}}</h6>
+            <div class="card-header bg-gradient bg-primary">
+                <h6 class="mb-0">
+                    <i class="bi bi-trash"></i>
+                    <span style="color: #fff;">{{$detailPengirimanLapaks->transaksiLapak->kode_transaksi ?? '-'}}</span>
+                </h6>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -91,16 +97,30 @@
                                 <th>Berat (kg)</th>
                                 <th>Harga per Kg</th>
                                 <th>Subtotal</th>
+                                <th>Susut</th>
+                                <th>Selisih</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? [] as $idx => $item)
-                            <tr></tr>
+                            <tr>
                                 <td>{{ $idx + 1 }}</td>
                                 <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
                                 <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
                                 <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
                                 <td>Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                <td>
+                                    <input type="number" min="0" step="0.01" class="form-control form-control-sm susut-input" 
+                                        name="susut[{{ $detailPengirimanLapaks->id }}][{{ $item->id }}]" 
+                                        value="{{ $item->susut ?? '' }}" 
+                                        data-berat="{{ $item->berat_kg }}" 
+                                        data-target="selisih-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                </td>
+                                <td>
+                                    <span id="selisih-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                        {{ isset($item->susut) ? number_format($item->berat_kg - $item->susut, 2, ',', '.') : '-' }}
+                                    </span>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -115,6 +135,22 @@
 @endsection
 
 @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.susut-input').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    const berat = parseFloat(this.getAttribute('data-berat')) || 0;
+                    const susut = parseFloat(this.value) || 0;
+                    const selisih = berat - susut;
+                    const targetId = this.getAttribute('data-target');
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.textContent = !isNaN(selisih) ? selisih.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+                    }
+                });
+            });
+        });
+    </script>
     <!-- JS Libraies -->
     <!-- Lightbox2 CSS & JS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet" />
