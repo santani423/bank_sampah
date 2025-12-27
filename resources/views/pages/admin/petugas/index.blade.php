@@ -1,7 +1,7 @@
 @extends('layouts.template')
 
 @section('title', 'Petugas')
- 
+
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
@@ -37,11 +37,11 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Aksi</th>
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Username</th>
                                     <th>Role</th>
-                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="petugas-tbody">
@@ -121,11 +121,7 @@
                 const row = `
                     <tr>
                         <td>${rowNumber}</td>
-                        <td>${petugas.nama}</td>
-                        <td>${petugas.email}</td>
-                        <td>${petugas.username}</td>
-                        <td>${petugas.role.charAt(0).toUpperCase() + petugas.role.slice(1)}</td>
-                        <td>
+                         <td>
                             <form onsubmit="return confirm('Apakah Anda yakin?');"
                                 action="/admin/data-petugas/${petugas.id}" method="POST">
                                 <a href="/admin/data-petugas/${petugas.id}"
@@ -143,6 +139,11 @@
                                 </button>
                             </form>
                         </td>
+                        <td>${petugas.nama}</td>
+                        <td>${petugas.email}</td>
+                        <td>${petugas.username}</td>
+                        <td>${petugas.role.charAt(0).toUpperCase() + petugas.role.slice(1)}</td>
+                       
                     </tr>
                 `;
                 tbody.innerHTML += row;

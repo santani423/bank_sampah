@@ -6,6 +6,7 @@ use App\Models\Lapak;
 use App\Models\Sampah;
 use App\Models\TransaksiLapak;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class SetorSampahLapak extends Seeder
 {
@@ -19,7 +20,7 @@ class SetorSampahLapak extends Seeder
 
             for ($i = 0; $i < $jumlahTransaksi; $i++) {
 
-                $kodeTransaksi = 'TRXLPK' . str_pad(($key * 100) + $i + 1, 5, '0', STR_PAD_LEFT);
+                $kodeTransaksi = 'TRXLPK-' . Str::uuid();
 
                 $transaksi = TransaksiLapak::create([
                     'kode_transaksi'     => $kodeTransaksi,

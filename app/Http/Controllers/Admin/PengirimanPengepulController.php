@@ -371,4 +371,13 @@ class PengirimanPengepulController extends Controller
     {
         return view('pages.admin.pengiriman.lapak.index');
     }
+
+    public function detailPengirimanLapak($kode)
+    {
+        // Ambil data pengiriman berdasarkan kode
+        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas', 'files')
+            ->where('kode_pengiriman', $kode)
+            ->first();
+        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman'));
+    }
 }

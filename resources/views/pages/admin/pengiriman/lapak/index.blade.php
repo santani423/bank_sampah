@@ -38,6 +38,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Aksi</th>
                                     <th>Kode Pengiriman</th>
                                     <th>Tanggal Pengiriman</th>
                                     <th>Driver</th>
@@ -82,7 +83,7 @@
             fetch(`/api/lapak/pengiriman/pending?page=${page}&per_page=${perPage}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("data",data);
+                    console.log("data", data);
                     if (data.success) {
                         currentPage = data.pagination.current_page;
                         totalPages = data.pagination.last_page;
@@ -106,8 +107,8 @@
             const tbody = document.getElementById('petugas-tbody');
             tbody.innerHTML = '';
 
-            console.log("data pagination",pagination);
-            
+            console.log("data pagination", pagination);
+
 
             if (data.length === 0) {
                 tbody.innerHTML = `
@@ -119,12 +120,21 @@
                 `;
                 return;
             }
-
+            const detailPengirimanRoute =
+                "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
             data.forEach((data, index) => {
                 const rowNumber = pagination.from + index;
+                const detailUrl = detailPengirimanRoute.replace(
+                    ':kode',
+                    data.kode_pengiriman
+                );
                 const row = `
                     <tr>
                         <td>${rowNumber}</td>
+                        <td><a href="${detailUrl}"
+                                    class="btn btn-sm btn-info">
+                                      Detail
+                                </a></td>
                         <td>${data.kode_pengiriman}</td>
                         <td>${data.tanggal_pengiriman}</td>
                         <td>${data.driver}</td>
