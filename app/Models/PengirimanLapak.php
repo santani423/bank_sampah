@@ -28,6 +28,7 @@ class PengirimanLapak extends Model
     {
         return $this->belongsTo(Gudang::class, 'gudang_id');
     }
+   
 
 
 

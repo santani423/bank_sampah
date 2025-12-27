@@ -11,6 +11,7 @@ use App\Models\PengirimanPengepul;
 use App\Models\DetailPengiriman;
 use App\Models\FilePengirimanPetugas;
 use App\Models\Gudang;
+use App\Models\PengirimanLapak;
 use App\Models\PengirimanPetugas;
 use App\Models\Petugas;
 use App\Models\RefFilePengirimanPetugas;
@@ -375,9 +376,14 @@ class PengirimanPengepulController extends Controller
     public function detailPengirimanLapak($kode)
     {
         // Ambil data pengiriman berdasarkan kode
-        $pengiriman = PengirimanPetugas::with('detailPengiriman', 'gudang', 'cabang', 'petugas', 'files')
+        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang'])
             ->where('kode_pengiriman', $kode)
             ->first();
-        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman'));
+
+        // Ambil cabang dari relasi gudang
+        $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
+
+        // dd($pengiriman); // Uncomment for debugging if needed
+        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman', 'cabang'));
     }
 }

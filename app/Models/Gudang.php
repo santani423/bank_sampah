@@ -14,6 +14,6 @@ class Gudang extends Model
 
     public function cabang()
     {
-        return $this->belongsTo(\App\Models\cabang::class, 'cabang_id');
+        return $this->belongsTo(cabang::class, 'cabang_id');
     }
 }

@@ -35,8 +35,8 @@ class KirimSampahLapak extends Seeder
                 'driver_hp'  => $faker->phoneNumber,
                 'plat_nomor' => strtoupper($faker->bothify('B #### ???')),
 
-                'foto_muatan'      => 'pengiriman/sample/foto_muatan.png',
-                'foto_plat_nomor'  => 'pengiriman/sample/foto_plat.png',
+                'foto_muatan'      => 'pengiriman/2025/12/27/1766820625_694f8b11e44f8.png',
+                'foto_plat_nomor'  => 'pengiriman/2025/12/27/1766820625_694f8b11e44f8.png',
 
                 'petugas_id' => 3,
                 'gudang_id'  => 1,

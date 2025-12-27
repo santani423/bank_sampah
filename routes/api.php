@@ -43,12 +43,12 @@ use App\Models\PengirimanLapak;
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
 
-Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
     
+    Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
 
