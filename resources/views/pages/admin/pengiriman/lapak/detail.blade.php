@@ -14,7 +14,8 @@
         <div class="ms-md-auto py-2 py-md-0 d-flex gap-2">
             <a href="{{ route('admin.pengiriman.lapak') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i>
                 Kembali</a>
-            <a href="{{ route('pdf.invoic.kirim-sampah-lapak', $pengiriman->kode_pengiriman ?? 0) }}" target="_blank" class="btn btn-primary">
+            <a href="{{ route('pdf.invoic.kirim-sampah-lapak', $pengiriman->kode_pengiriman ?? 0) }}" target="_blank"
+                class="btn btn-primary">
                 <i class="bi bi-file-earmark-text"></i> Invoice
             </a>
         </div>
@@ -79,12 +80,12 @@
             </div>
         </div>
     </div>
-    @foreach($pengiriman->detailPengirimanLapaks ?? [] as $index => $detailPengirimanLapaks)
+    @foreach ($pengiriman->detailPengirimanLapaks ?? [] as $index => $detailPengirimanLapaks)
         <div class="card border-0 shadow bg-white">
             <div class="card-header bg-gradient bg-primary">
                 <h6 class="mb-0">
                     <i class="bi bi-trash"></i>
-                    <span style="color: #fff;">{{$detailPengirimanLapaks->transaksiLapak->kode_transaksi ?? '-'}}</span>
+                    <span style="color: #fff;">{{ $detailPengirimanLapaks->transaksiLapak->kode_transaksi ?? '-' }}</span>
                 </h6>
             </div>
             <div class="card-body p-0">
@@ -94,58 +95,138 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Sampah</th>
-                                <th>Berat (kg)</th>
+                                <th>Berat Awal (kg)</th>
+                                <th>Berat Terupdate (kg)</th>
                                 <th>Harga per Kg</th>
                                 <th>Subtotal</th>
                                 <th>Susut</th>
-                                <th>Selisih</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? [] as $idx => $item)
-                            <tr>
-                                <td>{{ $idx + 1 }}</td>
-                                <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
-                                <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
-                                <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
-                                <td>
-                                    <input type="number" min="0" step="0.01" class="form-control form-control-sm susut-input" 
-                                        name="susut[{{ $detailPengirimanLapaks->id }}][{{ $item->id }}]" 
-                                        value="{{ $item->susut ?? '' }}" 
-                                        data-berat="{{ $item->berat_kg }}" 
-                                        data-target="selisih-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
-                                </td>
-                                <td>
-                                    <span id="selisih-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
-                                        {{ isset($item->susut) ? number_format($item->berat_kg - $item->susut, 2, ',', '.') : '-' }}
-                                    </span>
-                                </td>
-                            </tr>
+                            @foreach ($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? [] as $idx => $item)
+                                <tr>
+                                    <td>{{ $idx + 1 }}</td>
+                                    <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
+                                    <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
+                                    <td>
+                                        <input type="number" min="0" step="0.01"
+                                            class="form-control form-control-sm berat-terupdate-input"
+                                            name="berat_terupdate[{{ $detailPengirimanLapaks->id }}][{{ $item->id }}]"
+                                            value="{{ $item->berat_terupdate ?? $item->berat_kg }}"
+                                            data-berat-awal="{{ $item->berat_kg }}" data-harga="{{ $item->harga_per_kg }}"
+                                            data-target-susut="susut-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}"
+                                            data-target-subtotal="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                    </td>
+                                    <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
+                                    <td>
+                                        <span id="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                            Rp
+                                            {{ number_format(($item->berat_terupdate ?? $item->berat_kg) * $item->harga_per_kg, 0, ',', '.') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span id="susut-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                            {{ number_format($item->berat_kg - ($item->berat_terupdate ?? $item->berat_kg), 2, ',', '.') }}
+                                        </span>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
-                        <tfoot>
-                             
-                        </tfoot>
+                        <!-- tfoot total dihapus sesuai permintaan -->
                     </table>
                 </div>
             </div>
-        </div> 
-        @endforeach
+        </div>
+    @endforeach
+
+    <!-- Form Upload Sampah -->
+    <div class="card mt-4 mb-5">
+        <div class="card-header bg-primary text-white">
+            <strong>Upload File Sampah</strong>
+        </div>
+        <div class="card-body">
+            <form id="form-upload-sampah" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-3">
+                    <label for="file_sampah" class="form-label">Pilih File Sampah (CSV, XLSX, JPG, PNG, PDF)</label>
+                    <input type="file" class="form-control" id="file_sampah" name="file_sampah"
+                        accept=".csv,.xlsx,.jpg,.jpeg,.png,.pdf" required>
+                </div>
+                <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Upload</button>
+            </form>
+            <div id="upload-feedback" class="mt-2"></div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
     <script>
+        // AJAX upload file sampah
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.susut-input').forEach(function(input) {
+            var form = document.getElementById('form-upload-sampah');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var formData = new FormData(form);
+                    var feedback = document.getElementById('upload-feedback');
+                    feedback.innerHTML = '<span class="text-info">Uploading...</span>';
+                    fetch("{{ route('api.lapak.penerimaan-sampah-customer', $pengiriman->id ?? 0) }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ||
+                                    '{{ csrf_token() }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                feedback.innerHTML = '<span class="text-success">' + (data.message ||
+                                    'Upload berhasil!') + '</span>';
+                                form.reset();
+                            } else {
+                                feedback.innerHTML = '<span class="text-danger">' + (data.message ||
+                                    'Upload gagal!') + '</span>';
+                            }
+                        })
+                        .catch(error => {
+                            feedback.innerHTML =
+                                '<span class="text-danger">Terjadi kesalahan saat upload.</span>';
+                        });
+                });
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.querySelectorAll('.berat-terupdate-input').forEach(function(input) {
                 input.addEventListener('input', function() {
-                    const berat = parseFloat(this.getAttribute('data-berat')) || 0;
-                    const susut = parseFloat(this.value) || 0;
-                    const selisih = berat - susut;
-                    const targetId = this.getAttribute('data-target');
-                    const target = document.getElementById(targetId);
-                    if (target) {
-                        target.textContent = !isNaN(selisih) ? selisih.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+                    const beratAwal = parseFloat(this.getAttribute('data-berat-awal')) || 0;
+                    const harga = parseFloat(this.getAttribute('data-harga')) || 0;
+                    const beratTerupdate = parseFloat(this.value) || 0;
+                    const susut = beratAwal - beratTerupdate;
+                    const subtotal = beratTerupdate * harga;
+                    const targetSusut = document.getElementById(this.getAttribute(
+                        'data-target-susut'));
+                    const targetSubtotal = document.getElementById(this.getAttribute(
+                        'data-target-subtotal'));
+                    if (targetSusut) {
+                        targetSusut.textContent = !isNaN(susut) ? susut.toLocaleString('id-ID', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }) : '-';
+                    }
+                    if (targetSubtotal) {
+                        targetSubtotal.textContent = !isNaN(subtotal) ? 'Rp ' + subtotal
+                            .toLocaleString('id-ID', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            }) : '-';
+                    }
+                    // Update summary total
+                    const table = this.closest('table');
+                    if (table) {
+                        updateSummary(table);
                     }
                 });
             });
@@ -175,6 +256,11 @@
 
         .img-preview:hover {
             box-shadow: 0 0 0 4px #007bff44;
+        }
+
+        /* Setiap item/baris data tabel warna hitam */
+        .table tbody tr td {
+            color: #000 !important;
         }
     </style>
 @endpush

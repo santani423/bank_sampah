@@ -117,7 +117,7 @@ class PengirimanLapakController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Pengiriman berhasil difinalisasi.', 
+            'message' => 'Pengiriman berhasil difinalisasi.',
             'pengiriman' => $pengiriman
         ]);
     }
@@ -152,51 +152,19 @@ class PengirimanLapakController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function penerimaanSampahCustomer(Request $request, $id)
     {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Upload foto sampah jika ada
+        if ($request->hasFile('file_sampah')) {
+            $path = FileHelper::storeImageByDate($request->file('file_sampah'), 'penerimaan_sampah_customer');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PengirimanLapak $pengirimanLapak)
-    {
-        //
-    }
+             
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Penerimaan sampah oleh customer berhasil dicatat.',
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PengirimanLapak $pengirimanLapak)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PengirimanLapak $pengirimanLapak)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PengirimanLapak $pengirimanLapak)
-    {
-        //
+        ]);
     }
 }
