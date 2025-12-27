@@ -384,6 +384,6 @@ class PengirimanPengepulController extends Controller
         $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
 
         // dd($pengiriman); // Uncomment for debugging if needed
-        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman', 'cabang'));
+        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman', 'cabang', 'kode'));
     }
 }
