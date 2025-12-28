@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Helpers\FileHelper;
 use App\Models\DetailPengirimanLapak;
 use App\Models\Lapak;
+use App\Models\TransaksiLapak;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class PengirimanLapakController extends Controller
 {
@@ -154,17 +157,48 @@ class PengirimanLapakController extends Controller
 
     public function penerimaanSampahCustomer(Request $request, $id)
     {
-
-        // Upload foto sampah jika ada
-        if ($request->hasFile('file_sampah')) {
-            $path = FileHelper::storeImageByDate($request->file('file_sampah'), 'penerimaan_sampah_customer');
-
-             
-        }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Penerimaan sampah oleh customer berhasil dicatat.',
-
+        // =========================
+        // 1. VALIDASI INPUT
+        // =========================
+        $validator = Validator::make($request->all(), [
+            'kode_pengiriman' => 'required|string|exists:pengiriman_lapak,kode_pengiriman',
+            'file_sampah' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'catatan_sampah' => 'nullable|string|max:500',
         ]);
+
+        try {
+
+            // Ambil data pengiriman berdasarkan kode
+            $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang'])
+                ->where('kode_pengiriman', $request->kode_pengiriman)
+                ->first();
+            // Upload foto sampah jika ada
+            if ($request->hasFile('file_sampah')) {
+                $path = FileHelper::storeImageByDate($request->file('file_sampah'), 'penerimaan_sampah_customer');
+            }
+            foreach ($pengiriman->detailPengirimanLapaks as $detailPengirimanLapaks) {
+
+                $transaksi_lapak = TransaksiLapak::find($detailPengirimanLapaks->transaksi_lapak_id);
+                $transaksi_lapak->approval = 'approved';
+                $transaksi_lapak->save();
+            }
+
+            $pengiriman->status_pengiriman = 'diterima';
+            $pengiriman->catatan = $request->catatan_sampah;
+            $pengiriman->foto_penerimaan = $path;
+            $pengiriman->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'Penerimaan sampah oleh customer berhasil dicatat.',
+                'kode_pengiriman' => $pengiriman,
+
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memproses data.',
+                'error' => $th->getMessage(), // hapus di production jika perlu
+            ], 500);
+        }
     }
 }

@@ -149,12 +149,16 @@
             </div>
             <div class="card-body">
                 @csrf
-                <input type="text" name="kode_pengiriman" value="{{ $kode_pengiriman ?? '' }}" hidden>
+                <input type="hidden" name="kode_pengiriman" value="{{ $kode ?? '' }}">
                 <div class="mb-3">
-                    <label for="file_sampah" class="form-label">Pilih File Sampah (CSV, XLSX, JPG, PNG, PDF)</label>
+                    <label for="file_sampah" class="form-label">Upload penerimaan samaph</label>
                     <input type="file" class="form-control" id="file_sampah" name="file_sampah"
                         accept=".csv,.xlsx,.jpg,.jpeg,.png,.pdf" required>
                     <div id="preview_sampah" class="mt-2"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="file_sampah" class="form-label">Catatan</label>
+                    <textarea class="form-control" id="catatan_sampah" name="catatan_sampah" rows="3" placeholder="Masukkan keterangan tambahan (opsional)"></textarea>
                 </div>
                 <button type="submit" class="btn btn-success" id="btn-upload"><span id="btn-upload-text"><i
                             class="bi bi-save"></i> Simpan</span> <span id="btn-upload-spinner"

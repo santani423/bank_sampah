@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('plat_nomor')->nullable();
             $table->string('foto_muatan')->nullable();
             $table->string('foto_plat_nomor')->nullable(); 
+            $table->string('foto_penerimaan')->nullable(); 
+            $table->string('catatan')->nullable(); 
             $table->unsignedBigInteger('petugas_id');
             $table->longText('temp_before_data')->nullable();
             $table->unsignedBigInteger('gudang_id')->nullable();

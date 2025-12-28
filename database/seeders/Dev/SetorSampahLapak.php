@@ -16,7 +16,7 @@ class SetorSampahLapak extends Seeder
 
         foreach ($lapaks as $key => $lapak) {
 
-            $jumlahTransaksi = rand(5, 20);
+            $jumlahTransaksi = rand(1, 5);
 
             for ($i = 0; $i < $jumlahTransaksi; $i++) {
 
