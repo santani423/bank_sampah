@@ -29,9 +29,41 @@
                         <div class="info-box p-3 h-100 border rounded bg-light">
                             <div class="mb-2"><span class="badge bg-info text-dark">Lapak</span></div>
                             <div class="fw-bold fs-5">{{ $pengiriman->lapak->nama_lapak ?? '-' }}</div>
-                            <div class="text-muted small">No Rekening: {{ $pengiriman->lapak->no_rekening ?? '-' }}</div>
-                            <div class="text-muted small">Atas Nama: {{ $pengiriman->lapak->nama_rekening ?? '-' }}</div>
-                            <div class="text-muted small">Bank: {{ $pengiriman->lapak->nama_rekening ?? '-' }}</div>
+                            <div class="mb-1">
+                                <span class="fw-bold">No Rekening:</span>
+                                <span id="noRek" class="text-muted small">{{ $pengiriman->lapak->no_rekening ?? '-' }}</span>
+                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i class="bi bi-clipboard"></i> Copy</button>
+                            </div>
+                            <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert" style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
+                                No rekening berhasil disalin!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            <div class="mb-1">
+                                <span class="fw-bold">Atas Nama:</span>
+                                <span class="text-muted small">{{ $pengiriman->lapak->nama_rekening ?? '-' }}</span>
+                            </div>
+                            <div class="mb-1">
+                                <span class="fw-bold">Bank:</span>
+                                <span class="text-muted small">{{ $pengiriman->lapak->nama_bank ?? '-' }}</span>
+                            </div>
+                            <script>
+                                function copyRekening() {
+                                    var noRek = document.getElementById('noRek').innerText;
+                                    navigator.clipboard.writeText(noRek).then(function() {
+                                        var alertBox = document.getElementById('alertCopy');
+                                        alertBox.style.display = 'block';
+                                        setTimeout(function() {
+                                            alertBox.classList.add('show');
+                                        }, 100);
+                                        setTimeout(function() {
+                                            alertBox.classList.remove('show');
+                                            setTimeout(function() {
+                                                alertBox.style.display = 'none';
+                                            }, 500);
+                                        }, 2000);
+                                    });
+                                }
+                            </script>
                         </div>
                     </div>
                     <div class="col-md-3">

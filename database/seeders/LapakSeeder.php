@@ -51,6 +51,7 @@ class LapakSeeder extends Seeder
                     'jenis_metode_penarikan_id' => 1,
                     'nama_rekening' =>  $kodeLapak,
                     'nomor_rekening' =>  rand(10000, 99999),
+                    'nama_bank' => 'BSI',
                     'approval_status' => $randomApproval,
                     'approved_by' => $randomApproval !== 'pending' ? 1 : null,
                     'approved_at' => $randomApproval !== 'pending' ? now() : null,

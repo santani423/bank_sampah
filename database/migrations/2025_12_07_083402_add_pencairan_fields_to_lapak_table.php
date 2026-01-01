@@ -22,6 +22,9 @@ return new class extends Migration
             $table->string('nomor_rekening', 50)
                 ->nullable()
                 ->after('nama_rekening');
+            $table->string('nama_bank', 50)
+                ->nullable()
+                ->after('nomor_rekening');
 
             // Relasi foreign key
             $table->foreign('jenis_metode_penarikan_id')

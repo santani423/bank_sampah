@@ -229,6 +229,8 @@
                                     'Upload berhasil!') + '</span>';
                                 form.reset();
                                 preview.innerHTML = '';
+                                    
+
                             } else {
                                 feedback.innerHTML = '<span class="text-danger">' + (data.message ||
                                     'Upload gagal!') + '</span>';
