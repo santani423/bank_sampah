@@ -48,7 +48,7 @@
                         <div class="row align-items-end">
 
                             <div class="col-md-3 mb-3">
-                                <x-select.select-cabang />
+                                <x-select.select-cabang name="cabang" />
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -118,11 +118,12 @@
 @push('scripts')
     <script>
         /* ===============================
-                           AMBIL FILTER TANGGAL
-                        ================================ */
+                                       AMBIL FILTER TANGGAL
+                                    ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
+            const cabang = document.getElementById('cabang').value;
             let tanggalMulai = '';
             let tanggalSelesai = '';
 
@@ -137,7 +138,8 @@
             return {
                 tanggal_mulai: tanggalMulai,
                 tanggal_selesai: tanggalSelesai,
-                customer: customer
+                customer: customer,
+                cabang: cabang,
             };
         }
 
@@ -168,9 +170,12 @@
                 ...(filters.customer && {
                     customer: filters.customer
                 }),
+                ...(filters.cabang && {
+                    cabang: filters.cabang
+                }),
             });
 
-            console.log("params:", params.toString());
+
 
 
             fetch(`/api/lapak/pengiriman?${params.toString()}`)
