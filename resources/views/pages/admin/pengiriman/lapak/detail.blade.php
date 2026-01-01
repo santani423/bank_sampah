@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <x-select.select-status-pengiriman name="status_pengiriman" /> 
+                    <x-select.select-status-pengiriman name="status_pengiriman" />
                 </div>
                 <div class="mb-3">
                     <label for="file_sampah" class="form-label">Catatan</label>
@@ -225,12 +225,18 @@
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
                             if (data.success) {
-                                feedback.innerHTML = '<span class="text-success">' + (data.message ||
-                                    'Upload berhasil!') + '</span>';
+                                feedback.innerHTML =
+                                    '<span class="text-success">' + (data.message ||
+                                        'Upload berhasil!') + '</span>';
+
                                 form.reset();
                                 preview.innerHTML = '';
-                                    
 
+                                setTimeout(() => {
+                                    window.location.href =
+                                        "/admin/pengiriman/sampah-lapak/detail-pembayarank/" +
+                                        data.kode_pengiriman;
+                                }, 800);
                             } else {
                                 feedback.innerHTML = '<span class="text-danger">' + (data.message ||
                                     'Upload gagal!') + '</span>';

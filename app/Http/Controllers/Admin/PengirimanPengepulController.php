@@ -202,8 +202,7 @@ class PengirimanPengepulController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('petugas.pengiriman.index')
+            return redirect()->route('admin.pengiriman-lapak.detail.pembayaran', ['kode' => $pengiriman->kode_pengiriman])
                 ->with('success', 'Pengiriman dan file berhasil ditambahkan.');
         } catch (\Exception $e) {
             return back()->withErrors([
