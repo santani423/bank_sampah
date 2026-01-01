@@ -1,9 +1,26 @@
 @extends('layouts.template')
 
-@section('title', 'Petugas')
+@section('title', 'Pengiriman Lapak')
 
 @push('style')
-    <!-- CSS Libraries -->
+    <style>
+        #loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .pagination-controls button {
+            margin: 0 2px;
+        }
+    </style>
 @endpush
 
 @section('main')
@@ -11,51 +28,87 @@
         <div>
             <h3 class="fw-bold mb-3">Pengiriman Lapak</h3>
         </div>
-        <div class="ms-md-auto py-2 py-md-0">
-
-        </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="clearfix mb-3"></div>
+
+                    {{-- ALERT --}}
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
 
-                    <div class="table-responsive" style="overflow-x:auto;">
-                        <div id="loading-spinner">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                    {{-- FILTER FORM --}}
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang />
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Customer</label>
+                                <input type="text" class="form-control" id="customer" placeholder="Nama customer">
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-status-pengiriman />
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Tanggal Pengiriman</label>
+                                <input type="text" class="form-control" id="tanggal_range"
+                                    placeholder="YYYY-MM-DD s/d YYYY-MM-DD" autocomplete="off">
+                            </div>
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
                             </div>
                         </div>
+                    </form>
+
+                    {{-- TABLE --}}
+                    <div class="table-responsive">
+                        <div id="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+
                         <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
-                            style="display: none;">
+                            style="display:none;">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Aksi</th>
                                     <th>Kode Pengiriman</th>
-                                    <th>Tanggal Pengiriman</th>
+                                    <th>Tanggal</th>
+                                    <th>Collation Center</th>
+                                    <th>Customer</th>
                                     <th>Driver</th>
                                     <th>Driver HP</th>
-                                    <th>Plat Nomor</th>
+                                    <th>Plat</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody id="petugas-tbody">
-                                <!-- Data akan diisi oleh JavaScript -->
-                            </tbody>
+                            <tbody id="petugas-tbody"></tbody>
                         </table>
 
-                        <div id="pagination-wrapper" class="pagination-wrapper" style="display: none;">
-                            <div class="pagination-info" id="pagination-info"></div>
-                            <div class="pagination-controls" id="pagination-controls"></div>
+                        <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
+                            <div id="pagination-info"></div>
+                            <div id="pagination-controls"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -63,87 +116,120 @@
 @endsection
 
 @push('scripts')
-    <!-- JS Libraies -->
     <script>
-        let currentPage = 1;
-        let perPage = 10;
-        let totalPages = 1;
+        /* ===============================
+               AMBIL FILTER TANGGAL
+            ================================ */
+        function getFilterParams() {
+            const tanggalRange = document.getElementById('tanggal_range').value;
+            let tanggalMulai = '';
+            let tanggalSelesai = '';
 
-        // Fungsi untuk mengambil data dari API
+            if (tanggalRange.includes('s/d')) {
+                const split = tanggalRange.split('s/d');
+                tanggalMulai = split[0].trim();
+                tanggalSelesai = split[1].trim();
+            }
+
+            return {
+                tanggal_mulai: tanggalMulai,
+                tanggal_selesai: tanggalSelesai
+            };
+        }
+
+        /* ===============================
+           FETCH DATA API
+        ================================ */
         function fetchPetugasData(page = 1) {
-            const loadingSpinner = document.getElementById('loading-spinner');
+            const spinner = document.getElementById('loading-spinner');
             const table = document.getElementById('petugas-table');
-            const paginationWrapper = document.getElementById('pagination-wrapper');
+            const pagination = document.getElementById('pagination-wrapper');
 
-            // Tampilkan loading
-            loadingSpinner.style.display = 'block';
+            spinner.style.display = 'block';
             table.style.display = 'none';
-            paginationWrapper.style.display = 'none';
+            pagination.style.display = 'none';
 
-            fetch(`/api/lapak/pengiriman/pending?page=${page}&per_page=${perPage}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("data", data);
-                    if (data.success) {
-                        currentPage = data.pagination.current_page;
-                        totalPages = data.pagination.last_page;
-                        renderTable(data.data, data.pagination);
-                        renderPagination(data.pagination);
+            const filters = getFilterParams();
 
-                        // Sembunyikan loading dan tampilkan table
-                        loadingSpinner.style.display = 'none';
+            const params = new URLSearchParams({
+                page,
+                per_page: perPage,
+                ...(filters.tanggal_mulai && {
+                    tanggal_mulai: filters.tanggal_mulai
+                }),
+                ...(filters.tanggal_selesai && {
+                    tanggal_selesai: filters.tanggal_selesai
+                })
+            });
+
+            fetch(`/api/lapak/pengiriman?${params.toString()}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        current_page = res.pagination.current_page;
+                        totalPages = res.pagination.last_page;
+                        renderTable(res.data, res.pagination);
+                        renderPagination(res.pagination);
+
+                        spinner.style.display = 'none';
                         table.style.display = 'table';
-                        paginationWrapper.style.display = 'flex';
+                        pagination.style.display = 'flex';
                     }
                 })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    loadingSpinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
+                .catch(() => {
+                    spinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
                 });
         }
 
-        // Fungsi untuk render tabel
+        /* ===============================
+           RENDER TABLE
+        ================================ */
         function renderTable(data, pagination) {
             const tbody = document.getElementById('petugas-tbody');
             tbody.innerHTML = '';
 
-            console.log("data pagination", pagination);
-
-
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            Belum ada data pengiriman.
-                        </td>
-                    </tr>
-                `;
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
-            const detailPengirimanRoute =
-                "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
-            data.forEach((data, index) => {
-                const rowNumber = pagination.from + index;
-                const detailUrl = detailPengirimanRoute.replace(
-                    ':kode',
-                    data.kode_pengiriman
-                );
-                const row = `
-                    <tr>
-                        <td>${rowNumber}</td>
-                        <td><a href="${detailUrl}"
-                                    class="btn btn-sm btn-info">
-                                      Detail
-                                </a></td>
-                        <td>${data.kode_pengiriman}</td>
-                        <td>${data.tanggal_pengiriman}</td>
-                        <td>${data.driver}</td>
-                        <td>${data.driver_hp}</td>
-                        <td>${data.plat_nomor}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+
+            const detailRoute = "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
+
+            data.forEach((item, index) => {
+                const no = pagination.from + index;
+                const url = detailRoute.replace(':kode', item.kode_pengiriman);
+
+                tbody.innerHTML += `
+            <tr>
+                <td>${no}</td>
+                <td>
+                    <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                </td>
+                <td>${item.kode_pengiriman}</td>
+                <td>${item.tanggal_pengiriman}</td>
+                <td>${item.gudang?.cabang?.nama_cabang ?? '-'}</td>
+                <td>${item.gudang?.nama_gudang ?? '-'}</td>
+                <td>${item.driver ?? '-'}</td>
+                <td>${item.driver_hp ?? '-'}</td>
+                <td>${item.plat_nomor ?? '-'}</td>
+                <td>${item.status_pengiriman ?? '-'}</td>
+            </tr>
+        `;
             });
         }
+
+
+
+        /* ===============================
+           EVENT
+        ================================ */
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchPetugasData(1);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPetugasData(1);
+        });
     </script>
 @endpush

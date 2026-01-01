@@ -35,7 +35,7 @@
     <!-- Main css -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/main.css') }}">
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @stack('style')
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.trendy.min.css') }}"> --}}
 </head>
@@ -410,6 +410,16 @@
     <!-- main js -->
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#tanggal_range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "id",
+            allowInput: true
+        });
+    </script>
+
     <style>
         .pagination-wrapper {
             display: flex;
@@ -456,35 +466,56 @@
         }
     </style>
 
-    @yield('scripts')
-    @stack('scripts')
+
 
 
     <script>
+        let currentPage = 1;
+        let perPage = 10;
+        let totalPages = 1;
         // Fungsi untuk render pagination
         function renderPagination(pagination) {
+            if (!pagination) return;
+
+            // Sinkronisasi state
+            currentPage = pagination.current_page || 1;
+            totalPages = pagination.last_page || 1;
+
             const paginationInfo = document.getElementById('pagination-info');
             const paginationControls = document.getElementById('pagination-controls');
 
-            // Info pagination
+            // =========================
+            // INFO PAGINATION
+            // =========================
             paginationInfo.textContent =
-                `Menampilkan ${pagination.from || 0} sampai ${pagination.to || 0} dari ${pagination.total} data`;
+                `Menampilkan ${pagination.from ?? 0} sampai ${pagination.to ?? 0} dari ${pagination.total ?? 0} data`;
 
-            // Controls pagination
+            // =========================
+            // RESET CONTROLS
+            // =========================
             paginationControls.innerHTML = '';
 
-            // Tombol Previous
+            // =========================
+            // PREVIOUS BUTTON
+            // =========================
             const prevBtn = document.createElement('button');
             prevBtn.className = 'page-btn';
             prevBtn.textContent = '« Previous';
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.onclick = () => fetchPetugasData(currentPage - 1);
+            prevBtn.disabled = currentPage <= 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    fetchPetugasData(currentPage - 1);
+                }
+            };
             paginationControls.appendChild(prevBtn);
 
-            // Tombol halaman
+            // =========================
+            // PAGE RANGE
+            // =========================
             const startPage = Math.max(1, currentPage - 2);
             const endPage = Math.min(totalPages, currentPage + 2);
 
+            // FIRST PAGE + DOTS
             if (startPage > 1) {
                 const firstBtn = document.createElement('button');
                 firstBtn.className = 'page-btn';
@@ -495,24 +526,27 @@
                 if (startPage > 2) {
                     const dots = document.createElement('span');
                     dots.textContent = '...';
-                    dots.style.padding = '5px 10px';
+                    dots.style.padding = '0 8px';
                     paginationControls.appendChild(dots);
                 }
             }
 
+            // PAGE BUTTONS
             for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = 'page-btn' + (i === currentPage ? ' active' : '');
                 pageBtn.textContent = i;
+                pageBtn.disabled = i === currentPage;
                 pageBtn.onclick = () => fetchPetugasData(i);
                 paginationControls.appendChild(pageBtn);
             }
 
+            // LAST PAGE + DOTS
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                     const dots = document.createElement('span');
                     dots.textContent = '...';
-                    dots.style.padding = '5px 10px';
+                    dots.style.padding = '0 8px';
                     paginationControls.appendChild(dots);
                 }
 
@@ -523,21 +557,29 @@
                 paginationControls.appendChild(lastBtn);
             }
 
-            // Tombol Next
+            // =========================
+            // NEXT BUTTON
+            // =========================
             const nextBtn = document.createElement('button');
             nextBtn.className = 'page-btn';
             nextBtn.textContent = 'Next »';
-            nextBtn.disabled = currentPage === totalPages;
-            nextBtn.onclick = () => fetchPetugasData(currentPage + 1);
+            nextBtn.disabled = currentPage >= totalPages;
+            nextBtn.onclick = () => {
+                if (currentPage < totalPages) {
+                    fetchPetugasData(currentPage + 1);
+                }
+            };
             paginationControls.appendChild(nextBtn);
         }
+
 
         // Load data saat halaman pertama kali dimuat
         document.addEventListener('DOMContentLoaded', function() {
             fetchPetugasData(1);
         });
     </script>
-
+    @yield('scripts')
+    @stack('scripts')
 </body>
 
 </html>

@@ -10,6 +10,8 @@ use App\Models\Lapak;
 use App\Models\TransaksiLapak;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PengirimanLapakController extends Controller
 {
@@ -132,7 +134,7 @@ class PengirimanLapakController extends Controller
 
         $pengiriman = PengirimanLapak::with([
             'detailPengirimanLapaks.transaksiLapak.lapak',
-            'gudang',
+            'gudang.cabang',
             'petugas'
         ])
             ->where('status_pengiriman', 'dikirim')
@@ -198,6 +200,98 @@ class PengirimanLapakController extends Controller
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan saat memproses data.',
                 'error' => $th->getMessage(), // hapus di production jika perlu
+            ], 500);
+        }
+    }
+
+
+
+    public function index(Request $request)
+    {
+        try {
+            // =========================
+            // 1. VALIDASI PARAMETER
+            // =========================
+            $perPage = (int) $request->get('per_page', 10);
+            $perPage = $perPage > 0 ? $perPage : 10;
+
+            $tanggalMulai   = $request->get('tanggal_mulai');
+            $tanggalSelesai = $request->get('tanggal_selesai');
+
+            // =========================
+            // 2. QUERY BASE
+            // =========================
+            $query = PengirimanLapak::with([
+                'detailPengirimanLapaks.transaksiLapak.lapak',
+                'gudang.cabang',
+                'petugas'
+            ]);
+
+            // =========================
+            // 3. FILTER RANGE TANGGAL
+            // =========================
+            if ($tanggalMulai && $tanggalSelesai) {
+                $query->whereBetween('tanggal_pengiriman', [
+                    Carbon::parse($tanggalMulai)->startOfDay(),
+                    Carbon::parse($tanggalSelesai)->endOfDay()
+                ]);
+            } elseif ($tanggalMulai) {
+                $query->whereDate(
+                    'tanggal_pengiriman',
+                    '>=',
+                    Carbon::parse($tanggalMulai)->startOfDay()
+                );
+            } elseif ($tanggalSelesai) {
+                $query->whereDate(
+                    'tanggal_pengiriman',
+                    '<=',
+                    Carbon::parse($tanggalSelesai)->endOfDay()
+                );
+            }
+
+            // =========================
+            // 4. SORT & PAGINATION
+            // =========================
+            $pengiriman = $query
+                ->latest('tanggal_pengiriman')
+                ->paginate($perPage);
+
+            // =========================
+            // 5. RESPONSE SUKSES
+            // =========================
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pengiriman lapak berhasil diambil.',
+                'data' => $pengiriman->items(),
+                'pagination' => [
+                    'current_page' => $pengiriman->currentPage(),
+                    'last_page'    => $pengiriman->lastPage(),
+                    'per_page'     => $pengiriman->perPage(),
+                    'total'        => $pengiriman->total(),
+                    'from'         => $pengiriman->firstItem(),
+                    'to'           => $pengiriman->lastItem(),
+                ],
+                'filters' => [
+                    'tanggal_mulai'   => $tanggalMulai,
+                    'tanggal_selesai' => $tanggalSelesai,
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+
+            // =========================
+            // 6. LOG ERROR
+            // =========================
+            Log::error('Gagal mengambil data pengiriman lapak', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+
+            // =========================
+            // 7. RESPONSE ERROR
+            // =========================
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data pengiriman lapak.',
             ], 500);
         }
     }

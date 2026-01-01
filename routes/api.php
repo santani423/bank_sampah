@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
 
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
+    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
