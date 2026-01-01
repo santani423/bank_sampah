@@ -43,6 +43,7 @@ use App\Models\PengirimanLapak;
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
 
+Route::get('/lapak/tess', [PengirimanLapakController::class, 'index']);
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {

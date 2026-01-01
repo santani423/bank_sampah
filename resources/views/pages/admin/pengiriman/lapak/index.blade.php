@@ -118,17 +118,19 @@
 @push('scripts')
     <script>
         /* ===============================
-               AMBIL FILTER TANGGAL
-            ================================ */
+                   AMBIL FILTER TANGGAL
+                ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             let tanggalMulai = '';
             let tanggalSelesai = '';
 
-            if (tanggalRange.includes('s/d')) {
-                const split = tanggalRange.split('s/d');
-                tanggalMulai = split[0].trim();
-                tanggalSelesai = split[1].trim();
+            console.log("tanggalRange", tanggalRange);
+
+            if (tanggalRange && tanggalRange.includes('to')) {
+                const [start, end] = tanggalRange.split('to');
+                tanggalMulai = start.trim();
+                tanggalSelesai = end.trim();
             }
 
             return {
@@ -136,6 +138,7 @@
                 tanggal_selesai: tanggalSelesai
             };
         }
+
 
         /* ===============================
            FETCH DATA API
@@ -161,6 +164,9 @@
                     tanggal_selesai: filters.tanggal_selesai
                 })
             });
+
+            console.log("params:", params.toString());
+
 
             fetch(`/api/lapak/pengiriman?${params.toString()}`)
                 .then(res => res.json())
