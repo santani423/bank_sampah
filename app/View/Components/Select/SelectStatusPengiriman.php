@@ -11,10 +11,13 @@ class SelectStatusPengiriman extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public   $name;
+    public function __construct($name = 'status_pengiriman')
     {
         //
+        $this->name = $name;
     }
+
 
     /**
      * Get the view / contents that represent the component.

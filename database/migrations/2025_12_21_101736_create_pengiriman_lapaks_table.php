@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('petugas_id');
             $table->longText('temp_before_data')->nullable();
             $table->unsignedBigInteger('gudang_id')->nullable();
-            $table->enum('status_pengiriman', ['draft', 'dikirim', 'diterima', 'batal'])->default('draft');
+            $table->enum('status_pengiriman', ['draft', 'dikirim', 'diterima', 'batal','pending'])->default('pending');
             $table->timestamps();
         });
     }

@@ -25,6 +25,22 @@ class KirimSampahLapak extends Seeder
             if ($lapak->transaksiPending->isEmpty()) {
                 continue;
             }
+            $sp = rand(1, 3);
+            $statusPengiriman = 'dikirim';
+
+
+            switch ($sp) {
+                case 1:
+                    $statusPengiriman = 'dikirim';
+                    break;
+                case 2:
+                    $statusPengiriman = 'diterima';
+                    break;
+                case 3:
+                    $statusPengiriman = 'batal';
+                    break;
+            }
+
 
             $pengiriman = PengirimanLapak::create([
                 'kode_pengiriman'     => 'KRMPLK' . str_pad(($key * 100)  + 1, 5, '0', STR_PAD_LEFT),
@@ -41,7 +57,7 @@ class KirimSampahLapak extends Seeder
                 'petugas_id' => 3,
                 'gudang_id'  => rand(1, 3),
 
-                'status_pengiriman' => 'dikirim',
+                'status_pengiriman' => $statusPengiriman,
             ]);
 
             /**

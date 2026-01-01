@@ -166,6 +166,7 @@ class PengirimanLapakController extends Controller
             'kode_pengiriman' => 'required|string|exists:pengiriman_lapak,kode_pengiriman',
             'file_sampah' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'catatan_sampah' => 'nullable|string|max:500',
+            'status_pengiriman' => 'nullable|string|max:500',
         ]);
 
         try {
@@ -188,13 +189,14 @@ class PengirimanLapakController extends Controller
             $pengiriman->status_pengiriman = 'diterima';
             $pengiriman->catatan = $request->catatan_sampah;
             $pengiriman->foto_penerimaan = $path;
+            $pengiriman->status_pengiriman = $request->status_pengiriman;
             $pengiriman->save();
             return response()->json([
                 'status' => true,
                 'message' => 'Penerimaan sampah oleh customer berhasil dicatat.',
                 'kode_pengiriman' => $pengiriman,
-
-            ]);
+                'status_pengiriman' =>  $request->status_pengiriman,
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -249,11 +251,16 @@ class PengirimanLapakController extends Controller
                 );
             }
 
-            if ($request->has('customer')) {
-                $customer = $request->get('customer');
-                $query->whereHas('gudang', function ($q) use ($customer) {
-                    $q->where('nama_gudang', 'like', '%' . $customer . '%');
+            if ($request->has('cabang')) {
+                $cabang = $request->get('cabang');
+                $query->whereHas('gudang.cabang', function ($q) use ($cabang) {
+                    $q->where('kode_cabang', $cabang);
                 });
+            }
+
+            if ($request->has('status_pengiriman')) {
+                $status_pengiriman = $request->get('status_pengiriman');
+                $query->where('status_pengiriman', $status_pengiriman);
             }
 
             // =========================

@@ -57,7 +57,7 @@
                             </div>
 
                             <div class="col-md-3 mb-3">
-                                <x-select.select-status-pengiriman />
+                                <x-select.select-status-pengiriman name="status_pengiriman" />
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -118,12 +118,13 @@
 @push('scripts')
     <script>
         /* ===============================
-                                       AMBIL FILTER TANGGAL
-                                    ================================ */
+                                           AMBIL FILTER TANGGAL
+                                        ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
             const cabang = document.getElementById('cabang').value;
+            const status_pengiriman = document.getElementById('status_pengiriman').value;
             let tanggalMulai = '';
             let tanggalSelesai = '';
 
@@ -140,6 +141,7 @@
                 tanggal_selesai: tanggalSelesai,
                 customer: customer,
                 cabang: cabang,
+                status_pengiriman: status_pengiriman,
             };
         }
 
@@ -172,6 +174,9 @@
                 }),
                 ...(filters.cabang && {
                     cabang: filters.cabang
+                }),
+                ...(filters.status_pengiriman && {
+                    status_pengiriman: filters.status_pengiriman
                 }),
             });
 
