@@ -393,7 +393,6 @@ class TransaksiController extends Controller
             // Perbarui status ke status terbaru dari Xendit
             $transaction->status = $incomingStatus;
             $transaction->save();
-
             if ($incomingStatus === 'paid') {
                 $saldo = SaldoUtama::lockForUpdate()->first();
                 if ($saldo) {
@@ -494,3 +493,20 @@ class TransaksiController extends Controller
         }
     }
 }
+// {
+//   "id": "evt_4f21bc9a88",
+//   "event": "payment.completed",
+//   "created": "2026-01-01T10:05:00.000Z",
+//   "business_id": "65fa9e1c7a12",
+//   "data": {
+//     "id": "TOPUP-20260101113204-1-69565b3472eca",
+//     "reference": "TOPUP-20260101113204-1-69565b3472eca",
+//     "amount": 150000,
+//     "currency": "IDR",
+//     "status": "paid",
+//     "payment_method": "EWALLET",
+//     "channel_code": "DANA"
+//   }
+// }
+// http://127.0.0.1:8000/api/callback
+

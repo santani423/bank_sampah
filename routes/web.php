@@ -128,6 +128,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('admin.pengiriman');
     Route::get('/pengiriman/sampah-lapak', [AdminPengirimanPengepulController::class, 'lapak'])->name('admin.pengiriman.lapak');
     Route::get('/pengiriman/sampah-lapak/{kode}', [AdminPengirimanPengepulController::class, 'detailPengirimanLapak'])->name('admin.pengiriman-lapak.detail');
+    Route::get('/pengiriman/sampah-lapak/detail-pembayaran/{kode}', [AdminPengirimanPengepulController::class, 'detailPembayaranPengirimanLapak'])->name('admin.pengiriman-lapak.detail.pembayaran');
 
     // Pengaturan
     Route::get('/token-whatsapp', [AdminTokenWhatsAppController::class, 'index'])->name('admin.token-whatsapp.index');

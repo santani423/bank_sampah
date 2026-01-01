@@ -386,4 +386,18 @@ class PengirimanPengepulController extends Controller
         // dd($pengiriman); // Uncomment for debugging if needed
         return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman', 'cabang', 'kode'));
     }
+
+    public function detailPembayaranPengirimanLapak($kode)
+    {
+        // Ambil data pengiriman berdasarkan kode
+        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+
+        // Ambil cabang dari relasi gudang
+        $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
+
+        // dd($pengiriman); // Uncomment for debugging if needed
+        return view('pages.admin.pengiriman.lapak.detail-pembayaran', compact('pengiriman', 'cabang', 'kode'));
+    }
 }
