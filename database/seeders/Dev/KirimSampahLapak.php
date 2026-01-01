@@ -39,7 +39,7 @@ class KirimSampahLapak extends Seeder
                 'foto_plat_nomor'  => 'pengiriman/2025/12/27/1766820625_694f8b11e44f8.png',
 
                 'petugas_id' => 3,
-                'gudang_id'  => 1,
+                'gudang_id'  => rand(1, 3),
 
                 'status_pengiriman' => 'dikirim',
             ]);

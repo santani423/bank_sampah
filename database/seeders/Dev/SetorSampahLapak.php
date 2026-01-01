@@ -25,7 +25,7 @@ class SetorSampahLapak extends Seeder
                 $transaksi = TransaksiLapak::create([
                     'kode_transaksi'     => $kodeTransaksi,
                     'lapak_id'           => $lapak->id,
-                    'petugas_id'         => 3,
+                    'petugas_id'         => rand(1, 3),
                     'tanggal_transaksi' => now()->subDays(rand(1, 30)),
                     'total_transaksi'   => 0, // sementara
                 ]);

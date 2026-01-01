@@ -249,6 +249,14 @@ class PengirimanLapakController extends Controller
                 );
             }
 
+            if ($request->has('customer')) {
+                $customer = $request->get('customer');
+                $query->whereHas('detailPengirimanLapaks.transaksiLapak.lapak', function ($q) use ($customer) {
+                    $q->where('nama_lapak', 'like', '%' . $customer . '%')
+                        ->orWhere('kode_lapak', 'like', '%' . $customer . '%');
+                });
+            }
+
             // =========================
             // 4. SORT & PAGINATION
             // =========================

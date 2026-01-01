@@ -71,7 +71,7 @@
                                     <i class="bi bi-search"></i> Cari
                                 </button>
 
-                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-counterclockwise"></i> Reset
                                 </a>
                             </div>
@@ -118,14 +118,15 @@
 @push('scripts')
     <script>
         /* ===============================
-                   AMBIL FILTER TANGGAL
-                ================================ */
+                           AMBIL FILTER TANGGAL
+                        ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
+            const customer = document.getElementById('customer').value;
             let tanggalMulai = '';
             let tanggalSelesai = '';
 
-            console.log("tanggalRange", tanggalRange);
+
 
             if (tanggalRange && tanggalRange.includes('to')) {
                 const [start, end] = tanggalRange.split('to');
@@ -135,7 +136,8 @@
 
             return {
                 tanggal_mulai: tanggalMulai,
-                tanggal_selesai: tanggalSelesai
+                tanggal_selesai: tanggalSelesai,
+                customer: customer
             };
         }
 
@@ -162,7 +164,10 @@
                 }),
                 ...(filters.tanggal_selesai && {
                     tanggal_selesai: filters.tanggal_selesai
-                })
+                }),
+                ...(filters.customer && {
+                    customer: filters.customer
+                }),
             });
 
             console.log("params:", params.toString());
