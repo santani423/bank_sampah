@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('pengiriman_lapaks', function (Blueprint $table) {
             $table->id();
             $table->string('kode_pengiriman')->unique();
+            $table->unsignedBigInteger('gudang_id')->nullable();
+            $table->unsignedBigInteger('lapak_id')->nullable();
             $table->date('tanggal_pengiriman')->nullable();
             $table->string('driver')->nullable();
             $table->string('driver_hp')->nullable();
@@ -24,7 +26,6 @@ return new class extends Migration
             $table->string('catatan')->nullable(); 
             $table->unsignedBigInteger('petugas_id');
             $table->longText('temp_before_data')->nullable();
-            $table->unsignedBigInteger('gudang_id')->nullable();
             $table->enum('status_pengiriman', ['draft', 'dikirim', 'diterima', 'batal','pending'])->default('pending');
             $table->timestamps();
         });

@@ -39,4 +39,11 @@ class PengirimanLapak extends Model
     {
         return $this->belongsTo(Petugas::class, 'petugas_id');
     }
+    /**
+     * Mendapatkan data lapak terkait pengiriman lapak.
+     */
+    public function lapak()
+    {
+        return $this->belongsTo(Lapak::class, 'lapak_id');
+    }
 }

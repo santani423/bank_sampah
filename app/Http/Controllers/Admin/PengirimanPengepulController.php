@@ -390,7 +390,7 @@ class PengirimanPengepulController extends Controller
     public function detailPembayaranPengirimanLapak($kode)
     {
         // Ambil data pengiriman berdasarkan kode
-        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang'])
+        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang','lapak','petugas'])
             ->where('kode_pengiriman', $kode)
             ->first();
 

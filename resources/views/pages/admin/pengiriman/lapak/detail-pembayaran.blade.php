@@ -25,21 +25,30 @@
         <div class="card shadow mb-4 border-0">
             <div class="card-body">
                 <div class="row mb-3 g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="info-box p-3 h-100 border rounded bg-light">
+                            <div class="mb-2"><span class="badge bg-info text-dark">Lapak</span></div>
+                            <div class="fw-bold fs-5">{{ $pengiriman->lapak->nama_lapak ?? '-' }}</div>
+                            <div class="text-muted small">No Rekening: {{ $pengiriman->lapak->no_rekening ?? '-' }}</div>
+                            <div class="text-muted small">Atas Nama: {{ $pengiriman->lapak->nama_rekening ?? '-' }}</div>
+                            <div class="text-muted small">Bank: {{ $pengiriman->lapak->nama_rekening ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="info-box p-3 h-100 border rounded bg-light">
                             <div class="mb-2"><span class="badge bg-info text-dark">Kode Pengiriman</span></div>
                             <div class="fw-bold fs-5">{{ $pengiriman->kode_pengiriman ?? '-' }}</div>
                             <div class="text-muted small">Tanggal: {{ $pengiriman->tanggal_pengiriman ?? '-' }}</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="info-box p-3 h-100 border rounded bg-light">
                             <div class="mb-2"><span class="badge bg-success">Collaction Center</span></div>
                             <div class="fw-bold">{{ $pengiriman->gudang->cabang->nama_cabang ?? '-' }}</div>
                             <div class="text-muted small">Gudang: {{ $pengiriman->gudang->nama_gudang ?? '-' }}</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="info-box p-3 h-100 border rounded bg-light">
                             <div class="mb-2"><span class="badge bg-secondary">Petugas</span></div>
                             <div class="fw-bold">{{ $pengiriman->petugas->nama ?? '-' }}</div>
@@ -142,26 +151,86 @@
             </div>
         @endforeach
 
+        <!-- Summary Sampah & Total Subtotal -->
+        <div class="card border-0 shadow bg-white mt-4 mb-4">
+            <div class="card-header bg-gradient bg-info">
+                <h6 class="mb-0"><i class="bi bi-list-ul"></i> Summary Sampah</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Sampah</th>
+                                <th>Total Berat (kg)</th>
+                                <th>Total Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $summarySampah = [];
+                                $grandTotal = 0;
+                                foreach (($pengiriman->detailPengirimanLapaks ?? []) as $detailPengirimanLapaks) {
+                                    foreach (($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? []) as $item) {
+                                        $nama = $item->sampah->nama_sampah ?? '-';
+                                        $berat = $item->berat_terupdate ?? $item->berat_kg;
+                                        $subtotal = $berat * $item->harga_per_kg;
+                                        $grandTotal += $subtotal;
+                                        if (!isset($summarySampah[$nama])) {
+                                            $summarySampah[$nama] = ['berat' => 0, 'subtotal' => 0];
+                                        }
+                                        $summarySampah[$nama]['berat'] += $berat;
+                                        $summarySampah[$nama]['subtotal'] += $subtotal;
+                                    }
+                                }
+                                $no = 1;
+                            @endphp
+                            @foreach ($summarySampah as $nama => $data)
+                                <tr>
+                                    <td>{{ $no++ }}</td>
+                                    <td>{{ $nama }}</td>
+                                    <td>{{ number_format($data['berat'], 2, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($data['subtotal'], 0, ',', '.') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Grand Total</th>
+                                <th id="grand-total">Rp {{ number_format($grandTotal, 0, ',', '.') }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Form Upload Sampah -->
         <div class="card mt-4 mb-5">
             <div class="card-header bg-primary text-white">
-                <strong>Upload File Sampah</strong>
+                <strong>Pembayaran Pengiriman</strong>
             </div>
             <div class="card-body">
                 @csrf
                 <input type="hidden" name="kode_pengiriman" value="{{ $kode ?? '' }}">
                 <div class="mb-3">
-                    <label for="file_sampah" class="form-label">Upload penerimaan samaph</label>
-                    <input type="file" class="form-control" id="file_sampah" name="file_sampah"
-                        accept=".csv,.xlsx,.jpg,.jpeg,.png,.pdf" required>
-                    <div id="preview_sampah" class="mt-2"></div>
+                    <label for="jenis_bayar" class="form-label">Pilih Jenis Pembayaran</label>
+                    <select class="form-select" id="jenis_bayar" name="jenis_bayar" required>
+                        <option value="">-- Pilih Jenis Pembayaran --</option>
+                        <option value="potong_saldo">Potong Saldo</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                </div>
+                <div class="mb-3 d-none" id="bukti_transfer_group">
+                    <label for="bukti_transfer" class="form-label">Upload Bukti Transfer</label>
+                    <input type="file" class="form-control" id="bukti_transfer" name="bukti_transfer"
+                        accept=".jpg,.jpeg,.png,.pdf">
+                    <div id="preview_bukti_transfer" class="mt-2"></div>
                 </div>
 
                 <div class="mb-3">
-                    <x-select.select-status-pengiriman name="status_pengiriman" /> 
-                </div>
-                <div class="mb-3">
-                    <label for="file_sampah" class="form-label">Catatan</label>
+                    <label for="catatan_sampah" class="form-label">Catatan</label>
                     <textarea class="form-control" id="catatan_sampah" name="catatan_sampah" rows="3"
                         placeholder="Masukkan keterangan tambahan (opsional)"></textarea>
                 </div>
@@ -178,6 +247,43 @@
 
 @push('scripts')
     <script>
+        // Jenis bayar logic
+        document.addEventListener('DOMContentLoaded', function() {
+            var jenisBayar = document.getElementById('jenis_bayar');
+            var buktiGroup = document.getElementById('bukti_transfer_group');
+            var buktiInput = document.getElementById('bukti_transfer');
+            var previewBukti = document.getElementById('preview_bukti_transfer');
+            if (jenisBayar) {
+                jenisBayar.addEventListener('change', function() {
+                    if (this.value === 'transfer') {
+                        buktiGroup.classList.remove('d-none');
+                        buktiInput.required = true;
+                    } else {
+                        buktiGroup.classList.add('d-none');
+                        buktiInput.required = false;
+                        previewBukti.innerHTML = '';
+                        buktiInput.value = '';
+                    }
+                });
+            }
+            if (buktiInput && previewBukti) {
+                buktiInput.addEventListener('change', function(e) {
+                    previewBukti.innerHTML = '';
+                    var file = e.target.files[0];
+                    if (file && file.type.match('image.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function(evt) {
+                            previewBukti.innerHTML = '<img src="' + evt.target.result +
+                                '" class="img-thumbnail" style="max-width:200px;">';
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (file) {
+                        previewBukti.innerHTML = '<span class="text-secondary">File: ' + file.name +
+                            '</span>';
+                    }
+                });
+            }
+        });
         // AJAX upload file sampah
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('form-upload-sampah');

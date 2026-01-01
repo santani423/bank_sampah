@@ -94,7 +94,8 @@ class PengirimanLapakController extends Controller
         }
 
         // Update status
-        $pengiriman->kode_pengiriman = $request->kode_pengiriman;
+        $pengiriman->kode_pengiriman = $request ->kode_pengiriman;
+        $pengiriman->lapak_id = $lapak->id;
         $pengiriman->tanggal_pengiriman = date('Y-m-d', strtotime($request->tanggal_pengiriman));
         $pengiriman->driver = $request->driver;
         $pengiriman->driver_hp = $request->driver_hp;
