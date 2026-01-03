@@ -19,19 +19,8 @@ class NasabahController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $query = Nasabah::with('saldo','user');
-        $perPage = (int) $request->get('per_page', 10);
-        $page = max(1, (int) $request->get('page', 1));
-        if ($request->filled('nama_nasabah')) {
-            $query->where('nama_lengkap', 'like', '%' . $request->input('nama_nasabah') . '%');
-        }
-
-        $nasabahs = $query->paginate($perPage, ['*'], 'page', $page);
-
-       
-
-        return view('pages.admin.nasabah.index', compact('nasabahs'));
+    { 
+        return view('pages.admin.nasabah.index',);
     }
 
     /**
@@ -97,7 +86,7 @@ class NasabahController extends Controller
     public function show($id)
     {
         // Ambil data nasabah
-        $nasabah = Nasabah::with('saldo','user','loggings')->findOrFail($id);
+        $nasabah = Nasabah::with('saldo', 'user', 'loggings')->findOrFail($id);
 
         // Ambil riwayat setoran (transaksi)
         $riwayatSetoran = Transaksi::with(['detailTransaksi.sampah'])
@@ -111,7 +100,7 @@ class NasabahController extends Controller
             ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
         // dd($nasabah);
-            
+
 
         return view('pages.admin.nasabah.show', compact('nasabah', 'riwayatSetoran', 'riwayatPenarikan'));
     }

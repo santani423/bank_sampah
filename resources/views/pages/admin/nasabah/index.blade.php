@@ -46,25 +46,16 @@
                     {{-- FILTER FORM --}}
                     <form id="filter-form">
                         <div class="row align-items-end">
-
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                            </div>
                             <div class="col-md-3 mb-3">
                                 <x-select.select-cabang name="cabang" />
                             </div>
 
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Customer</label>
-                                <input type="text" class="form-control" id="customer" placeholder="Nama customer">
-                            </div>
 
-                            <div class="col-md-3 mb-3">
-                                <x-select.select-status-pengiriman name="status_pengiriman" />
-                            </div>
 
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Tanggal Pengiriman</label>
-                                <input type="text" class="form-control" id="tanggal_range"
-                                    placeholder="YYYY-MM-DD s/d YYYY-MM-DD" autocomplete="off">
-                            </div>
 
                             <div class="col-md-12 mb-3 d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
@@ -93,6 +84,7 @@
                                     <th>Nama</th>
                                     <th>Username</th>
                                     <th>No. Registrasi</th>
+                                    <th>Cabang</th>
                                     <th>No. HP</th>
                                     <th>Saldo</th>
                                     <th>Status</th>
@@ -116,30 +108,18 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                               AMBIL FILTER TANGGAL
-                                                            ================================ */
+                                                                                                           AMBIL FILTER TANGGAL
+                                                                                                        ================================ */
         function getFilterParams() {
-            const tanggalRange = document.getElementById('tanggal_range').value;
-            const customer = document.getElementById('customer').value;
+
+            const nasabah = document.getElementById('nasabah').value;
             const cabang = document.getElementById('cabang').value;
-            const status_pengiriman = document.getElementById('status_pengiriman').value;
-            let tanggalMulai = '';
-            let tanggalSelesai = '';
 
-
-
-            if (tanggalRange && tanggalRange.includes('to')) {
-                const [start, end] = tanggalRange.split('to');
-                tanggalMulai = start.trim();
-                tanggalSelesai = end.trim();
-            }
-
+           
+            
             return {
-                tanggal_mulai: tanggalMulai,
-                tanggal_selesai: tanggalSelesai,
-                customer: customer,
+                nasabah: nasabah,
                 cabang: cabang,
-                status_pengiriman: status_pengiriman,
             };
         }
 
@@ -157,27 +137,19 @@
             pagination.style.display = 'none';
 
             const filters = getFilterParams();
-
             const params = new URLSearchParams({
                 page,
                 per_page: perPage,
-                ...(filters.tanggal_mulai && {
-                    tanggal_mulai: filters.tanggal_mulai
-                }),
-                ...(filters.tanggal_selesai && {
-                    tanggal_selesai: filters.tanggal_selesai
-                }),
-                ...(filters.customer && {
-                    customer: filters.customer
+                
+                ...(filters.nasabah && {
+                    search: filters.nasabah, 
                 }),
                 ...(filters.cabang && {
-                    cabang: filters.cabang
-                }),
-                ...(filters.status_pengiriman && {
-                    status_pengiriman: filters.status_pengiriman
+                    cabang: filters.cabang, 
                 }),
             });
-
+            
+         
 
 
 
@@ -212,33 +184,37 @@
                 return;
             }
 
-            const detailRoute = "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
-            const detailBayarRoute = "{{ route('admin.pengiriman-lapak.detail.pembayaran', ':kode') }}";
+            const detailRoute = "{{ route('admin.nasabah.show', ':kode') }}";
+            const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
                 const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlBayar = detailBayarRoute.replace(':kode', item.kode_pengiriman);
+                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
 
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td>
                 <td>
-                    ${item.status_pengiriman === 'diterima' ? `
-                                        <a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>
-                                        ` : `
-                                        <a href="${url}" class="btn btn-sm btn-info">Detail</a>
-                                        `}
+                     <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                     <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
                 </td>
                 <td>${item.nama_lengkap}</td> 
                 <td>${item.username}</td> 
                 <td>${item.no_registrasi}</td>
+                <td>${item.nama_cabang}</td>
                 <td>${item.no_hp}</td>
-                <td>${item.status}</td>
+                <td>${formatRupiah(item.saldo.saldo)}</td>
                 <td>${item.status}</td>
             </tr>
         `;
             });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            if (angka == null) return '-';
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
 

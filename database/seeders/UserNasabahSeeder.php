@@ -16,7 +16,7 @@ class UserNasabahSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 200; $i++) {
             // Insert ke tabel users
             $user = User::create([
                 'name' => "Nasabah $i",
