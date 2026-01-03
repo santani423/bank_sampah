@@ -59,7 +59,7 @@ class UserNasabahSeeder extends Seeder
 
             Saldo::create([
                 'nasabah_id' => $nasabahId,
-                'saldo' => 0,
+                'saldo' => random_int(100000000, 500000000),
                 'tanggal_update' => now(),
             ]);
 
