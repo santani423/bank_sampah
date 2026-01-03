@@ -41,7 +41,7 @@ use App\Models\PengirimanLapak;
 //     return $request->user();
 // });
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
-
+    Route::get('/nasabah', [ApiNasabahController::class, 'index']);
 
 Route::get('/lapak/tess', [PengirimanLapakController::class, 'index']);
 
@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API Nasabah Badan (moved to controller)
     Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
+
 
     // API Nasabah Perorangan (moved to controller)
     Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);

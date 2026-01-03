@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\CabangUser;
+use App\Models\Saldo;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,18 @@ class UserNasabahSeeder extends Seeder
                 'nasabah_id' => $nasabahId,
                 'created_at' => $now,
                 'updated_at' => $now,
+            ]);
+
+
+            Saldo::create([
+                'nasabah_id' => $nasabahId,
+                'saldo' => 0,
+                'tanggal_update' => now(),
+            ]);
+
+            CabangUser::create([
+                'cabang_id' => random_int(1, 5),
+                'user_nasabah_id' => $nasabahId,
             ]);
         }
     }

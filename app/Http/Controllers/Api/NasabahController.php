@@ -14,23 +14,68 @@ class NasabahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Nasabah::query();
+        try {
+            // =========================
+            // 1. QUERY DASAR
+            // =========================
+            $query = Nasabah::query()->with(['saldo']);
 
-        if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lengkap', 'like', "%{$search}%")
-                    ->orWhere('no_registrasi', 'like', "%{$search}%");
+            // =========================
+            // 2. FILTER SEARCH
+            // =========================
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($subQuery) use ($search) {
+                    $subQuery->where('nama_lengkap', 'like', "%{$search}%")
+                        ->orWhere('no_registrasi', 'like', "%{$search}%");
+                });
             });
-        }
 
-        $perPage = (int) $request->get('per_page', 10);
-        if ($perPage <= 0 || $perPage > 100) {
-            $perPage = 10;
-        }
+            // =========================
+            // 3. VALIDASI PER PAGE
+            // =========================
+            $perPage = (int) $request->get('per_page', 10);
+            $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 10;
 
-        $nasabahs = $query->orderByDesc('id')->paginate($perPage);
-        return response()->json($nasabahs);
+            // =========================
+            // 4. PAGINATION
+            // =========================
+            $nasabahs = $query
+                ->orderByDesc('id')
+                ->paginate($perPage);
+
+            // =========================
+            // 5. RESPONSE SUKSES
+            // =========================
+            return response()->json([
+                'success' => true,
+                'message' => 'Data nasabah berhasil diambil.',
+                'data'    => $nasabahs->items(),
+                'pagination' => [
+                    'current_page' => $nasabahs->currentPage(),
+                    'last_page'    => $nasabahs->lastPage(),
+                    'per_page'     => $nasabahs->perPage(),
+                    'total'        => $nasabahs->total(),
+                    'from'         => $nasabahs->firstItem(),
+                    'to'           => $nasabahs->lastItem(),
+                ],
+            ], 200);
+        } catch (\Throwable $e) {
+            // =========================
+            // 6. RESPONSE ERROR
+            // =========================
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data nasabah.',
+                'error'   => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
+    /**
+     * Daftar nasabah berdasarkan petugas (perorangan) dengan pagination & optional search.
+     * Route: GET /api/nasabah
+     * Query params: email, search, page, per_page
+     */
 
     public function nasabahPetugas(Request $request)
     {
@@ -74,7 +119,7 @@ class NasabahController extends Controller
             $term = $request->input('search');
             $query->where(function ($q) use ($term) {
                 $q->where('nasabah.nama_lengkap', 'like', "%{$term}%")
-                  ->orWhere('nasabah.no_registrasi', 'like', "%{$term}%");
+                    ->orWhere('nasabah.no_registrasi', 'like', "%{$term}%");
             });
         } else {
             // 🔍 Filter berdasarkan nama nasabah
@@ -127,8 +172,8 @@ class NasabahController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nasabah.nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
-                  ->orWhere('nasabah.no_hp', 'like', "%{$search}%");
+                    ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
+                    ->orWhere('nasabah.no_hp', 'like', "%{$search}%");
             });
         }
 
