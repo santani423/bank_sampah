@@ -233,9 +233,11 @@
                                 preview.innerHTML = '';
 
                                 setTimeout(() => {
-                                    window.location.href =
-                                        "/admin/pengiriman/sampah-lapak/detail-pembayarank/" +
-                                        data.kode_pengiriman;
+                                    if (data.kode_pengiriman) {
+                                        window.location.href = "/admin/pengiriman/sampah-lapak/detail-pembayaran/" + data.kode_pengiriman;
+                                    } else {
+                                        feedback.innerHTML += '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
+                                    }
                                 }, 800);
                             } else {
                                 feedback.innerHTML = '<span class="text-danger">' + (data.message ||

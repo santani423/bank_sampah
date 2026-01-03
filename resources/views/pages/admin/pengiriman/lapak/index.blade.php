@@ -118,8 +118,8 @@
 @push('scripts')
     <script>
         /* ===============================
-                                           AMBIL FILTER TANGGAL
-                                        ================================ */
+                                                       AMBIL FILTER TANGGAL
+                                                    ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
@@ -215,16 +215,22 @@
             }
 
             const detailRoute = "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
+            const detailBayarRoute = "{{ route('admin.pengiriman-lapak.detail.pembayaran', ':kode') }}";
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
                 const url = detailRoute.replace(':kode', item.kode_pengiriman);
+                const urlBayar = detailBayarRoute.replace(':kode', item.kode_pengiriman);
 
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td>
                 <td>
-                    <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                    ${item.status_pengiriman === 'diterima' ? `
+                                <a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>
+                                ` : `
+                                <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                                `}
                 </td>
                 <td>${item.kode_pengiriman}</td>
                 <td>${item.tanggal_pengiriman}</td>
