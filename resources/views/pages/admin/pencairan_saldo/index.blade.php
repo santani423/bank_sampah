@@ -75,6 +75,7 @@
                             <div class="spinner-border" role="status"></div>
                         </div>
 
+
                         <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
                             style="display:none;">
                             <thead>
@@ -89,6 +90,44 @@
                             <tbody id="petugas-tbody"></tbody>
                         </table>
 
+                        <!-- Modal Konfirmasi Setujui -->
+                        <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah" class="fw-bold"></span> sebesar <span id="setujuiJumlah" class="fw-bold"></span>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-success" id="btnKonfirmasiSetujui">Setujui</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Konfirmasi Tolak -->
+                        <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalTolakLabel">Konfirmasi Tolak</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Apakah Anda yakin ingin menolak pencairan saldo <span id="tolakNamaNasabah" class="fw-bold"></span> sebesar <span id="tolakJumlah" class="fw-bold"></span>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-danger" id="btnKonfirmasiTolak">Tolak</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
                             <div id="pagination-info"></div>
                             <div id="pagination-controls"></div>
@@ -98,31 +137,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        Launch demo modal
-    </button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div> 
 @endsection
 
 @push('scripts')
@@ -203,29 +218,23 @@
                 tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
-
-            const detailRoute = "{{ route('admin.nasabah.show', ':kode') }}";
-            const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
+ 
 
             data.forEach((item, index) => {
-                const no = pagination.from + index;
-                const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
+                const no = pagination.from + index;  
 
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td> 
                 <td>
-                     <button type="submit" class="btn btn-success btn-sm"
-                                                    onclick=" ">
-                                                    Setujui
-                                                </button>
-                  <button type="button" class="btn btn-danger btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalTolak"
-                                                onclick=" ">
-                                                Tolak
-                                            </button>
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSetujui"
+                        onclick="showSetujuiModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.kode_pengiriman}')">
+                        Setujui
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalTolak"
+                        onclick="showTolakModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.kode_pengiriman}')">
+                        Tolak
+                    </button>
                 </td>
                 <td>${item?.created_at}</td> 
                 <td>${item?.nasabah?.nama_lengkap}</td> 
@@ -254,5 +263,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchPetugasData(1);
         });
+        // Fungsi untuk menampilkan modal Setujui dengan data dinamis
+        function showSetujuiModal(nama, jumlah, kode) {
+            document.getElementById('setujuiNamaNasabah').textContent = nama;
+            document.getElementById('setujuiJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('btnKonfirmasiSetujui').onclick = function() {
+                // TODO: Aksi konfirmasi setujui, misal AJAX atau submit form
+                // kode_pengiriman: kode
+                // Tutup modal setelah aksi
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalSetujui'));
+                modal.hide();
+            };
+        }
+
+        // Fungsi untuk menampilkan modal Tolak dengan data dinamis
+        function showTolakModal(nama, jumlah, kode) {
+            document.getElementById('tolakNamaNasabah').textContent = nama;
+            document.getElementById('tolakJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('btnKonfirmasiTolak').onclick = function() {
+                // TODO: Aksi konfirmasi tolak, misal AJAX atau submit form
+                // kode_pengiriman: kode
+                // Tutup modal setelah aksi
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalTolak'));
+                modal.hide();
+            };
+        }
     </script>
 @endpush

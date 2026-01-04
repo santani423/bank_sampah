@@ -52,12 +52,13 @@ class PencairanSaldoController extends Controller
     /**
      * Proses persetujuan permintaan pencairan saldo.
      */
-    public function setujui(Request $request, $id)
+    public function setujui(Request $request)
     {
         $request->validate([
             'jumlah_pencairan' => 'required|numeric|min:0',
+            'id' => 'required|numeric|min:0',
         ]);
-
+        $id = $request->input('id');
         $pencairan = PencairanSaldo::findOrFail($id);
 
         // Pastikan statusnya masih pending

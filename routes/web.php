@@ -122,7 +122,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     // Route::get('', 'AdminTransaksiController@print')->name('admin.transaksi.print');
 
     Route::get('/tarik-saldo', [AdminTarikSaldoController::class, 'index'])->name('admin.tarik-saldo.index');
-    Route::post('/tarik-saldo/setujui/{id}', [AdminTarikSaldoController::class, 'setujui'])->name('admin.tarik-saldo.setujui');
+    Route::post('/tarik-saldo/setujui', [AdminTarikSaldoController::class, 'setujui'])->name('admin.tarik-saldo.setujui');
     Route::post('/tarik-saldo/tolak/{id}', [AdminTarikSaldoController::class, 'tolak'])->name('admin.tarik-saldo.tolak');
 
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('admin.pengiriman');
