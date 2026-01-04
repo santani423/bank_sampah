@@ -89,7 +89,7 @@
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.tarik-saldo.index') }}" class="sidebar-submenu__link">
                     Tarik
-                    Sald </a>
+                    Saldo </a>
             </li>
             <li class="sidebar-submenu__item">
                 <a href="{{ route('admin.pengiriman.index') }}" class="sidebar-submenu__link">

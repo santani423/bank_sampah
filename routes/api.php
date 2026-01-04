@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PencairanSaldoController;
 use App\Http\Controllers\Api\countConttroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,8 @@ use App\Models\PengirimanLapak;
 // });
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
-Route::get('/lapak/tess', [PengirimanLapakController::class, 'index']);
+ 
+Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {
