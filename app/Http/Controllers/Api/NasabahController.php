@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
+use App\Models\Petugas;
 use Illuminate\Support\Facades\DB;
 
 class NasabahController extends Controller
@@ -15,6 +16,12 @@ class NasabahController extends Controller
     public function index(Request $request)
     {
         try {
+            //
+            $authUser = auth()->user();
+
+            // Cari petugas berdasarkan email user login
+            $petugas = Petugas::where('email', $authUser->email)->first();
+
             // =========================
             // 1. QUERY DASAR
             // =========================
@@ -28,7 +35,11 @@ class NasabahController extends Controller
                 ->join('cabang_users', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
                 ->join('cabangs', 'cabang_users.cabang_id', '=', 'cabangs.id');
 
-
+            // Jika petugas ditemukan, filter berdasarkan petugas
+            if ($petugas) {
+                $query->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
+                    ->where('petugas_cabangs.petugas_id', $petugas->id);
+            }
             // =========================
             // 2. FILTER SEARCH
             // =========================
