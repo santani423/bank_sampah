@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama')->nullable();
             $table->string('keterangan')->nullable();
-            $table->decimal('code')->nullable();
+            $table->string('code')->nullable();
             $table->string('base_fee')->nullable();
             $table->string('ppn_percent')->nullable();
             $table->string('total_fee')->nullable();
