@@ -147,12 +147,13 @@ class PencairanSaldoController extends Controller
     /**
      * Proses penolakan permintaan pencairan saldo.
      */
-    public function tolak(Request $request, $id)
+    public function tolak(Request $request)
     {
         $request->validate([
             'keterangan' => 'required|string|max:255',
         ]);
 
+        $id = $request->input('id');
         // Ambil data pencairan saldo berdasarkan ID
         $pencairan = PencairanSaldo::findOrFail($id);
 
@@ -171,7 +172,7 @@ class PencairanSaldoController extends Controller
         $userNasabah = UserNasabah::with('nasabah')->where('nasabah_id', $pencairan->nasabah_id)->first();
         $nasabah = $userNasabah ? $userNasabah->nasabah : null;
 
-        
+
 
         if ($nasabah) {
             $setting = Setting::first();

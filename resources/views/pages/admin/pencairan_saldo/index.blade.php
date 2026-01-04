@@ -42,6 +42,12 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
                     {{-- FILTER FORM --}}
                     <form id="filter-form">
@@ -91,23 +97,29 @@
                         </table>
 
                         <!-- Modal Konfirmasi Setujui -->
-                        <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel" aria-hidden="true">
+                        <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel"
+                            aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <form id="formSetujui" method="POST" action="{{ route('admin.tarik-saldo.setujui') }}">
                                         @csrf
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah" class="fw-bold"></span> sebesar <span id="setujuiJumlah" class="fw-bold"></span>?
+                                            Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="setujuiJumlah"
+                                                class="fw-bold"></span>?
                                             <input type="hidden" name="id" id="setujuiId">
                                             <input type="hidden" name="jumlah_pencairan" id="setujuiJumlahInput">
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-success" id="btnKonfirmasiSetujui">Setujui</button>
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success"
+                                                id="btnKonfirmasiSetujui">Setujui</button>
                                         </div>
                                     </form>
                                 </div>
@@ -115,20 +127,36 @@
                         </div>
 
                         <!-- Modal Konfirmasi Tolak -->
-                        <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
+                        <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel"
+                            aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalTolakLabel">Konfirmasi Tolak</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Apakah Anda yakin ingin menolak pencairan saldo <span id="tolakNamaNasabah" class="fw-bold"></span> sebesar <span id="tolakJumlah" class="fw-bold"></span>?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="button" class="btn btn-danger" id="btnKonfirmasiTolak">Tolak</button>
-                                    </div>
+                                    <form id="formTolak" method="POST" action="">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalTolakLabel">Konfirmasi Tolak</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menolak pencairan saldo <span id="tolakNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="tolakJumlah"
+                                                class="fw-bold"></span>?
+                                            <input type="hidden" name="id" id="tolakId">
+                                            <input type="hidden" name="jumlah_pencairan" id="tolakJumlahInput">
+                                            <div class="mb-3 mt-3">
+                                                <label for="tolakKeterangan" class="form-label">Keterangan
+                                                    Penolakan</label>
+                                                <textarea class="form-control" name="keterangan" id="tolakKeterangan" rows="2" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-danger"
+                                                id="btnKonfirmasiTolak">Tolak</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -142,14 +170,14 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
 @endsection
 
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                                                           AMBIL FILTER TANGGAL
-                                                                                                                                        ================================ */
+                                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                                            ================================ */
         function getFilterParams() {
 
             const nasabah = document.getElementById('nasabah').value;
@@ -223,10 +251,10 @@
                 tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
- 
+
 
             data.forEach((item, index) => {
-                const no = pagination.from + index;  
+                const no = pagination.from + index;
 
                 tbody.innerHTML += `
             <tr>
@@ -280,13 +308,10 @@
         function showTolakModal(nama, jumlah, kode) {
             document.getElementById('tolakNamaNasabah').textContent = nama;
             document.getElementById('tolakJumlah').textContent = formatRupiah(jumlah);
-            document.getElementById('btnKonfirmasiTolak').onclick = function() {
-                // TODO: Aksi konfirmasi tolak, misal AJAX atau submit form
-                // kode_pengiriman: kode
-                // Tutup modal setelah aksi
-                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalTolak'));
-                modal.hide();
-            };
+            document.getElementById('tolakJumlahInput').value = jumlah;
+            document.getElementById('tolakId').value = kode;
+            // Set action form sesuai route dan id
+            document.getElementById('formTolak').action = `/admin/tarik-saldo/tolak`;
         }
     </script>
 @endpush
