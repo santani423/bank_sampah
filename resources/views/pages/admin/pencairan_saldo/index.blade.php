@@ -94,17 +94,22 @@
                         <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah" class="fw-bold"></span> sebesar <span id="setujuiJumlah" class="fw-bold"></span>?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="button" class="btn btn-success" id="btnKonfirmasiSetujui">Setujui</button>
-                                    </div>
+                                    <form id="formSetujui" method="POST" action="{{ route('admin.tarik-saldo.setujui') }}">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah" class="fw-bold"></span> sebesar <span id="setujuiJumlah" class="fw-bold"></span>?
+                                            <input type="text" name="id" id="setujuiId">
+                                            <input type="text" name="jumlah_pencairan" id="setujuiJumlahInput">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success" id="btnKonfirmasiSetujui">Setujui</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -267,13 +272,8 @@
         function showSetujuiModal(nama, jumlah, kode) {
             document.getElementById('setujuiNamaNasabah').textContent = nama;
             document.getElementById('setujuiJumlah').textContent = formatRupiah(jumlah);
-            document.getElementById('btnKonfirmasiSetujui').onclick = function() {
-                // TODO: Aksi konfirmasi setujui, misal AJAX atau submit form
-                // kode_pengiriman: kode
-                // Tutup modal setelah aksi
-                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalSetujui'));
-                modal.hide();
-            };
+            document.getElementById('setujuiId').value = kode;
+            document.getElementById('setujuiJumlahInput').value = jumlah;
         }
 
         // Fungsi untuk menampilkan modal Tolak dengan data dinamis
