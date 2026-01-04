@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CabangUser;
+use App\Models\MetodePencairan;
 use App\Models\Saldo;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -66,6 +67,13 @@ class UserNasabahSeeder extends Seeder
             CabangUser::create([
                 'cabang_id' => random_int(1, 5),
                 'user_nasabah_id' => $nasabahId,
+            ]);
+
+            MetodePencairan::create([
+                'nasabah_id' => $nasabahId,
+                'jenis_metode_penarikan_id' => 1,
+                'nama_metode_pencairan' => "Nasabah $i",
+                'no_rek' => '1234567890' . str_pad($i, 2, '0', STR_PAD_LEFT), 
             ]);
         }
     }
