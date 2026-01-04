@@ -102,8 +102,8 @@
                                         </div>
                                         <div class="modal-body">
                                             Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah" class="fw-bold"></span> sebesar <span id="setujuiJumlah" class="fw-bold"></span>?
-                                            <input type="text" name="id" id="setujuiId">
-                                            <input type="text" name="jumlah_pencairan" id="setujuiJumlahInput">
+                                            <input type="hidden" name="id" id="setujuiId">
+                                            <input type="hidden" name="jumlah_pencairan" id="setujuiJumlahInput">
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
