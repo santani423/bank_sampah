@@ -99,6 +99,7 @@ class PencairanSaldoController extends Controller
         ];
         $response = Http::withBasicAuth(config('xendit.api_key'), '')
             ->post('https://api.xendit.co/disbursements', $payload);
+        // dd($response->json());
 
         if ($response->successful()) {
             Log::info('DANA Disbursement berhasil', [
