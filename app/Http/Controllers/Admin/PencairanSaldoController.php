@@ -60,7 +60,7 @@ class PencairanSaldoController extends Controller
         ]);
         $id = $request->input('id');
         $pencairan = PencairanSaldo::findOrFail($id);
-        dd($pencairan);
+        // dd($pencairan);
         // Pastikan statusnya masih pending
         if ($pencairan->status !== 'pending') {
             return redirect()->back()->withErrors(['msg' => 'Permintaan sudah diproses sebelumnya.']);

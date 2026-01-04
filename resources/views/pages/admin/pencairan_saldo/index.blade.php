@@ -233,11 +233,11 @@
                 <td>${no}</td> 
                 <td>
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSetujui"
-                        onclick="showSetujuiModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.kode_pengiriman}')">
+                        onclick="showSetujuiModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.id}')">
                         Setujui
                     </button>
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalTolak"
-                        onclick="showTolakModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.kode_pengiriman}')">
+                        onclick="showTolakModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.id}')">
                         Tolak
                     </button>
                 </td>
