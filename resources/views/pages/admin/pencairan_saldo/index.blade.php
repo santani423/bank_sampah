@@ -255,10 +255,18 @@
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
-
+                // Format tanggal
+                let tanggal = '-';
+                if (item?.created_at) {
+                    const dateObj = new Date(item.created_at);
+                    const pad = n => n.toString().padStart(2, '0');
+                    tanggal = `${dateObj.getFullYear()}-${pad(dateObj.getMonth()+1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+                }
+                // Format jumlah penarikan
+                const jumlahRupiah = formatRupiah(item?.jumlah_pencairan);
                 tbody.innerHTML += `
             <tr>
-                <td>${no}</td> 
+                <td>${no}</td>
                 <td>
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSetujui"
                         onclick="showSetujuiModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.id}')">
@@ -269,9 +277,9 @@
                         Tolak
                     </button>
                 </td>
-                <td>${item?.created_at}</td> 
-                <td>${item?.nasabah?.nama_lengkap}</td> 
-                <td>${item?.jumlah_pencairan}</td> 
+                <td>${tanggal}</td>
+                <td>${item?.nasabah?.nama_lengkap}</td>
+                <td>${jumlahRupiah}</td>
             </tr>
         `;
             });
