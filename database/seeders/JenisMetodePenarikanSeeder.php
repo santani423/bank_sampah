@@ -19,10 +19,10 @@ class JenisMetodePenarikanSeeder extends Seeder
             [
                 'nama' => 'BCA',
                 'keterangan' => 'Transfer ke rekening Bank Central Asia',
-                'code' => 'bank_bca',
-                'base_fee' => '2500',
-                'ppn_percent' => '11',
-                'total_fee' => '2775',
+                'code' => 'BCA', // Kode standar Xendit untuk Bank BCA
+                'base_fee' => 2500,
+                'ppn_percent' => 11,
+                'total_fee' => 2775,
                 'fee_bearer' => 'CUSTOMER',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
@@ -30,10 +30,10 @@ class JenisMetodePenarikanSeeder extends Seeder
             [
                 'nama' => 'DANA',
                 'keterangan' => 'Transfer ke akun DANA pengguna',
-                'code' => 'ewallet_dana',
-                'base_fee' => '2500',
-                'ppn_percent' => '11',
-                'total_fee' => '2775',
+                'code' => 'DANA', // Kode standar Xendit untuk E-Wallet DANA
+                'base_fee' => 2500,
+                'ppn_percent' => 11,
+                'total_fee' => 2775,
                 'fee_bearer' => 'CUSTOMER',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
@@ -41,10 +41,10 @@ class JenisMetodePenarikanSeeder extends Seeder
             [
                 'nama' => 'OVO',
                 'keterangan' => 'Pengiriman ke dompet digital OVO',
-                'code' => 'ewallet_ovo',
-                'base_fee' => '2500',
-                'ppn_percent' => '11',
-                'total_fee' => '2775',
+                'code' => 'OVO', // Kode standar Xendit untuk E-Wallet OVO
+                'base_fee' => 2500,
+                'ppn_percent' => 11,
+                'total_fee' => 2775,
                 'fee_bearer' => 'CUSTOMER',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
@@ -52,10 +52,21 @@ class JenisMetodePenarikanSeeder extends Seeder
             [
                 'nama' => 'Gopay',
                 'keterangan' => 'Penarikan ke akun Gopay pengguna',
-                'code' => 'ewallet_gopay',
-                'base_fee' => '2500',
-                'ppn_percent' => '11',
-                'total_fee' => '2775',
+                'code' => 'GOPAY', // Kode standar Xendit untuk E-Wallet GOPAY
+                'base_fee' => 2500,
+                'ppn_percent' => 11,
+                'total_fee' => 2775,
+                'fee_bearer' => 'CUSTOMER',
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ],
+            [
+                'nama' => 'ShopeePay',
+                'keterangan' => 'Penarikan ke akun ShopeePay pengguna',
+                'code' => 'SHOPEEPAY', // Tambahan opsi populer
+                'base_fee' => 2500,
+                'ppn_percent' => 11,
+                'total_fee' => 2775,
                 'fee_bearer' => 'CUSTOMER',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
