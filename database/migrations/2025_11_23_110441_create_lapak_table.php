@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('nasabah_id');
             $table->string('kode_lapak', 50)->unique();
+            $table->foreignId('jenis_metode_penarikan_id');
             $table->string('nama_lapak', 100);
             $table->text('alamat');
             $table->string('kota', 50)->nullable();

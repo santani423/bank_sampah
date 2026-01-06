@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
+    Route::post('/lapak/{id}/bayar-sampah-lapak', [PengirimanLapakController::class, 'bayarSampahLapak'])->name('api.lapak.bayar-sampah');
 
 
     Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);

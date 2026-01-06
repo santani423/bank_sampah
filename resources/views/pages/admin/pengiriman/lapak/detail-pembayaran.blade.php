@@ -348,12 +348,23 @@
                     btnUploadText.classList.add('d-none');
                     btnUploadSpinner.classList.remove('d-none');
                     var formData = new FormData(form);
+                    // Ambil nilai grand total dari elemen grand-total
+                    var grandTotalText = document.getElementById('grand-total')?.textContent || '';
+                    // Ekstrak angka dari string (misal: "Rp 1.000.000" -> 1000000)
+                    var subtotal = 0;
+                    if (grandTotalText) {
+                        var match = grandTotalText.match(/([\d.,]+)/);
+                        if (match) {
+                            subtotal = parseInt(match[1].replace(/\./g, '').replace(/,/g, '')) || 0;
+                        }
+                    }
+                    formData.append('subtotal', subtotal);
                     var feedback = document.getElementById('upload-feedback');
                     feedback.innerHTML = '';
-                    fetch("{{ route('api.lapak.penerimaan-sampah-customer', $pengiriman->id ?? 0) }}", {
+                    fetch("{{ route('api.lapak.bayar-sampah', $pengiriman->id ?? 0) }}", {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ||
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || 
                                     '{{ csrf_token() }}'
                             },
                             body: formData
@@ -363,12 +374,12 @@
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
                             if (data.success) {
-                                feedback.innerHTML = '<span class="text-success">' + (data.message ||
+                                feedback.innerHTML = '<span class="text-success">' + (data.message || 
                                     'Upload berhasil!') + '</span>';
                                 form.reset();
                                 preview.innerHTML = '';
                             } else {
-                                feedback.innerHTML = '<span class="text-danger">' + (data.message ||
+                                feedback.innerHTML = '<span class="text-danger">' + (data.message || 
                                     'Upload gagal!') + '</span>';
                             }
                         })

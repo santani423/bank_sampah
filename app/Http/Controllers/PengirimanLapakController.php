@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use App\Services\WhatsAppService; // ✅ Tambahkan ini
 
 class PengirimanLapakController extends Controller
 {
@@ -94,7 +97,7 @@ class PengirimanLapakController extends Controller
         }
 
         // Update status
-        $pengiriman->kode_pengiriman = $request ->kode_pengiriman;
+        $pengiriman->kode_pengiriman = $request->kode_pengiriman;
         $pengiriman->lapak_id = $lapak->id;
         $pengiriman->tanggal_pengiriman = date('Y-m-d', strtotime($request->tanggal_pengiriman));
         $pengiriman->driver = $request->driver;
@@ -309,5 +312,52 @@ class PengirimanLapakController extends Controller
                 'message' => 'Terjadi kesalahan saat mengambil data pengiriman lapak.',
             ], 500);
         }
+    }
+
+    public function bayarSampahLapak(Request $request, $id)
+    {
+        $externalId = 'disb-dana-lpk-' . time() . '-' . Str::random(5);
+
+        $pengiriman = PengirimanLapak::with('lapak.jenisMetodePenarikan')
+            ->where('kode_pengiriman', $request->kode_pengiriman)
+            ->firstOrFail();
+        $jenisMetodePenarikan = $pengiriman->lapak->jenisMetodePenarikan;
+        $fee = 0;
+        $amount = (int) $request->subtotal;
+        if ($jenisMetodePenarikan->fee_bearer == 'CUSTOMER') {
+            $fee = $jenisMetodePenarikan->base_fee + ($jenisMetodePenarikan->ppn_percent / 100 * $jenisMetodePenarikan->base_fee);
+            $amount -= (int) $fee;
+        }
+
+
+
+        $payload = [
+            'external_id' => $externalId,
+            'amount' => $amount,
+            'bank_code' => $jenisMetodePenarikan->code, // contoh: DANA
+            'account_holder_name' => $pengiriman->lapak->nama_lapak,
+            'account_number' => $pengiriman->lapak->no_telepon, // nomor DANA
+            'description' => sprintf(
+                'Pembayaran sampah lapak | Kode: %s | Lapak: %s',
+                $pengiriman->kode_pengiriman,
+                $pengiriman->lapak->nama_lapak
+            ),
+        ];
+
+        $response = Http::withBasicAuth(config('xendit.api_key'), '')
+            ->post('https://api.xendit.co/disbursements', $payload);
+
+
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pembayaran sampah lapak berhasil diproses.',
+            'pengiriman' => $pengiriman,
+            'response_xendit' => $response->json(),
+            'payload' => $payload,
+            'fee' => $fee,
+            'amount' => $amount,
+        ]);
     }
 }

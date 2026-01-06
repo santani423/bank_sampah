@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Pengiriman Lapak')
+@section('title', 'Data Nasabah')
 
 @push('style')
     <style>

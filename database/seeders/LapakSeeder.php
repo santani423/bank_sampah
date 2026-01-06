@@ -40,6 +40,7 @@ class LapakSeeder extends Seeder
                 Lapak::create([
                     'cabang_id' => $randomCabang->id,
                     'kode_lapak' => $kodeLapak,
+                    'jenis_metode_penarikan_id' => 1,
                     'nama_lapak' => 'Lapak ' . $randomNama . ' ' . $i,
                     'alamat' => 'Jl. ' . $randomJalan . ' No. ' . rand(1, 999),
                     'kota' => $randomKota,
@@ -51,7 +52,7 @@ class LapakSeeder extends Seeder
                     'jenis_metode_penarikan_id' => 1,
                     'nama_rekening' =>  $kodeLapak,
                     'nomor_rekening' =>  rand(10000, 99999),
-                    'nama_bank' => 'BSI',
+                    'nama_bank' => 'DANA',
                     'approval_status' => $randomApproval,
                     'approved_by' => $randomApproval !== 'pending' ? 1 : null,
                     'approved_at' => $randomApproval !== 'pending' ? now() : null,

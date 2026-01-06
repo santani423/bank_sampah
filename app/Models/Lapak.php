@@ -79,4 +79,6 @@ class Lapak extends Model
             ->where('approval', 'pending')
             ->where('status_transaksi', 'pending');
     }
+
+   
 }
