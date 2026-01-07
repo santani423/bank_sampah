@@ -398,10 +398,24 @@ class PengirimanLapakController extends Controller
             }
 
 
-            $wa->sendMessage(
-                '088289445437',
-                'Transaksi Anda berhasil. Terima kasih.'
-            );
+
+            // Kirim pesan WhatsApp ke nomor lapak jika ada
+            $nomorWa = $pengiriman->lapak->no_telepon ?? null;
+            if ($nomorWa) {
+                // Pastikan format nomor ke internasional (62...)
+                $nomorWa = preg_replace('/^0/', '62', $nomorWa);
+                $waResult = $wa->sendMessage(
+                    $nomorWa,
+                    'Transaksi Anda berhasil. Terima kasih.'
+                );
+                // Optional: log jika gagal
+                if (empty($waResult['status'])) {
+                    Log::warning('Gagal kirim WhatsApp ke lapak', [
+                        'nomor' => $nomorWa,
+                        'wa_result' => $waResult
+                    ]);
+                }
+            }
 
 
             return response()->json([
