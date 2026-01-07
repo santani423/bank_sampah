@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Services\WhatsAppService; // ✅ Tambahkan ini
 
+
 class PengirimanLapakController extends Controller
 {
+
 
     public function upload(Request $request)
     {
@@ -315,7 +317,7 @@ class PengirimanLapakController extends Controller
         }
     }
 
-    public function bayarSampahLapak(Request $request, $code)
+    public function bayarSampahLapak(WhatsAppService $wa, Request $request, $code)
     {
         try {
             $pengiriman = PengirimanLapak::with([
@@ -366,12 +368,12 @@ class PengirimanLapakController extends Controller
             }
             $kode_pencairan = 'PCR-LPK' . time() . '-' . Str::upper(Str::random(6));
 
-          
+
             $pencairan = new PencairanLapak();
             $pencairan->kode_pencairan = $kode_pencairan;
             $pencairan->lapak_id = $pengiriman->lapak->id;
             $pencairan->pengiriman_lapak_id = $pengiriman->id;
-            $pencairan->metode_id = $jenisMetodePenarikan->id; 
+            $pencairan->metode_id = $jenisMetodePenarikan->id;
             $pencairan->jumlah_pencairan = $request->subtotal;
             $pencairan->tanggal_pengajuan = now();
             $pencairan->tanggal_proses = now();
@@ -395,22 +397,18 @@ class PengirimanLapakController extends Controller
                 $transaksi_lapak->save();
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'ok',
-                'pengiriman' => $pengiriman,
-                'payload' => $payload,
-                'jenisMetodePenarikan' => $jenisMetodePenarikan,
-                'pencairan' => $pencairan,
-                'detailPengirimanLapaks' => $detailPengirimanLapaks,
-            ], 200);
 
-            
+            $wa->sendMessage(
+                '088289445437',
+                'Transaksi Anda berhasil. Terima kasih.'
+            );
+
 
             return response()->json([
                 'success' => true,
                 'message' => 'Data pengiriman lapak berhasil diambil.',
-                'data' => $pengiriman
+                'data' => $pengiriman,
+                'wa' => $wa
             ], 200);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil data pengiriman lapak', [
