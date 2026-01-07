@@ -32,7 +32,7 @@
                             <div class="mb-1">
                                 <span class="fw-bold">No Rekening:</span>
                                 <span id="noRek"
-                                    class="text-muted small">{{ $pengiriman->lapak->no_rekening ?? '-' }}</span>
+                                    class="text-muted small">{{ $pengiriman->lapak->nomor_rekening ?? '-' }}</span>
                                 <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i
                                         class="bi bi-clipboard"></i> Copy</button>
                             </div>
@@ -81,7 +81,7 @@
                         <div class="info-box p-3 h-100 border rounded bg-light">
                             <div class="mb-2"><span class="badge bg-success">Collaction Center</span></div>
                             <div class="fw-bold">{{ $pengiriman->gudang->cabang->nama_cabang ?? '-' }}</div>
-                            <div class="text-muted small">Gudang: {{ $pengiriman->gudang->nama_gudang ?? '-' }}</div>
+                            <div class="text-muted small">Customer: {{ $pengiriman->gudang->nama_gudang ?? '-' }}</div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -244,7 +244,40 @@
                 <strong>Detail Pencairan</strong>
             </div>
             <div class="card-body">
-                 
+                <div class="row g-3">
+                     
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Keterangan</th>
+                                        <th>Nominal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Total Pencairan</td>
+                                        <td>Rp {{ number_format($grandTotal ?? 0, 0, ',', '.') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Biaya Admin Bank</td>
+                                        <td>Rp {{ number_format($pencairan->fee_net ?? 0, 0, ',', '.') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td><strong>Jumlah Diterima Lapak</strong></td>
+                                        <td><strong>Rp {{ number_format(($grandTotal ?? 0) - ($pencairan->fee_net ?? 0), 0, ',', '.') }}</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
