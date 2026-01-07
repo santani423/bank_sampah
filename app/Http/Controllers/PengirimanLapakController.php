@@ -367,7 +367,7 @@ class PengirimanLapakController extends Controller
                         'errors' => $response->json(),
                     ], 500);
                 }
-            }else{
+            } else {
                 // Jika bukan potong saldo, anggap berhasil tanpa panggilan API
             }
 
@@ -424,6 +424,7 @@ class PengirimanLapakController extends Controller
                     . "Jumlah Diterima : Rp " . number_format(($request->subtotal ?? 0) - ($pencairan->fee_net ?? 0), 0, ',', '.') . "\n"
                     . "Tanggal         : " . ($pencairan->tanggal_proses  ?? '-') . "\n"
                     . "==============================\n"
+                    . "Detail invoice: " . config('app.url') . "/invoice/{$pengiriman->kode_pengiriman}\n"
                     . "Terima kasih atas kepercayaannya.\nBank Sampah";
                 $waResult = $wa->sendMessage(
                     $nomorWa,
