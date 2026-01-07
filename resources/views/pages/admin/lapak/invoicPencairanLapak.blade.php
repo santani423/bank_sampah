@@ -31,12 +31,16 @@
                             <div class="fw-bold fs-5">{{ $pengiriman->lapak->nama_lapak ?? '-' }}</div>
                             <div class="mb-1">
                                 <span class="fw-bold">No Rekening:</span>
-                                <span id="noRek" class="text-muted small">{{ $pengiriman->lapak->no_rekening ?? '-' }}</span>
-                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i class="bi bi-clipboard"></i> Copy</button>
+                                <span id="noRek"
+                                    class="text-muted small">{{ $pengiriman->lapak->no_rekening ?? '-' }}</span>
+                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i
+                                        class="bi bi-clipboard"></i> Copy</button>
                             </div>
-                            <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert" style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
+                            <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert"
+                                style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
                                 No rekening berhasil disalin!
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="mb-1">
                                 <span class="fw-bold">Atas Nama:</span>
@@ -152,14 +156,7 @@
                                         <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
                                         <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
                                         <td>
-                                            <input type="number" min="0" step="0.01"
-                                                class="form-control form-control-sm berat-terupdate-input"
-                                                name="berat_terupdate[{{ $detailPengirimanLapaks->id }}][{{ $item->id }}]"
-                                                value="{{ $item->berat_terupdate ?? $item->berat_kg }}"
-                                                data-berat-awal="{{ $item->berat_kg }}"
-                                                data-harga="{{ $item->harga_per_kg }}"
-                                                data-target-susut="susut-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}"
-                                                data-target-subtotal="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
+                                            {{ $item->berat_terupdate ?? $item->berat_kg }}
                                         </td>
                                         <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
                                         <td>
@@ -203,8 +200,11 @@
                             @php
                                 $summarySampah = [];
                                 $grandTotal = 0;
-                                foreach (($pengiriman->detailPengirimanLapaks ?? []) as $detailPengirimanLapaks) {
-                                    foreach (($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? []) as $item) {
+                                foreach ($pengiriman->detailPengirimanLapaks ?? [] as $detailPengirimanLapaks) {
+                                    foreach (
+                                        $detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? []
+                                        as $item
+                                    ) {
                                         $nama = $item->sampah->nama_sampah ?? '-';
                                         $berat = $item->berat_terupdate ?? $item->berat_kg;
                                         $subtotal = $berat * $item->harga_per_kg;
@@ -241,36 +241,10 @@
         <!-- Form Upload Sampah -->
         <div class="card mt-4 mb-5">
             <div class="card-header bg-primary text-white">
-                <strong>Pembayaran Pengiriman</strong>
+                <strong>Detail Pencairan</strong>
             </div>
             <div class="card-body">
-                @csrf
-                <input type="hidden" name="kode_pengiriman" value="{{ $kode ?? '' }}">
-                <div class="mb-3">
-                    <label for="jenis_bayar" class="form-label">Pilih Jenis Pembayaran</label>
-                    <select class="form-select" id="jenis_bayar" name="jenis_bayar" required>
-                        <option value="">-- Pilih Jenis Pembayaran --</option>
-                        <option value="potong_saldo">Potong Saldo</option>
-                        <option value="transfer">Transfer</option>
-                    </select>
-                </div>
-                <div class="mb-3 d-none" id="bukti_transfer_group">
-                    <label for="bukti_transfer" class="form-label">Upload Bukti Transfer</label>
-                    <input type="file" class="form-control" id="bukti_transfer" name="bukti_transfer"
-                        accept=".jpg,.jpeg,.png,.pdf">
-                    <div id="preview_bukti_transfer" class="mt-2"></div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="catatan_sampah" class="form-label">Catatan</label>
-                    <textarea class="form-control" id="catatan_sampah" name="catatan_sampah" rows="3"
-                        placeholder="Masukkan keterangan tambahan (opsional)"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success" id="btn-upload"><span id="btn-upload-text"><i
-                            class="bi bi-save"></i> Simpan</span> <span id="btn-upload-spinner"
-                        class="spinner-border spinner-border-sm d-none" role="status"
-                        aria-hidden="true"></span></button>
-                <div id="upload-feedback" class="mt-2"></div>
+                 
             </div>
         </div>
     </form>
@@ -364,7 +338,7 @@
                     fetch("{{ route('api.lapak.bayar-sampah', $pengiriman->kode_pengiriman ?? '') }}", {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || 
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ||
                                     '{{ csrf_token() }}'
                             },
                             body: formData
@@ -374,12 +348,12 @@
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
                             if (data.success) {
-                                feedback.innerHTML = '<span class="text-success">' + (data.message || 
+                                feedback.innerHTML = '<span class="text-success">' + (data.message ||
                                     'Upload berhasil!') + '</span>';
                                 form.reset();
                                 preview.innerHTML = '';
                             } else {
-                                feedback.innerHTML = '<span class="text-danger">' + (data.message || 
+                                feedback.innerHTML = '<span class="text-danger">' + (data.message ||
                                     'Upload gagal!') + '</span>';
                             }
                         })

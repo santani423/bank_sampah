@@ -15,6 +15,8 @@ use App\Models\Feedback;
 use App\Models\PencairanSaldo;
 use App\Models\PengirimanPengepul;
 use App\Models\DetailPengiriman;
+use App\Models\PencairanLapak;
+use App\Models\PengirimanLapak;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -66,7 +68,28 @@ class DashboardController extends Controller
         ));
     }
 
-    public function faceUser() {
+    public function faceUser()
+    {
         return view('pages.admin.faceUser');
+    }
+
+
+    public function invoicPencairanLapak($kode)
+    {
+
+        $pencairan = PencairanLapak::with([
+            'pengirimanLapak.detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak',
+            'pengirimanLapak.gudang.cabang',
+            'pengirimanLapak.lapak',
+            'pengirimanLapak.petugas'
+        ])->where('kode_pencairan', $kode)->firstOrFail();
+
+        // Akses langsung
+        $pengiriman = $pencairan->pengirimanLapak;
+        // dd($pencairan);
+
+        // Ambil cabang dari relasi gudang
+        $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
+        return view('pages.admin.lapak.invoicPencairanLapak', compact('pengiriman', 'cabang', 'kode','pencairan'));
     }
 }
