@@ -353,7 +353,7 @@ class PengirimanLapakController extends Controller
                     $pengiriman->lapak->nama_lapak
                 ),
             ];
-
+            $sumber_dana = '';
             if ($request->jenis_bayar == 'potong_saldo') {
                 // Jika biaya ditanggung bank, tambahkan ke jumlah pencairan
                 $response = Http::withBasicAuth(config('xendit.api_key'), '')
@@ -367,8 +367,13 @@ class PengirimanLapakController extends Controller
                         'errors' => $response->json(),
                     ], 500);
                 }
+                $sumber_dana = 'saldo_admin';
             } else {
                 // Jika bukan potong saldo, anggap berhasil tanpa panggilan API
+                $sumber_dana = 'transfer_admin';
+                if ($request->hasFile('bukti_transfer')) {
+                    $path = FileHelper::storeImageByDate($request->file('bukti_transfer'), 'bukti_transfer');
+                }
             }
 
 
@@ -426,10 +431,23 @@ class PengirimanLapakController extends Controller
                     . "==============================\n"
                     . "Detail invoice: " . config('app.url') . "/invoice/{$pengiriman->kode_pengiriman}\n"
                     . "Terima kasih atas kepercayaannya.\nBank Sampah";
-                $waResult = $wa->sendMessage(
-                    $nomorWa,
-                    $pesanInvoice
-                );
+
+                // Jika ada bukti_transfer, kirim gambar via WhatsApp
+                if ($request->jenis_bayar == 'potong_saldo') {
+                    // Pastikan path adalah URL publik
+                    // $urlBukti = config('app.url') . '/storage/' . ltrim($path, '/');
+                    $urlBukti = 'https://fastly.picsum.photos/id/905/200/300.jpg?hmac=uLUlIwyKcu9AtTY3uOL04O0gbesMVu-yNVRvCsF1xD8';
+                    $waResult = $wa->sendImage(
+                        $nomorWa,
+                        $pesanInvoice,
+                        $urlBukti
+                    );
+                } else {
+                    $waResult = $wa->sendMessage(
+                        $nomorWa,
+                        $pesanInvoice
+                    );
+                }
                 // Optional: log jika gagal
                 if (empty($waResult['status'])) {
                     Log::warning('Gagal kirim WhatsApp ke lapak', [
@@ -444,6 +462,7 @@ class PengirimanLapakController extends Controller
                 'success' => true,
                 'message' => 'Data pengiriman lapak berhasil diambil.',
                 'data' => $pengiriman,
+                'sumber_dana' => $sumber_dana,
                 'wa' => $wa
             ], 200);
         } catch (\Throwable $th) {
