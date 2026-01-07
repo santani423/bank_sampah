@@ -354,18 +354,24 @@ class PengirimanLapakController extends Controller
                 ),
             ];
 
+            if ($request->jenis_bayar == 'potong_saldo') {
+                // Jika biaya ditanggung bank, tambahkan ke jumlah pencairan
+                $response = Http::withBasicAuth(config('xendit.api_key'), '')
+                    ->post('https://api.xendit.co/disbursements', $payload);
 
-            $response = Http::withBasicAuth(config('xendit.api_key'), '')
-                ->post('https://api.xendit.co/disbursements', $payload);
 
-
-            if (!$response->successful()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal memproses pembayaran sampah lapak.',
-                    'errors' => $response->json(),
-                ], 500);
+                if (!$response->successful()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Gagal memproses pembayaran sampah lapak.',
+                        'errors' => $response->json(),
+                    ], 500);
+                }
+            }else{
+                // Jika bukan potong saldo, anggap berhasil tanpa panggilan API
             }
+
+
             $kode_pencairan = 'PCR-LPK' . time() . '-' . Str::upper(Str::random(6));
 
 
@@ -404,9 +410,24 @@ class PengirimanLapakController extends Controller
             if ($nomorWa) {
                 // Pastikan format nomor ke internasional (62...)
                 $nomorWa = preg_replace('/^0/', '62', $nomorWa);
+                // Format pesan invoice
+                $pesanInvoice = "*INVOICE Pencairan Lapak*\n"
+                    . "==============================\n"
+                    . "Kode Pengiriman : {$pengiriman->kode_pengiriman}\n"
+                    . "Nama Lapak      : {$pengiriman->lapak->nama_lapak}\n"
+                    . "Bank            : {$pengiriman->lapak->nama_bank}\n"
+                    . "No Rekening     : {$pengiriman->lapak->nomor_rekening}\n"
+                    . "Atas Nama       : {$pengiriman->lapak->nama_rekening}\n"
+                    . "------------------------------\n"
+                    . "Total Pencairan : Rp " . number_format($request->subtotal, 0, ',', '.') . "\n"
+                    . "Biaya Admin     : Rp " . number_format($pencairan->fee_net ?? 0, 0, ',', '.') . "\n"
+                    . "Jumlah Diterima : Rp " . number_format(($request->subtotal ?? 0) - ($pencairan->fee_net ?? 0), 0, ',', '.') . "\n"
+                    . "Tanggal         : " . ($pencairan->tanggal_proses  ?? '-') . "\n"
+                    . "==============================\n"
+                    . "Terima kasih atas kepercayaannya.\nBank Sampah";
                 $waResult = $wa->sendMessage(
                     $nomorWa,
-                    'Transaksi Anda berhasil. Terima kasih.'
+                    $pesanInvoice
                 );
                 // Optional: log jika gagal
                 if (empty($waResult['status'])) {
