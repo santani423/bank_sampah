@@ -55,19 +55,21 @@ class PDFController extends Controller
         $pencairan = PencairanLapak::with([
             'pengirimanLapak.detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak',
             'pengirimanLapak.gudang.cabang',
-            'pengirimanLapak.lapak',
+            'pengirimanLapak.lapak.jenisMetodePenarikan',
             'pengirimanLapak.petugas'
         ])->where('kode_pencairan', $kode)->firstOrFail();
 
         // Akses langsung
         $pengiriman = $pencairan->pengirimanLapak;
+        $lapak = $pencairan->pengirimanLapak->lapak;
+        $bank = $pencairan->pengirimanLapak->lapak->jenisMetodePenarikan;
         // dd($pencairan);
 
         // Ambil cabang dari relasi gudang
         $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
         $pdf = Pdf::loadView(
             'pages.pdf.lapak-pencairan',
-            compact('pengiriman', 'cabang', 'kode', 'pencairan')
+            compact('pengiriman', 'cabang', 'kode', 'pencairan', 'lapak', 'bank')
         )->setPaper('A4', 'portrait');
 
         return $pdf->stream(
