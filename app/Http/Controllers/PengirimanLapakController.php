@@ -413,9 +413,7 @@ class PengirimanLapakController extends Controller
             // Kirim pesan WhatsApp ke nomor lapak jika ada
             $nomorWa = $pengiriman->lapak->no_telepon ?? null;
             if ($nomorWa) {
-                // Pastikan format nomor ke internasional (62...)
                 $nomorWa = preg_replace('/^0/', '62', $nomorWa);
-                // Format pesan invoice
                 $pesanInvoice = "*INVOICE Pencairan Lapak*\n"
                     . "==============================\n"
                     . "Kode Pengiriman : {$pengiriman->kode_pengiriman}\n"
@@ -432,11 +430,15 @@ class PengirimanLapakController extends Controller
                     . "Detail invoice: " . config('app.url') . "/invoice/{$pengiriman->kode_pengiriman}\n"
                     . "Terima kasih atas kepercayaannya.\nBank Sampah";
 
-                // Jika ada bukti_transfer, kirim gambar via WhatsApp
-                if ($request->jenis_bayar == 'potong_saldo') {
-                    // Pastikan path adalah URL publik
-                    // $urlBukti = config('app.url') . '/storage/' . ltrim($path, '/');
-                    $urlBukti = 'https://fastly.picsum.photos/id/905/200/300.jpg?hmac=uLUlIwyKcu9AtTY3uOL04O0gbesMVu-yNVRvCsF1xD8';
+                $waResult = null;
+                // Kirim gambar jika ada file bukti_transfer dan path valid
+                if (!empty($path ?? null)) {
+                    $appUrl = config('app.url');
+                    if (str_contains($appUrl, 'localhost') || str_contains($appUrl, '127.0.0.1')) {
+                        $urlBukti = 'https://fastly.picsum.photos/id/905/200/300.jpg?hmac=uLUlIwyKcu9AtTY3uOL04O0gbesMVu-yNVRvCsF1xD8';
+                    } else {
+                        $urlBukti = $appUrl . '/storage/' . ltrim($path, '/');
+                    }
                     $waResult = $wa->sendImage(
                         $nomorWa,
                         $pesanInvoice,
@@ -448,7 +450,6 @@ class PengirimanLapakController extends Controller
                         $pesanInvoice
                     );
                 }
-                // Optional: log jika gagal
                 if (empty($waResult['status'])) {
                     Log::warning('Gagal kirim WhatsApp ke lapak', [
                         'nomor' => $nomorWa,

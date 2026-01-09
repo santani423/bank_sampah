@@ -71,7 +71,7 @@ class WhatsAppService
                 'device_id' => $this->deviceId,
                 'number' => $phone,
                 'message' => $caption,
-                'url' => $imageUrl,
+                'file' => $imageUrl,
             ]);
 
             if ($response->successful()) {

@@ -157,6 +157,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 });
 
 Route::get('/invoic/kirim-sampah-lapak/{kode}', [PDFController::class, 'invoiceKirimSampahLapak'])->name('pdf.invoic.kirim-sampah-lapak');
+Route::get('/invoic/pencairan-lapak/{kode}', [PDFController::class, 'invoicePencairanLapak'])->name('pdf.invoic.pencairan-lapak');
 
 Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
     Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
