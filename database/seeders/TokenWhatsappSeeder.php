@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class TokenWhatsappSeeder extends Seeder
 {
-     
+    /**
+     * Jalankan seeder untuk tabel token_whatsapp.
+     */
     public function run(): void
     {
         DB::table('token_whatsapp')->insert([
