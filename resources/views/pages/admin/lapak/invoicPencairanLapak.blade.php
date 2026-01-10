@@ -15,7 +15,7 @@
             <div class="ms-md-auto py-2 py-md-0 d-flex gap-2">
                 <a href="{{ route('admin.pengiriman.lapak') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i>
                     Kembali</a>
-                <a href="{{ route('pdf.invoic.pencairan-lapak', $pengiriman->kode_pengiriman ?? 0) }}" target="_blank"
+                <a href="{{ route('pdf.invoic.pencairan-lapak', $kode ?? '') }}" target="_blank"
                     class="btn btn-primary">
                     <i class="bi bi-file-earmark-text"></i> Invoice
                 </a>

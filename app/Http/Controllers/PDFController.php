@@ -52,18 +52,18 @@ class PDFController extends Controller
 
     public function invoicePencairanLapak($kode)
     {
+         
         $pencairan = PencairanLapak::with([
             'pengirimanLapak.detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak',
             'pengirimanLapak.gudang.cabang',
             'pengirimanLapak.lapak.jenisMetodePenarikan',
             'pengirimanLapak.petugas'
         ])->where('kode_pencairan', $kode)->firstOrFail();
-
+        // dd($pencairan);
         // Akses langsung
         $pengiriman = $pencairan->pengirimanLapak;
         $lapak = $pencairan->pengirimanLapak->lapak;
         $bank = $pencairan->pengirimanLapak->lapak->jenisMetodePenarikan;
-        // dd($pencairan);
 
         // Ambil cabang dari relasi gudang
         $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
