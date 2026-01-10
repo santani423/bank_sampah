@@ -2,7 +2,7 @@
 
 namespace App\View\Components\Select;
 
-use App\Models\cabang;
+use App\Models\Cabang;
 use App\Models\Petugas;
 use Closure;
 use Illuminate\Contracts\View\View;
