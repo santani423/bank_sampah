@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\cabang;
 use App\Models\CabangUser;
 use App\Models\Nasabah;
-use App\Models\setting;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        $setting  =  setting::first();
+        $setting  =  Setting::first();
         return view('pages.auth.login',compact('setting'));
     }
 
