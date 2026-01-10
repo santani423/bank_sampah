@@ -340,11 +340,6 @@ class PengirimanLapakController extends Controller
             $fee_gross = $request->subtotal;
             $amount = (int) $request->subtotal;
             $externalId = 'disb-dana-lpk-' . time() . '-' . Str::random(5);
-            if ($jenisMetodePenarikan->fee_bearer == 'CUSTOMER') {
-                $fee = $jenisMetodePenarikan->base_fee + ($jenisMetodePenarikan->ppn_percent / 100 * $jenisMetodePenarikan->base_fee);
-                $amount -= (int) $fee;
-                $fee_gross -= (int) $fee;
-            }
 
 
 
@@ -362,6 +357,12 @@ class PengirimanLapakController extends Controller
             ];
             $sumber_dana = '';
             if ($request->jenis_bayar == 'potong_saldo') {
+                if ($jenisMetodePenarikan->fee_bearer == 'CUSTOMER') {
+                    $fee = $jenisMetodePenarikan->base_fee + ($jenisMetodePenarikan->ppn_percent / 100 * $jenisMetodePenarikan->base_fee);
+                    $amount -= (int) $fee;
+                    $fee_gross -= (int) $fee;
+                }
+
                 // Jika biaya ditanggung bank, tambahkan ke jumlah pencairan
                 $response = Http::withBasicAuth(config('xendit.api_key'), '')
                     ->post('https://api.xendit.co/disbursements', $payload);
