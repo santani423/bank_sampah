@@ -380,7 +380,7 @@
                                 preview.innerHTML = '';
 
                                 setTimeout(() => {
-                                    if (data.kode_pencairan) {
+                                    if (data.data.kode_pencairan) {
                                         window.location.href =
                                             "{{ route('admin.invoic.pencairan-lapak', '') }}" + data.kode_pencairan;
                                     } else {
