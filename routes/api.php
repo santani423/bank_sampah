@@ -44,6 +44,7 @@ use App\Models\PengirimanLapak;
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
  
+Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware('auth:sanctum')->group(function () {
@@ -52,7 +53,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
-    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
