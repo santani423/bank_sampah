@@ -151,16 +151,8 @@
                                         <td>{{ $idx + 1 }}</td>
                                         <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
                                         <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
-                                        <td>
-                                            <input type="number" min="0" step="0.01"
-                                                class="form-control form-control-sm berat-terupdate-input"
-                                                name="berat_terupdate[{{ $detailPengirimanLapaks->id }}][{{ $item->id }}]"
-                                                value="{{ $item->berat_terupdate ?? $item->berat_kg }}"
-                                                data-berat-awal="{{ $item->berat_kg }}"
-                                                data-harga="{{ $item->harga_per_kg }}"
-                                                data-target-susut="susut-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}"
-                                                data-target-subtotal="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
-                                        </td>
+                                        <td>{{ number_format($item->berat_terupdate ?? $item->berat_kg, 2, ',', '.') }}</td>
+                                        
                                         <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
                                         <td>
                                             <span id="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
