@@ -11,10 +11,7 @@ class Cabang extends Model
     use HasFactory, LogsActivity;
     protected $guarded = [];
 
-    /**
-     * Relasi ke tabel lapak
-     * Satu cabang bisa memiliki banyak lapak
-     */
+     
     public function lapaks()
     {
         return $this->hasMany(Lapak::class, 'cabang_id');
