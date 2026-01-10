@@ -434,7 +434,7 @@ class PengirimanLapakController extends Controller
                     . "Jumlah Diterima : Rp " . number_format(($request->subtotal ?? 0) - ($pencairan->fee_net ?? 0), 0, ',', '.') . "\n"
                     . "Tanggal         : " . ($pencairan->tanggal_proses  ?? '-') . "\n"
                     . "==============================\n"
-                    . "Detail invoice: " . config('app.url') . "/invoice/{$pengiriman->kode_pengiriman}\n"
+                    . "Detail invoice: " . config('app.url') . "/invoice/pencairan-lapak/{$kode_pencairan}\n"
                     . "Terima kasih atas kepercayaannya.\nBank Sampah";
 
                 $waResult = null;
