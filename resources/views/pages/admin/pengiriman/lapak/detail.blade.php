@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <x-select.select-status-pengiriman name="status_pengiriman" />
+                    <x-select.select-status-pengiriman name="status_pengiriman" value="{{ old('status_pengiriman', $status_pengiriman ?? $pengiriman->status_pengiriman ?? '') }}" />
                 </div>
                 <div class="mb-3">
                     <label for="file_sampah" class="form-label">Catatan</label>
