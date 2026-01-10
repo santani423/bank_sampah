@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PencairanSaldoController;
 use App\Http\Controllers\Api\countConttroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,15 @@ use App\Http\Controllers\Api\NasabahController as ApiNasabahController;
 use App\Http\Controllers\Api\NasabahBadanController as ApiNasabahBadanController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
+use App\Http\Controllers\Api\AllLapakTransaksiController;
+use App\Http\Controllers\Api\LapakTransaksiBuktiController;
+use App\Http\Controllers\Api\LapakTransaksiController;
+use App\Http\Controllers\Api\NasabahBadanTransaksiController;
+use App\Http\Controllers\GudangController;
+
+use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\PengirimanLapakController;
+use App\Models\PengirimanLapak;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,47 +43,70 @@ use App\Http\Controllers\Admin\PetugasController as AdminPetugasController;
 // });
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
-Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
-Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
-Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
-
+ 
 
 Route::apiResource('cleans', CleanController::class);
-
-
-Route::apiResource('activities', ActivityController::class);
-
-
-// API Nasabah Badan (moved to controller)
-Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
-
-// API Nasabah Perorangan (moved to controller)
-Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);
-// Nasabah berdasarkan cabang (perorangan)
-Route::get('/cabangs/{id}/nasabah', [ApiNasabahController::class, 'byCabang']);
-
-Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
-
-// API Nasabah Badan Transaction History
-Route::get('/nasabah-badan/{id}/transactions', [App\Http\Controllers\Api\NasabahBadanTransaksiController::class, 'getTransactionHistory']);
-
-Route::post('/user-face/create', [UserFaceController::class, 'create'])
-    ->withoutMiddleware(['throttle:api']);
-
-// API Top Up Admin (menggunakan session auth dari web)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/admin/topup/store', [AdminTopUpController::class, 'apiStore'])
-        ->name('api.admin.topup.store');
-});
+    Route::apiResource('activities', ActivityController::class);
+    Route::get('/nasabah', [ApiNasabahController::class, 'index']);
+    
+    Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
+    Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
+    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
+    Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
+    Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
+    Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
+    Route::post('/lapak/{id}/bayar-sampah-lapak', [PengirimanLapakController::class, 'bayarSampahLapak'])->name('api.lapak.bayar-sampah');
 
 
-Route::prefix('teams')->group(function () {
-    Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
-    Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
-    Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data
-    Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
-    Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
+    Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);
+    Route::get('/lapak/{id}/transaksi/ready-to-ships', [LapakTransaksiController::class, 'readyToShips']);
+
+    // Endpoint untuk seluruh data transaksi lapak
+    Route::get('/lapak/transaksi', [AllLapakTransaksiController::class, 'index'])->middleware('auth:sanctum');
+
+    // API Ambil Saldo Lapak
+    Route::post('/transaksi-lapak/{id}/ambil-saldo', [LapakTransaksiController::class, 'ambilSaldo']);
+
+    Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
+    Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
+    Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
+
+
+    // API Nasabah Badan (moved to controller)
+    Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
+
+
+    // API Nasabah Perorangan (moved to controller)
+    Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);
+    // Nasabah berdasarkan cabang (perorangan)
+    Route::get('/cabangs/{id}/nasabah', [ApiNasabahController::class, 'byCabang']);
+
+    Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
+
+    // API Nasabah Badan Transaction History
+    Route::get('/nasabah-badan/{id}/transactions', [NasabahBadanTransaksiController::class, 'getTransactionHistory']);
+
+    Route::post('/user-face/create', [UserFaceController::class, 'create'])
+        ->withoutMiddleware(['throttle:api']);
+
+    // API Top Up Admin (menggunakan session auth dari web)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/admin/topup/store', [AdminTopUpController::class, 'apiStore'])
+            ->name('api.admin.topup.store');
+    });
+
+
+    Route::prefix('teams')->group(function () {
+        Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
+        Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
+        Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data
+        Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
+        Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
+    });
+    Route::get('/petugas', [AdminPetugasController::class, 'apiIndex']);
+    Route::post('/transaksi-lapak/{id}/upload-bukti-transfer', [LapakTransaksiBuktiController::class, 'uploadBuktiTransfer']);
 });
+ 
 
 // API Petugas
-Route::get('/petugas', [AdminPetugasController::class, 'apiIndex']);

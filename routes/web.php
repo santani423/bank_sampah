@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminCabangController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TopUpController as AdminTopUpController;
 use App\Http\Controllers\Admin\LapakController as AdminLapakController;
+use App\Http\Controllers\Api\LapakTransaksiController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\landingPageController;
 use App\Http\Controllers\CleanController;
@@ -39,7 +40,10 @@ use App\Http\Controllers\Nasabah\DashboardController as NasabahDashboardControll
 use App\Http\Controllers\Nasabah\NasabahTransaksiController as NasabahTransaksiController;
 use App\Http\Controllers\Nasabah\CabangController as NasabahCabangController;
 use App\Http\Controllers\Nasabah\MetodePenarikanController as NasabahMetodePenarikanController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\PengirimanLapakController;
 use App\Http\Controllers\Petugas\NasabahUserBadanController;
+use App\Http\Controllers\Petugas\LapakController;
 use App\Http\Controllers\TimeController;
 use Illuminate\Support\Facades\Response;
 /*
@@ -69,15 +73,15 @@ Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLoginForm'])->name('home');
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
-
+    
     Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [AuthController::class, 'register'])->name('register.post');
 });
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser'); 
-
+    Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser');
+    
     // Data Master
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
@@ -90,8 +94,13 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
     Route::resource('/data-customers', GudangController::class)->names('admin.gudangs');
     Route::post('admin/customers/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
+    
+    Route::get('/invoic/pencairan-lapak/{kode}', [AdminDashboardController::class, 'invoicPencairanLapak'])->name('petugas.invoic.pencairan-lapak');
 
-
+    // Approval Setoran Lapak
+    Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
+    Route::get('/setor-lapak/{code}', [AdminLapakController::class, 'approvalSetoranLapakDetail'])->name('admin.setor-lapak.detail');
+    // Data Clean
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
     
     // Lapak Management
@@ -99,15 +108,15 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::post('/data-lapak/{id}/approve', [AdminLapakController::class, 'approve'])->name('admin.lapak.approve');
     Route::post('/data-lapak/{id}/reject', [AdminLapakController::class, 'reject'])->name('admin.lapak.reject');
     Route::post('/data-collaction-center/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
-
+    
     // Manajemen Konten
     Route::resource('/data-banner', AdminBannerController::class)->names('admin.banner');
     Route::resource('/data-artikel', AdminArtikelController::class)->names('admin.artikel');
-
+    
     // Transaksi
     Route::resource('/transaksi', AdminTransaksiController::class)->names('admin.transaksi');
     Route::get('/transaksi/print/{transaksi}', [AdminTransaksiController::class, 'print'])->name('admin.transaksi.print');
-
+    
 
 
     Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
@@ -115,10 +124,13 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     // Route::get('', 'AdminTransaksiController@print')->name('admin.transaksi.print');
 
     Route::get('/tarik-saldo', [AdminTarikSaldoController::class, 'index'])->name('admin.tarik-saldo.index');
-    Route::post('/tarik-saldo/setujui/{id}', [AdminTarikSaldoController::class, 'setujui'])->name('admin.tarik-saldo.setujui');
-    Route::post('/tarik-saldo/tolak/{id}', [AdminTarikSaldoController::class, 'tolak'])->name('admin.tarik-saldo.tolak');
+    Route::post('/tarik-saldo/setujui', [AdminTarikSaldoController::class, 'setujui'])->name('admin.tarik-saldo.setujui');
+    Route::post('/tarik-saldo/tolak', [AdminTarikSaldoController::class, 'tolak'])->name('admin.tarik-saldo.tolak');
 
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('admin.pengiriman');
+    Route::get('/pengiriman/sampah-lapak', [AdminPengirimanPengepulController::class, 'lapak'])->name('admin.pengiriman.lapak');
+    Route::get('/pengiriman/sampah-lapak/{kode}', [AdminPengirimanPengepulController::class, 'detailPengirimanLapak'])->name('admin.pengiriman-lapak.detail');
+    Route::get('/pengiriman/sampah-lapak/detail-pembayaran/{kode}', [AdminPengirimanPengepulController::class, 'detailPembayaranPengirimanLapak'])->name('admin.pengiriman-lapak.detail.pembayaran');
 
     // Pengaturan
     Route::get('/token-whatsapp', [AdminTokenWhatsAppController::class, 'index'])->name('admin.token-whatsapp.index');
@@ -127,7 +139,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::get('/tentang-kami', [TentangKamiController::class, 'index'])->name('admin.tentang_kami.index');
     Route::post('/tentang-kami', [TentangKamiController::class, 'store'])->name('admin.tentang_kami.store');
     Route::put('/tentang-kami/update/{id}', [TentangKamiController::class, 'update'])->name('admin.tentang_kami.update');
-
+    
     // Feedback
     Route::resource('/data-feedback', AdminFeedbackController::class)->names('admin.feedback');
     Route::resource('/settings', SettingController::class)->names('admin.settings');
@@ -138,15 +150,29 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::post('/topup/store', [AdminTopUpController::class, 'store'])->name('admin.topup.store');
     Route::get('/topup/success', [AdminTopUpController::class, 'success'])->name('admin.topup.success');
     Route::get('/topup/{id}', [AdminTopUpController::class, 'show'])->name('admin.topup.show');
+
+
+
+    Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('admin.lapak.transaksi.download');
 });
 
-Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
-    Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
+Route::get('/invoic/kirim-sampah-lapak/{kode}', [PDFController::class, 'invoiceKirimSampahLapak'])->name('pdf.invoic.kirim-sampah-lapak');
+Route::get('/invoic/pencairan-lapak/{kode}', [PDFController::class, 'invoicePencairanLapak'])->name('pdf.invoic.pencairan-lapak');
 
+Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(function () {
+    Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
+    Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
+    Route::get('/invoic/kirim-sampah-lapak/{kode}', [PetugasDashboardController::class, 'invoicKirimSampahLapak'])->name('petugas.invoic.kirim-sampah-lapak');
+    
+    Route::get('/invoic/pencairan-lapak/{kode}', [PetugasDashboardController::class, 'invoicPencairanLapak'])->name('petugas.invoic.pencairan-lapak');
+    
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
     Route::resource('/data-lapak', PetugasLapakController::class)->names('petugas.lapak');
+    Route::get('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'kirimSampah'])->name('petugas.lapak.kirim-sampah');
+    Route::get('/data-lapak/{lapak}/setor-sampah', [PetugasLapakController::class, 'setorSampah'])->name('petugas.lapak.setor-sampah');
+    Route::post('/data-lapak/{lapak}/setor-sampah', [PetugasLapakController::class, 'storeSetorSampah'])->name('petugas.lapak.setor-sampah.store');
     Route::get('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'setorSampah'])->name('petugas.rekanan.setor-sampah');
     Route::post('/data-rekanan/{nasabahBadan}/setor-sampah', [NasabahUserBadanController::class, 'storeSetorSampah'])->name('petugas.rekanan.setor-sampah.store');
     // Import data sampah (Excel/CSV)
@@ -156,11 +182,15 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     // Transaksi
     Route::resource('/transaksi', PetugasTransaksiController::class)->names('petugas.transaksi');
     Route::get('/transaksi/print/{transaksi}', [PetugasTransaksiController::class, 'print'])->name('petugas.transaksi.print');
-    Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');
+    // Route::get('/transaksi/top-up/saldo', [PetugasTransaksiController::class, 'topUp'])->name('petugas.transaksi.top-up');
     Route::post('/midtrans/token', [PetugasTransaksiController::class, 'createTransaction'])->name('bayar.proses');
     Route::post('/midtrans/notification', [PetugasTransaksiController::class, 'handleNotification']);
     Route::post('/midtrans/callback', [PetugasTransaksiController::class, 'callback']);
     Route::resource('/pengiriman/sampah', AdminPengirimanPengepulController::class)->names('petugas.pengiriman');
+
+    Route::get('/lapak/transaksi/{id}', [LapakController::class, 'showTransaksi'])->name('petugas.lapak.transaksi.detail');
+    Route::get('/lapak/transaksi/ready-to-ship/{id}', [LapakController::class, 'readyToShip'])->name('petugas.lapak.transaksi.ready-to-ship');
+    Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('petugas.lapak.transaksi.download');
 });
 
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
@@ -187,6 +217,12 @@ Route::post('/xendit/callback/topup', [AdminTopUpController::class, 'callback'])
 
 
 
+// Halaman testing TessController
+Route::get('/testing', [TessController::class, 'testing'])->name('testing');
+
+// Route proses top up Xendit
+Route::post('/topup/proses', [TessController::class, 'proses'])->name('topup.proses');
+
 Route::get('storage/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
 
@@ -197,3 +233,8 @@ Route::get('storage/{filename}', function ($filename) {
     return Response::file($path);
 });
 
+Route::post('/upload-gambar', [PengirimanLapakController::class, 'upload'])->name('image.upload');
+
+
+
+// composer require barryvdh/laravel-dompdf

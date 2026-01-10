@@ -37,6 +37,10 @@
                                 value="{{ $sampah->harga_per_kg }}" required>
                         </div>
                         <div class="form-group">
+                            <label>Harga Lapak</label>
+                            <input type="number" step="0.01" class="form-control" name="harga_lapak" value="{{ $sampah->harga_lapak }}">
+                        </div>
+                        <div class="form-group">
                             <label>Gambar</label>
                             <input type="file" class="form-control" name="gambar" accept="image/*">
                             @if ($sampah->gambar)

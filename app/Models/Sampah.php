@@ -15,6 +15,7 @@ class Sampah extends Model
     protected $fillable = [
         'nama_sampah',
         'harga_per_kg',
+        'harga_lapak',
         'gambar'
     ];
 

@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('jenis_metode_penarikans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama')->nullable(); 
-            $table->string('keterangan')->nullable(); 
-            $table->string('code')->nullable(); 
-            $table->longText('temp_before_data')->nullable();  
+            $table->string('nama')->nullable();
+            $table->string('keterangan')->nullable();
+            $table->string('code')->nullable();
+            $table->string('base_fee')->nullable();
+            $table->string('ppn_percent')->nullable();
+            $table->string('total_fee')->nullable();
+            $table->enum('fee_bearer', ['COMPANY', 'CUSTOMER'])->nullable();
+            $table->longText('temp_before_data')->nullable();
             $table->timestamps();
         });
     }

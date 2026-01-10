@@ -67,6 +67,10 @@ class TopUpController extends Controller
      */
     public function store(Request $request)
     {
+          return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat top upasdasdasd'  
+            ], 500);
         // Validasi input
         $validated = $request->validate([
             'jumlah' => 'required|numeric|min:10000|max:1000000000000000000',
@@ -153,7 +157,7 @@ class TopUpController extends Controller
                 'user_id' => Auth::id(),
             ]);
 
-            return back()->with('error', 'Gagal terhubung ke payment gateway. Silakan coba lagi.')->withInput();
+            return back()->with('error', 'Gagal terhubung ke payment gateway. Silakan coba lagi.!')->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Top up store error', [
@@ -288,7 +292,7 @@ class TopUpController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal terhubung ke payment gateway. Silakan coba lagi.'
+                'message' => 'Gagal terhubung ke payment gateway. Silakan coba lagi.!'
             ], 500);
         } catch (\Exception $e) {
             DB::rollBack();

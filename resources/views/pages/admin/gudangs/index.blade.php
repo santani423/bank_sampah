@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Daftar Gudang')
+@section('title', 'Daftar Customer')
 
 @push('style')
     <style>
@@ -20,12 +20,12 @@
 @section('main')
 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
     <div>
-        <h3 class="fw-bold mb-3">List Gudang</h3>
-        <h6 class="op-7 mb-2">Anda dapat mengelola semua gudang, seperti menambah, mengedit, menghapus, dan lainnya.</h6>
+        <h3 class="fw-bold mb-3">List Customer</h3>
+        <h6 class="op-7 mb-2">Anda dapat mengelola semua customer, seperti menambah, mengedit, menghapus, dan lainnya.</h6>
     </div>
     <div class="ms-md-auto py-2 py-md-0">
         <div class="section-header-button d-flex gap-2">
-            <a href="{{ route('admin.gudangs.create') }}" class="btn btn-primary btn-round">Tambah Gudang</a>
+            <a href="{{ route('admin.gudangs.create') }}" class="btn btn-primary btn-round">Tambah Customer</a>
             <!-- Tombol download template Excel via JS -->
             <button id="download-template" class="btn btn-info btn-round">Download Template Excel</button>
         </div>
@@ -57,8 +57,9 @@
                     <table class="table table-hover table-bordered table-head-bg-primary">
                         <thead>
                             <tr>
-                                <th>Kode Gudang</th>
-                                <th>Nama Gudang</th>
+                                <th>Kode Customer</th>
+                                <th>Cabang</th>
+                                <th>Nama Customer</th>
                                 <th>Alamat</th>
                                 <th>Kota</th>
                                 <th>Provinsi</th>
@@ -72,6 +73,7 @@
                             @forelse($gudangs as $gudang)
                                 <tr>
                                     <td>{{ $gudang->kode_gudang }}</td>
+                                    <td>{{ $gudang->cabang ? ($gudang->cabang->nama_cabang ?? $gudang->cabang->id) : '-' }}</td>
                                     <td>{{ $gudang->nama_gudang }}</td>
                                     <td>{{ $gudang->alamat }}</td>
                                     <td>{{ $gudang->kota }}</td>

@@ -40,4 +40,10 @@ class Petugas extends Authenticatable
         return $this->hasMany(AlokasiSaldoAdmin::class, 'admin_id');
     }
 
+    // Relasi ke cabang melalui tabel pivot petugas_cabangs
+    public function cabangs()
+    {
+        return $this->belongsToMany(\App\Models\cabang::class, 'petugas_cabangs', 'petugas_id', 'cabang_id');
+    }
+
 }

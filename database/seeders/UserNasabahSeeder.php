@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CabangUser;
+use App\Models\MetodePencairan;
+use App\Models\Saldo;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +17,7 @@ class UserNasabahSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 200; $i++) {
             // Insert ke tabel users
             $user = User::create([
                 'name' => "Nasabah $i",
@@ -52,6 +55,26 @@ class UserNasabahSeeder extends Seeder
                 'nasabah_id' => $nasabahId,
                 'created_at' => $now,
                 'updated_at' => $now,
+            ]);
+
+
+            Saldo::create([
+                'nasabah_id' => $nasabahId,
+                // 'saldo' => random_int(100000, 5000000),
+                'saldo' => random_int(1, 50)*100000,
+                'tanggal_update' => now(),
+            ]);
+
+            CabangUser::create([
+                'cabang_id' => random_int(1, 5),
+                'user_nasabah_id' => $nasabahId,
+            ]);
+
+            MetodePencairan::create([
+                'nasabah_id' => $nasabahId,
+                'jenis_metode_penarikan_id' => 1,
+                'nama_metode_pencairan' => "Nasabah $i",
+                'no_rek' => '1234567890' . str_pad($i, 2, '0', STR_PAD_LEFT), 
             ]);
         }
     }

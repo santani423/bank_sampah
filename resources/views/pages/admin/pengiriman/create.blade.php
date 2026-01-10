@@ -69,19 +69,13 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label>Pilih Gudang</label>
-                            <select name="gudang_id" class="form-control @error('gudang_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Gudang --</option>
-                                @foreach ($gudang as $gdg)
-                                    <option value="{{ $gdg->id }}"
-                                        {{ old('gudang_id') == $gdg->id ? 'selected' : '' }}>
-                                        {{ $gdg->nama_gudang }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('gudang_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <label>Pilih Customer</label>
+                                <select name="gudang_id" id="gudang-select" class="form-control @error('gudang_id') is-invalid @enderror" required>
+                                    <option value="">-- Pilih Customer --</option>
+                                </select>
+                                @error('gudang_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                         </div>
 
                         <div class="form-group mb-3">
@@ -211,6 +205,37 @@
                 } else {
                     preview.src = '';
                     preview.classList.add('d-none');
+                }
+            });
+        });
+
+        // Dynamic Gudang/Customer List by Cabang
+        $(document).ready(function() {
+            $('select[name="cabang_id"]').on('change', function() {
+                var cabangId = $(this).val();
+                var gudangSelect = $('#gudang-select');
+                gudangSelect.html('<option value="">Memuat data...</option>');
+                if (cabangId) {
+                    $.ajax({
+                        url: '/api/gudang-by-cabang/' + cabangId,
+                        type: 'GET',
+                        success: function(data) {
+                            gudangSelect.empty();
+                            gudangSelect.append('<option value="">-- Pilih Customer --</option>');
+                            if (data.length > 0) {
+                                $.each(data, function(i, gudang) {
+                                    gudangSelect.append('<option value="' + gudang.id + '">' + gudang.nama_gudang + '</option>');
+                                });
+                            } else {
+                                gudangSelect.append('<option value="">Tidak ada gudang terkait</option>');
+                            }
+                        },
+                        error: function() {
+                            gudangSelect.html('<option value="">Gagal memuat data</option>');
+                        }
+                    });
+                } else {
+                    gudangSelect.html('<option value="">-- Pilih Customer --</option>');
                 }
             });
         });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
+use App\Models\Petugas;
 use Illuminate\Support\Facades\DB;
 
 class NasabahController extends Controller
@@ -14,23 +15,95 @@ class NasabahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Nasabah::query();
+        try {
+            //
+            $authUser = auth()->user();
 
-        if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lengkap', 'like', "%{$search}%")
-                    ->orWhere('no_registrasi', 'like', "%{$search}%");
+            // Cari petugas berdasarkan email user login
+            $petugas = Petugas::where('email', $authUser->email)->first();
+
+            // =========================
+            // 1. QUERY DASAR
+            // =========================
+            $query = Nasabah::query()
+                ->select([
+                    'nasabah.*',
+                    'cabangs.nama_cabang as nama_cabang', // TAMBAHAN
+                ])
+                ->with(['saldo'])
+                ->join('user_nasabahs', 'nasabah.id', '=', 'user_nasabahs.nasabah_id')
+                ->join('cabang_users', 'user_nasabahs.id', '=', 'cabang_users.user_nasabah_id')
+                ->join('cabangs', 'cabang_users.cabang_id', '=', 'cabangs.id');
+
+            // Jika petugas ditemukan, filter berdasarkan petugas
+            if ($petugas) {
+                $query->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
+                    ->where('petugas_cabangs.petugas_id', $petugas->id);
+            }
+            // =========================
+            // 2. FILTER SEARCH
+            // =========================
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('nasabah.nama_lengkap', 'like', "%{$search}%")
+                        ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
+                        ->orWhere('user_nasabahs.username', 'like', "%{$search}%");
+                });
             });
-        }
 
-        $perPage = (int) $request->get('per_page', 10);
-        if ($perPage <= 0 || $perPage > 100) {
-            $perPage = 10;
-        }
+            // =========================
+            // 3. FILTER BY KODE CABANG (BARU)
+            // =========================
+            $query->when($request->filled('cabang'), function ($q) use ($request) {
+                $q->where('cabangs.kode_cabang', $request->cabang);
+            });
 
-        $nasabahs = $query->orderByDesc('id')->paginate($perPage);
-        return response()->json($nasabahs);
+            // =========================
+            // 4. VALIDASI PER PAGE
+            // =========================
+            $perPage = (int) $request->get('per_page', 10);
+            $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 10;
+
+            // =========================
+            // 5. PAGINATION
+            // =========================
+            $nasabahs = $query
+                ->orderByDesc('nasabah.id')
+                ->paginate($perPage);
+
+            // =========================
+            // 6. RESPONSE SUKSES
+            // =========================
+            return response()->json([
+                'success' => true,
+                'message' => 'Data nasabah berhasil diambil.',
+                'data'    => $nasabahs->items(),
+                'pagination' => [
+                    'current_page' => $nasabahs->currentPage(),
+                    'last_page'    => $nasabahs->lastPage(),
+                    'per_page'     => $nasabahs->perPage(),
+                    'total'        => $nasabahs->total(),
+                    'from'         => $nasabahs->firstItem(),
+                    'to'           => $nasabahs->lastItem(),
+                ],
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data nasabah.',
+                'error'   => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
+
+
+    /**
+     * Daftar nasabah berdasarkan petugas (perorangan) dengan pagination & optional search.
+     * Route: GET /api/nasabah
+     * Query params: email, search, page, per_page
+     */
 
     public function nasabahPetugas(Request $request)
     {
@@ -74,7 +147,7 @@ class NasabahController extends Controller
             $term = $request->input('search');
             $query->where(function ($q) use ($term) {
                 $q->where('nasabah.nama_lengkap', 'like', "%{$term}%")
-                  ->orWhere('nasabah.no_registrasi', 'like', "%{$term}%");
+                    ->orWhere('nasabah.no_registrasi', 'like', "%{$term}%");
             });
         } else {
             // 🔍 Filter berdasarkan nama nasabah
@@ -127,8 +200,8 @@ class NasabahController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nasabah.nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
-                  ->orWhere('nasabah.no_hp', 'like', "%{$search}%");
+                    ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
+                    ->orWhere('nasabah.no_hp', 'like', "%{$search}%");
             });
         }
 

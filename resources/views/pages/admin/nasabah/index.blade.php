@@ -1,114 +1,104 @@
 @extends('layouts.template')
 
-@section('title', 'Nasabah')
+@section('title', 'Data Nasabah')
 
 @push('style')
-    <!-- CSS Libraries -->
+    <style>
+        #loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .pagination-controls button {
+            margin: 0 2px;
+        }
+    </style>
 @endpush
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
             <h3 class="fw-bold mb-3">Nasabah</h3>
-            <h6 class="op-7 mb-2">Anda dapat mengelola semua nasabah, seperti mengedit, menghapus, dan lainnya.</h6>
-        </div>
-        <div class="ms-md-auto py-2 py-md-0">
-            <div class="section-header-button">
-                {{-- <a href="{{ route('admin.nasabah.create') }}" class="btn btn-primary btn-round">Tambah Nasabah Baru</a> --}}
-            </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
 
-                    <div class="float-right">
-                        <form method="GET" action="{{ route('admin.nasabah.index') }}">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Cari Nama" name="nama_nasabah"
-                                    value="{{ request('nama_nasabah') }}">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary">Search</button>
-                                </div>
+                    {{-- ALERT --}}
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    {{-- FILTER FORM --}}
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang name="cabang" />
+                            </div>
 
-                <div class="card-body">
 
-                    <div class="clearfix mb-3"></div>
 
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    {{-- TABLE --}}
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-head-bg-primary">
+                        <div id="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+
+                        <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
+                            style="display:none;">
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th style="width: 250px">Aksi</th>
                                     <th>Nama</th>
                                     <th>Username</th>
                                     <th>No. Registrasi</th>
+                                    <th>Cabang</th>
                                     <th>No. HP</th>
                                     <th>Saldo</th>
                                     <th>Status</th>
-                                    <th style="width: 250px">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse ($nasabahs as $index => $nasabah)
-                                    <tr>
-                                        <td>{{ $nasabahs->firstItem() + $index }}</td>
-                                        <td>{{ $nasabah->nama_lengkap }}</td>
-                                        <td>{{ $nasabah->user->username }}</td>
-                                        <td>{{ $nasabah->no_registrasi }}</td>
-                                        <td>{{ $nasabah->no_hp }}</td>
-                                        <td>Rp </td>
-                                        <td>
-                                            @if ($nasabah->status === 'aktif')
-                                                <span class="badge bg-success text-white">Aktif</span>
-                                            @else
-                                                <span class="badge bg-danger text-white">Tidak Aktif</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="d-flex justify-content-start">
-                                                <a href="{{ route('admin.nasabah.show', $nasabah->id) }}"
-                                                    class="btn btn-sm btn-info me-2">
-                                                    <i class="fas fa-info-circle"></i> Detail
-                                                </a>
-                                                <a href="{{ route('admin.nasabah.edit', $nasabah->id) }}"
-                                                    class="btn btn-sm btn-primary me-2">
-                                                    <i class="fas fa-pencil-alt"></i> Edit
-                                                </a>
-                                                {{-- <form onsubmit="return confirm('Apakah Anda yakin?');"
-                                                    action="{{ route('admin.nasabah.destroy', $nasabah->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class="fas fa-trash"></i> Hapus
-                                                    </button>
-                                                </form> --}}
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8">
-                                            <div class="text-center">
-                                                Belum ada nasabah.
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
+                            <tbody id="petugas-tbody"></tbody>
                         </table>
-                         <x-pagination :data="$nasabahs" />
+
+                        <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
+                            <div id="pagination-info"></div>
+                            <div id="pagination-controls"></div>
+                        </div>
                     </div>
-                     
+
                 </div>
             </div>
         </div>
@@ -116,7 +106,129 @@
 @endsection
 
 @push('scripts')
-    <!-- JS Libraies -->
+    <script>
+        /* ===============================
+                                                                                                           AMBIL FILTER TANGGAL
+                                                                                                        ================================ */
+        function getFilterParams() {
 
-    <!-- Page Specific JS File -->
+            const nasabah = document.getElementById('nasabah').value;
+            const cabang = document.getElementById('cabang').value;
+
+           
+            
+            return {
+                nasabah: nasabah,
+                cabang: cabang,
+            };
+        }
+
+
+        /* ===============================
+           FETCH DATA API
+        ================================ */
+        function fetchPetugasData(page = 1) {
+            const spinner = document.getElementById('loading-spinner');
+            const table = document.getElementById('petugas-table');
+            const pagination = document.getElementById('pagination-wrapper');
+
+            spinner.style.display = 'block';
+            table.style.display = 'none';
+            pagination.style.display = 'none';
+
+            const filters = getFilterParams();
+            const params = new URLSearchParams({
+                page,
+                per_page: perPage,
+                
+                ...(filters.nasabah && {
+                    search: filters.nasabah, 
+                }),
+                ...(filters.cabang && {
+                    cabang: filters.cabang, 
+                }),
+            });
+            
+         
+
+
+
+            fetch(`/api/nasabah?${params.toString()}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        current_page = res.pagination.current_page;
+                        totalPages = res.pagination.last_page;
+                        renderTable(res.data, res.pagination);
+                        renderPagination(res.pagination);
+
+                        spinner.style.display = 'none';
+                        table.style.display = 'table';
+                        pagination.style.display = 'flex';
+                    }
+                })
+                .catch(() => {
+                    spinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
+                });
+        }
+
+        /* ===============================
+           RENDER TABLE
+        ================================ */
+        function renderTable(data, pagination) {
+            const tbody = document.getElementById('petugas-tbody');
+            tbody.innerHTML = '';
+
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
+                return;
+            }
+
+            const detailRoute = "{{ route('admin.nasabah.show', ':kode') }}";
+            const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
+
+            data.forEach((item, index) => {
+                const no = pagination.from + index;
+                const url = detailRoute.replace(':kode', item.kode_pengiriman);
+                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
+
+                tbody.innerHTML += `
+            <tr>
+                <td>${no}</td>
+                <td>
+                     <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                     <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
+                </td>
+                <td>${item.nama_lengkap}</td> 
+                <td>${item.username}</td> 
+                <td>${item.no_registrasi}</td>
+                <td>${item.nama_cabang}</td>
+                <td>${item.no_hp}</td>
+                <td>${formatRupiah(item.saldo.saldo)}</td>
+                <td>${item.status}</td>
+            </tr>
+        `;
+            });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            if (angka == null) return '-';
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+
+
+        /* ===============================
+           EVENT
+        ================================ */
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchPetugasData(1);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPetugasData(1);
+        });
+    </script>
 @endpush

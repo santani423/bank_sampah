@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gudang;
+use App\Models\cabang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,7 +25,13 @@ class GudangController extends Controller
      */
     public function create()
     {
-        return view('pages.admin.gudangs.create');
+        // Generate kode gudang otomatis: GUD + 4 digit angka terakhir
+        $lastGudang = Gudang::orderBy('id', 'desc')->first();
+        $lastId = $lastGudang ? $lastGudang->id : 0;
+        $newKode = 'CUST' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
+        $cabangs = cabang::all();
+        // dd($cabangs);
+        return view('pages.admin.gudangs.create', compact('newKode', 'cabangs'));
     }
 
     /**
@@ -41,11 +48,12 @@ class GudangController extends Controller
             'kode_pos' => 'nullable|string|max:10',
             'telepon' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,nonaktif',
+            'cabang_id' => 'nullable|exists:cabangs,id',
         ]);
 
         Gudang::create($request->all());
 
-        return redirect()->route('admin.gudangs.index')->with('success', 'Gudang berhasil ditambahkan!');
+        return redirect()->route('admin.gudangs.index')->with('success', 'Customer berhasil ditambahkan!');
     }
 
     /**
@@ -54,7 +62,8 @@ class GudangController extends Controller
     public function edit($id)
     {
         $gudang = Gudang::findOrFail($id);
-        return view('pages.admin.gudangs.edit', compact('gudang'));
+        $cabangs = cabang::all();
+        return view('pages.admin.gudangs.edit', compact('gudang', 'cabangs'));
     }
 
     /**
@@ -73,11 +82,12 @@ class GudangController extends Controller
             'kode_pos' => 'nullable|string|max:10',
             'telepon' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,nonaktif',
+            'cabang_id' => 'nullable|exists:cabangs,id',
         ]);
 
         $gudang->update($request->all());
 
-        return redirect()->route('admin.gudangs.index')->with('success', 'Gudang berhasil diperbarui!');
+        return redirect()->route('admin.gudangs.index')->with('success', 'Customer berhasil diperbarui!');
     }
 
     /**
@@ -100,5 +110,11 @@ class GudangController extends Controller
         Excel::import(new GudangsImport, $request->file('file'));
 
         return redirect()->route('admin.gudangs.index')->with('success', 'Data gudang berhasil diimpor!');
+    }
+
+    public function gudangByCabang($id)
+    {
+        $gudangs = Gudang::where('cabang_id', $id)->get();
+        return response()->json($gudangs);
     }
 }

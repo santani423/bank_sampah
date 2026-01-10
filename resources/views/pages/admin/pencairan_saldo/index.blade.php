@@ -1,138 +1,325 @@
 @extends('layouts.template')
 
-@section('title', 'Pengajuan Tarik Saldo')
+@section('title', 'Pengiriman Lapak')
+
+@push('style')
+    <style>
+        #loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .pagination-controls button {
+            margin: 0 2px;
+        }
+    </style>
+@endpush
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Permintaan Penarikan Saldo</h3>
-            <h6 class="op-7 mb-2">Anda dapat mengelola permintaan penarikan saldo yang masuk.</h6>
+            <h3 class="fw-bold mb-3">Nasabah</h3>
         </div>
     </div>
 
-    {{-- ✅ Alert hasil proses --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ $errors->first() }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-    @endif
-
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm border-0">
+            <div class="card">
                 <div class="card-body">
+
+                    {{-- ALERT --}}
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    {{-- FILTER FORM --}}
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang name="cabang" />
+                            </div>
+
+
+
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    {{-- TABLE --}}
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered align-middle text-center">
-                            <thead class="table-primary">
+                        <div id="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+
+
+                        <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
+                            style="display:none;">
+                            <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th style="width: 250px">Aksi</th>
                                     <th>Tanggal Pengajuan</th>
                                     <th>Nama Nasabah</th>
                                     <th>Jumlah Penarikan</th>
-                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse ($pencairanSaldo as $index => $pencairan)
-                                    <tr>
-                                        <td>{{ $pencairanSaldo->firstItem() + $index }}</td>
-                                        <td>{{ $pencairan->created_at->format('d-m-Y H:i') }}</td>
-                                        <td>{{ $pencairan->nasabah->nama_lengkap ?? '-' }}</td>
-                                        <td>Rp {{ number_format($pencairan->jumlah_pencairan, 0, ',', '.') }}</td>
-                                        <td>
-                                            {{-- Tombol Setujui --}}
-                                            <form action="{{ route('admin.tarik-saldo.setujui', $pencairan->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="jumlah_pencairan" value="{{ $pencairan->jumlah_pencairan }}">
-                                                <button type="submit" class="btn btn-success btn-sm"
-                                                    onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan ini?')">
-                                                    Setujui
-                                                </button>
-                                            </form>
-
-                                            {{-- Tombol Tolak (buka modal) --}}
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalTolak"
-                                                onclick="setRejectData({{ $pencairan->id }}, '{{ number_format($pencairan->jumlah_pencairan, 0, ',', '.') }}', '{{ $pencairan->nasabah->nama_lengkap }}')">
-                                                Tolak
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">Tidak ada data pengajuan penarikan.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
+                            <tbody id="petugas-tbody"></tbody>
                         </table>
+
+                        <!-- Modal Konfirmasi Setujui -->
+                        <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form id="formSetujui" method="POST" action="{{ route('admin.tarik-saldo.setujui') }}">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="setujuiJumlah"
+                                                class="fw-bold"></span>?
+                                            <input type="hidden" name="id" id="setujuiId">
+                                            <input type="hidden" name="jumlah_pencairan" id="setujuiJumlahInput">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success"
+                                                id="btnKonfirmasiSetujui">Setujui</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Konfirmasi Tolak -->
+                        <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form id="formTolak" method="POST" action="">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalTolakLabel">Konfirmasi Tolak</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menolak pencairan saldo <span id="tolakNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="tolakJumlah"
+                                                class="fw-bold"></span>?
+                                            <input type="hidden" name="id" id="tolakId">
+                                            <input type="hidden" name="jumlah_pencairan" id="tolakJumlahInput">
+                                            <div class="mb-3 mt-3">
+                                                <label for="tolakKeterangan" class="form-label">Keterangan
+                                                    Penolakan</label>
+                                                <textarea class="form-control" name="keterangan" id="tolakKeterangan" rows="2" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-danger"
+                                                id="btnKonfirmasiTolak">Tolak</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
+                            <div id="pagination-info"></div>
+                            <div id="pagination-controls"></div>
+                        </div>
                     </div>
 
-                    <div class="float-end mt-3">
-                        {{ $pencairanSaldo->withQueryString()->links() }}
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
 
-    <!-- ✅ Modal Tolak -->
-    <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="formTolak" method="POST">
-                    @csrf
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="modalTolakLabel">Tolak Pengajuan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <input type="hidden" name="id" id="tolakId">
-
-                        <div class="mb-3">
-                            <strong>Nama Nasabah:</strong> <span id="namaNasabah" class="text-primary"></span><br>
-                            <strong>Jumlah Penarikan:</strong> Rp <span id="jumlahPenarikan" class="text-success"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="keterangan" class="fw-semibold">Keterangan Penolakan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required placeholder="Tulis alasan penolakan di sini..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- ✅ Script -->
+@push('scripts')
     <script>
-        function setRejectData(id, jumlah, nama) {
-            const url = "{{ route('admin.tarik-saldo.tolak', ':id') }}".replace(':id', id);
-            document.getElementById('formTolak').action = url;
-            document.getElementById('tolakId').value = id;
-            document.getElementById('jumlahPenarikan').textContent = jumlah;
-            document.getElementById('namaNasabah').textContent = nama;
+        /* ===============================
+                                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                                            ================================ */
+        function getFilterParams() {
+
+            const nasabah = document.getElementById('nasabah').value;
+            const cabang = document.getElementById('cabang').value;
+
+
+
+            return {
+                nasabah: nasabah,
+                cabang: cabang,
+            };
+        }
+
+
+        /* ===============================
+           FETCH DATA API
+        ================================ */
+        function fetchPetugasData(page = 1) {
+            const spinner = document.getElementById('loading-spinner');
+            const table = document.getElementById('petugas-table');
+            const pagination = document.getElementById('pagination-wrapper');
+
+            spinner.style.display = 'block';
+            table.style.display = 'none';
+            pagination.style.display = 'none';
+
+            const filters = getFilterParams();
+            const params = new URLSearchParams({
+                page,
+                per_page: perPage,
+
+                ...(filters.nasabah && {
+                    search: filters.nasabah,
+                }),
+                ...(filters.cabang && {
+                    cabang: filters.cabang,
+                }),
+            });
+
+
+
+
+
+            fetch(`/api/pencairan-nasabah-list?${params.toString()}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        current_page = res.pagination.current_page;
+                        totalPages = res.pagination.last_page;
+                        renderTable(res.data, res.pagination);
+                        renderPagination(res.pagination);
+
+                        spinner.style.display = 'none';
+                        table.style.display = 'table';
+                        pagination.style.display = 'flex';
+                    }
+                })
+                .catch(() => {
+                    spinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
+                });
+        }
+
+        /* ===============================
+           RENDER TABLE
+        ================================ */
+        function renderTable(data, pagination) {
+            const tbody = document.getElementById('petugas-tbody');
+            tbody.innerHTML = '';
+
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
+                return;
+            }
+
+
+            data.forEach((item, index) => {
+                const no = pagination.from + index;
+                // Format tanggal
+                let tanggal = '-';
+                if (item?.created_at) {
+                    const dateObj = new Date(item.created_at);
+                    const pad = n => n.toString().padStart(2, '0');
+                    tanggal = `${dateObj.getFullYear()}-${pad(dateObj.getMonth()+1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+                }
+                // Format jumlah penarikan
+                const jumlahRupiah = formatRupiah(item?.jumlah_pencairan);
+                tbody.innerHTML += `
+            <tr>
+                <td>${no}</td>
+                <td>
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSetujui"
+                        onclick="showSetujuiModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.id}')">
+                        Setujui
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalTolak"
+                        onclick="showTolakModal('${item?.nasabah?.nama_lengkap}', '${item?.jumlah_pencairan}', '${item?.id}')">
+                        Tolak
+                    </button>
+                </td>
+                <td>${tanggal}</td>
+                <td>${item?.nasabah?.nama_lengkap}</td>
+                <td>${jumlahRupiah}</td>
+            </tr>
+        `;
+            });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            if (angka == null) return '-';
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+
+
+        /* ===============================
+           EVENT
+        ================================ */
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchPetugasData(1);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPetugasData(1);
+        });
+        // Fungsi untuk menampilkan modal Setujui dengan data dinamis
+        function showSetujuiModal(nama, jumlah, kode) {
+            document.getElementById('setujuiNamaNasabah').textContent = nama;
+            document.getElementById('setujuiJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('setujuiId').value = kode;
+            document.getElementById('setujuiJumlahInput').value = jumlah;
+        }
+
+        // Fungsi untuk menampilkan modal Tolak dengan data dinamis
+        function showTolakModal(nama, jumlah, kode) {
+            document.getElementById('tolakNamaNasabah').textContent = nama;
+            document.getElementById('tolakJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('tolakJumlahInput').value = jumlah;
+            document.getElementById('tolakId').value = kode;
+            // Set action form sesuai route dan id
+            document.getElementById('formTolak').action = `/admin/tarik-saldo/tolak`;
         }
     </script>
-@endsection
+@endpush

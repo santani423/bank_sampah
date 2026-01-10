@@ -11,6 +11,7 @@ use App\Models\PengirimanPengepul;
 use App\Models\DetailPengiriman;
 use App\Models\FilePengirimanPetugas;
 use App\Models\Gudang;
+use App\Models\PengirimanLapak;
 use App\Models\PengirimanPetugas;
 use App\Models\Petugas;
 use App\Models\RefFilePengirimanPetugas;
@@ -58,7 +59,7 @@ class PengirimanPengepulController extends Controller
                 ->get();
         }
 
-        
+
 
         return view('pages.admin.pengiriman.index', compact('pengirimanSampah'));
     }
@@ -201,8 +202,7 @@ class PengirimanPengepulController extends Controller
                 }
             }
 
-            return redirect()
-                ->route('petugas.pengiriman.index')
+            return redirect()->route('admin.pengiriman-lapak.detail.pembayaran', ['kode' => $pengiriman->kode_pengiriman])
                 ->with('success', 'Pengiriman dan file berhasil ditambahkan.');
         } catch (\Exception $e) {
             return back()->withErrors([
@@ -365,5 +365,38 @@ class PengirimanPengepulController extends Controller
                 'error' => 'Terjadi kesalahan saat memperbarui pengiriman: ' . $e->getMessage()
             ])->withInput();
         }
+    }
+
+    public function lapak()
+    {
+        return view('pages.admin.pengiriman.lapak.index');
+    }
+
+    public function detailPengirimanLapak($kode)
+    {
+        // Ambil data pengiriman berdasarkan kode
+        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+
+        // Ambil cabang dari relasi gudang
+        $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
+
+        // dd($pengiriman); // Uncomment for debugging if needed
+        return view('pages.admin.pengiriman.lapak.detail', compact('pengiriman', 'cabang', 'kode'));
+    }
+
+    public function detailPembayaranPengirimanLapak($kode)
+    {
+        // Ambil data pengiriman berdasarkan kode
+        $pengiriman = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak', 'gudang.cabang','lapak','petugas'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+
+        // Ambil cabang dari relasi gudang
+        $cabang = $pengiriman && $pengiriman->gudang ? $pengiriman->gudang->cabang : null;
+
+        // dd($pengiriman); // Uncomment for debugging if needed
+        return view('pages.admin.pengiriman.lapak.detail-pembayaran', compact('pengiriman', 'cabang', 'kode'));
     }
 }

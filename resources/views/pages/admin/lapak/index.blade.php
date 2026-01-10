@@ -3,44 +3,7 @@
 @section('title', 'Data Lapak - Admin')
 
 @push('style')
-    <style>
-        .table td, .table th {
-            vertical-align: middle;
-        }
-        .badge {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .pagination {
-            margin: 0;
-        }
-        .pagination .page-item .page-link {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            margin: 0 0.125rem;
-            color: #1572e8;
-            border: 1px solid #dee2e6;
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #1572e8;
-            border-color: #1572e8;
-            color: #fff;
-        }
-        .pagination .page-item:hover:not(.active):not(.disabled) .page-link {
-            background-color: #e9ecef;
-            color: #1572e8;
-        }
-        .pagination .page-item.disabled .page-link {
-            color: #6c757d;
-            background-color: #fff;
-            border-color: #dee2e6;
-        }
-    </style>
+    
 @endpush
 
 @section('main')
@@ -149,7 +112,7 @@
                                     <th>#</th>
                                     <th>Kode Lapak</th>
                                     <th>Nama Lapak</th>
-                                    <th>Cabang</th>
+                                    <th>Collation Center</th>
                                     <th>Alamat</th>
                                     <th>Status</th>
                                     <th>Approval</th>

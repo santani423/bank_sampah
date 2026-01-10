@@ -9,15 +9,30 @@ return new class extends Migration {
     {
         Schema::create('logging', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique(); // kode unik LOG-00001 dst
+
+            // Kode unik log: LOG-00001, LOG-00002, dst
+            $table->string('code')->unique();
+
+            // Relasi user (opsional)
             $table->unsignedBigInteger('user_id')->nullable();
+
+            // Aksi yang dilakukan (CREATE, UPDATE, DELETE, LOGIN, dll)
             $table->string('action');
+
+            // Deskripsi singkat aktivitas
             $table->text('description')->nullable();
-            $table->json('data_before')->nullable();
-            $table->json('data_after')->nullable();
-            $table->ipAddress('ip_address')->nullable();
+
+            // DATA JSON → gunakan LONGTEXT agar kompatibel MariaDB
+            $table->longText('data_before')->nullable();
+            $table->longText('data_after')->nullable();
+
+            // Metadata request
+            $table->string('ip_address', 45)->nullable();
             $table->string('user_agent')->nullable();
-            $table->longText('temp_before_data')->nullable();  
+
+            // Backup tambahan (opsional / debugging)
+            $table->longText('temp_before_data')->nullable();
+
             $table->timestamps();
         });
     }

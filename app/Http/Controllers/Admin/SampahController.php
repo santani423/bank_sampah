@@ -28,10 +28,11 @@ class SampahController extends Controller
         $request->validate([
             'nama_sampah' => 'required|string|max:255',
             'harga_per_kg' => 'required|numeric',
+            'harga_lapak' => 'nullable|numeric',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $sampah = new Sampah($request->only('nama_sampah', 'harga_per_kg'));
+        $sampah = new Sampah($request->only('nama_sampah', 'harga_per_kg', 'harga_lapak'));
 
         if ($request->hasFile('gambar')) {
             $fileName = Str::random(40) . '.' . $request->file('gambar')->getClientOriginalExtension();
@@ -64,10 +65,11 @@ class SampahController extends Controller
         $request->validate([
             'nama_sampah' => 'required|string|max:255',
             'harga_per_kg' => 'required|numeric',
+            'harga_lapak' => 'nullable|numeric',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $sampah->fill($request->only('nama_sampah', 'harga_per_kg'));
+        $sampah->fill($request->only('nama_sampah', 'harga_per_kg', 'harga_lapak'));
 
         if ($request->hasFile('gambar')) {
             if ($sampah->gambar) {

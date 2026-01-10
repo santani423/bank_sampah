@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
 use App\Models\DetailTransaksi;
+use App\Models\PengirimanLapak;
 use App\Models\saldoPetugas;
 use App\Models\Transaksi;
+use App\Models\TransaksiLapak;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -81,5 +83,28 @@ class DashboardController extends Controller
             'nasabahTerbaik',
             'saldoPetugas'
         ));
+    }
+
+    public function invoicKirimSampahLapoak($kode = null)
+    {
+        $invoice = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak.sampah', 'gudang', 'petugas'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+
+
+
+        // dd($invoice);
+        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice','kode'));
+    }
+
+
+
+    public function invoicPencairanLapak($kode = null)
+    {
+        $invoice = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak.sampah', 'gudang', 'petugas','lapak'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+        // dd($invoice);
+        // return view('pages.petugas.invoic.pencairan-lapak', compact('invoice','kode'));
     }
 }

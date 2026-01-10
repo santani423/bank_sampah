@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\Lapak;
 use App\Models\Cabang;
+use App\Models\Gudang;
+use App\Models\JenisMetodePenarikan;
 use App\Models\Petugas;
+use App\Models\petugasCabang;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
@@ -14,13 +17,171 @@ use Illuminate\Support\Facades\DB;
 class LapakController extends Controller
 {
     /**
+     * Proses kirim sampah dari lapak
+     */
+    public function prosesKirimSampah(Request $request, $lapakId)
+    {
+        // Validasi data
+        $request->validate([
+            'kode_pengiriman' => 'required|string|unique:pengiriman_petugas,kode_pengiriman',
+            'tanggal_pengiriman' => 'required|date',
+            'jenis_sampah' => 'required|string',
+            'berat' => 'required|numeric|min:0.01',
+        ]);
+
+        // Simpan data pengiriman ke database (tabel pengiriman_petugas)
+        DB::table('pengiriman_petugas')->insert([
+            'kode_pengiriman' => $request->kode_pengiriman,
+            'lapak_id' => $lapakId,
+            'tanggal_pengiriman' => $request->tanggal_pengiriman,
+            'jenis_sampah' => $request->jenis_sampah,
+            'berat' => $request->berat,
+            'catatan' => $request->catatan,
+            'petugas_id' => auth()->user()->id ?? null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Alert::success('Berhasil', 'Pengiriman sampah berhasil disimpan');
+        return redirect()->route('petugas.lapak.index');
+    }
+    /**
+     * Tampilkan halaman pengiriman sampah dari lapak
+     */
+    public function kirimSampah($lapakId)
+    {
+        $lapak = Lapak::with([
+            'cabang',
+            'gudangs'
+        ])->where('kode_lapak', $lapakId)->firstOrFail();
+
+        $petugas = Petugas::where('email', auth()->user()->email)->first();
+        $cabangIds = [];
+        $cabangs = collect();
+        if ($petugas) {
+            $cabangIds = petugasCabang::where('petugas_id', $petugas->id)->pluck('cabang_id')->toArray();
+            $cabangs = cabang::whereIn('id', $cabangIds)->get();
+        }
+
+        // Generate kode pengiriman otomatis (format: KRM + tanggal + 4 digit random)
+        $kodePengiriman = 'KRM' . date('ymd') . strtoupper(substr(uniqid(), -5));
+        $customers = $lapak->gudangs;
+        // dd($customers);
+
+        return view('pages.petugas.lapak.kirim-sampah', compact('lapak', 'cabangs', 'cabangIds', 'kodePengiriman', 'customers','petugas'));
+    }
+    /**
+     * Tampilkan detail transaksi lapak
+     */
+    public function showTransaksi($id)
+    {
+        $transaksi = DB::table('transaksi_lapak')->where('id', $id)->first();
+        if (!$transaksi) abort(404);
+        $transaksi->detail_transaksi = DB::table('detail_transaksi_lapak')
+            ->where('transaksi_lapak_id', $id)
+            ->get()
+            ->map(function ($detail) {
+                $detail->sampah = DB::table('sampah')->where('id', $detail->sampah_id)->first();
+                return $detail;
+            });
+        $transaksi->petugas = DB::table('petugas')->where('id', $transaksi->petugas_id)->first();
+        // Pastikan properti status selalu ada
+        if (!property_exists($transaksi, 'status')) {
+            $transaksi->status = $transaksi->approval ?? 'pending';
+        }
+        return view('pages.petugas.lapak.transaksi.detail', compact('transaksi'));
+    }
+
+
+
+    /**
+     * Download detail transaksi lapak dalam format khusus
+     */
+    public function downloadTransaksi($id)
+    {
+        $transaksi = DB::table('transaksi_lapak')->where('id', $id)->first();
+        if (!$transaksi) abort(404);
+        $details = DB::table('detail_transaksi_lapak')
+            ->where('transaksi_lapak_id', $id)
+            ->get()
+            ->map(function ($detail) {
+                $detail->sampah = DB::table('sampah')->where('id', $detail->sampah_id)->first();
+                return $detail;
+            });
+        $transaksi->detail_transaksi = $details;
+        $transaksi->petugas = DB::table('petugas')->where('id', $transaksi->petugas_id)->first();
+        $transaksi->status = property_exists($transaksi, 'status') ? $transaksi->status : ($transaksi->approval ?? 'pending');
+        $pdf = \PDF::loadView('pages.petugas.lapak.transaksi.pdf', compact('transaksi'));
+        $filename = 'detail_transaksi_lapak_' . $transaksi->kode_transaksi . '.pdf';
+        return $pdf->download($filename);
+    }
+    /**
+     * Simpan transaksi setor sampah lapak
+     */
+    public function storeSetorSampah(Request $request, $lapakId)
+    {
+        $request->validate([
+            'kode_transaksi' => 'required|string|unique:transaksi_lapak,kode_transaksi',
+            'tanggal_transaksi' => 'required|date',
+            'detail_transaksi' => 'required|array|min:1',
+            'detail_transaksi.*.sampah_id' => 'required|exists:sampah,id',
+            'detail_transaksi.*.berat_kg' => 'required|numeric|min:0',
+            'detail_transaksi.*.harga_per_kg' => 'required|numeric|min:0',
+        ]);
+
+        $totalTransaksi = 0;
+        foreach ($request->detail_transaksi as $detail) {
+            $totalTransaksi += $detail['berat_kg'] * $detail['harga_per_kg'];
+        }
+
+        $petugas = \App\Models\Petugas::where('email', auth()->user()->email)->first();
+
+        $transaksiLapak = \DB::transaction(function () use ($request, $lapakId, $totalTransaksi, $petugas) {
+            $transaksi = \DB::table('transaksi_lapak')->insertGetId([
+                'lapak_id' => $lapakId,
+                'kode_transaksi' => $request->kode_transaksi,
+                'tanggal_transaksi' => $request->tanggal_transaksi,
+                'total_transaksi' => $totalTransaksi,
+                'approval' => 'pending',
+                'keterangan' => $request->keterangan ?? null,
+                'petugas_id' => $petugas ? $petugas->id : null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            foreach ($request->detail_transaksi as $detail) {
+                \DB::table('detail_transaksi_lapak')->insert([
+                    'transaksi_lapak_id' => $transaksi,
+                    'sampah_id' => $detail['sampah_id'],
+                    'berat_kg' => $detail['berat_kg'],
+                    'harga_per_kg' => $detail['harga_per_kg'],
+                    'total_harga' => $detail['berat_kg'] * $detail['harga_per_kg'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+            return $transaksi;
+        });
+
+        \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Transaksi setor sampah lapak berhasil disimpan dan menunggu approval admin');
+        return redirect()->route('petugas.lapak.index');
+    }
+    /**
+     * Tampilkan halaman setor sampah untuk lapak
+     */
+    public function setorSampah($lapakId)
+    {
+        $lapak = Lapak::where('kode_lapak', $lapakId)->firstOrFail();
+        return view('pages.petugas.lapak.setor-sampah', compact('lapak'));
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         // Ambil cabang petugas yang sedang login
         $petugasCabangIds = $this->getPetugasCabangIds();
-        
+
         $query = Lapak::with('cabang')
             ->whereIn('cabang_id', $petugasCabangIds);
 
@@ -35,8 +196,9 @@ class LapakController extends Controller
         }
 
         $lapaks = $query->paginate(10);
-        
-        return view('pages.petugas.lapak.index', compact('lapaks'));
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
+
+        return view('pages.petugas.lapak.index', compact('lapaks', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -50,13 +212,14 @@ class LapakController extends Controller
             ->where('status', 'aktif')
             ->orderBy('nama_cabang')
             ->get();
-        
+
         // Generate kode lapak otomatis
         $lastLapak = Lapak::latest('id')->first();
         $nextNumber = $lastLapak ? intval(substr($lastLapak->kode_lapak, 3)) + 1 : 1;
         $kodeLapak = 'LPK' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
 
-        return view('pages.petugas.lapak.create', compact('cabangs', 'kodeLapak'));
+        return view('pages.petugas.lapak.create', compact('cabangs', 'kodeLapak', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -76,6 +239,9 @@ class LapakController extends Controller
             'deskripsi' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
+            'jenis_metode_penarikan_id' => 'required|exists:jenis_metode_penarikans,id',
+            'nama_rekening' => 'required|string|max:100',
+            'nomor_rekening' => 'required|string|max:50',
         ]);
 
         $data = $request->all();
@@ -90,10 +256,9 @@ class LapakController extends Controller
 
         // Set default approval status ke pending dan status ke tidak_aktif
         $data['approval_status'] = 'pending';
-        $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin
+        $data['status'] = 'tidak_aktif'; // Tidak aktif sampai di-approve admin 
 
         Lapak::create($data);
-
         Alert::success('Berhasil', 'Data lapak berhasil ditambahkan dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
@@ -103,7 +268,8 @@ class LapakController extends Controller
      */
     public function show(string $id)
     {
-        $lapak = Lapak::with('cabang')->findOrFail($id);
+        $lapak = Lapak::with('cabang', 'jenisMetodePenarikan')->where('kode_lapak', $id)->firstOrFail();
+        // dd($lapak);
         return view('pages.petugas.lapak.show', compact('lapak'));
     }
 
@@ -113,15 +279,16 @@ class LapakController extends Controller
     public function edit(string $id)
     {
         $lapak = Lapak::findOrFail($id);
-        
+
         // Ambil cabang yang terkait dengan petugas yang sedang login
         $petugasCabangIds = $this->getPetugasCabangIds();
         $cabangs = Cabang::whereIn('id', $petugasCabangIds)
             ->where('status', 'aktif')
             ->orderBy('nama_cabang')
             ->get();
-        
-        return view('pages.petugas.lapak.edit', compact('lapak', 'cabangs'));
+        $jenisMetodePenarikan = JenisMetodePenarikan::all();
+
+        return view('pages.petugas.lapak.edit', compact('lapak', 'cabangs', 'jenisMetodePenarikan'));
     }
 
     /**
@@ -143,6 +310,9 @@ class LapakController extends Controller
             'deskripsi' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
+            'jenis_metode_penarikan_id' => 'required|exists:jenis_metode_penarikans,id',
+            'nama_rekening' => 'required|string|max:100',
+            'nomor_rekening' => 'required|string|max:50',
         ]);
 
         $data = $request->all();
@@ -162,9 +332,13 @@ class LapakController extends Controller
             unset($data['foto']);
         }
 
+        // Set approval_status ke pending dan status ke tidak_aktif setiap update
+        $data['approval_status'] = 'pending';
+        $data['status'] = 'tidak_aktif';
+
         $lapak->update($data);
 
-        Alert::success('Berhasil', 'Data lapak berhasil diperbarui');
+        Alert::success('Berhasil', 'Data lapak berhasil diperbarui dan menunggu persetujuan admin');
         return redirect()->route('petugas.lapak.index');
     }
 
@@ -192,7 +366,7 @@ class LapakController extends Controller
     private function getPetugasCabangIds()
     {
         $petugas = Petugas::where('email', auth()->user()->email)->first();
-        
+
         if (!$petugas) {
             return [];
         }

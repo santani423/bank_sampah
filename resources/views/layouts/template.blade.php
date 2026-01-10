@@ -35,13 +35,12 @@
     <!-- Main css -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/main.css') }}">
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @stack('style')
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.trendy.min.css') }}"> --}}
 </head>
 
 <body>
-
     <!--==================== Preloader Start ====================-->
     <div class="preloader">
         <div class="loader"></div>
@@ -84,10 +83,8 @@
 
     </aside>
     <!-- ============================ Sidebar End  ============================ -->
-
     <div class="dashboard-main-wrapper">
         <div class="top-navbar flex-between gap-16">
-
             <div class="flex-align gap-16">
                 <!-- Toggle Button Start -->
                 <button type="button" class="toggle-btn d-xl-none d-flex text-26 text-gray-500"><i
@@ -296,9 +293,9 @@
                         </div>
                     </div> --}}
                     <!-- Language Start -->
+
+
                 </div>
-
-
                 <!-- User Profile Start -->
                 <div class="dropdown">
                     <button
@@ -316,7 +313,7 @@
                             <div class="card-body">
                                 <div class="flex-align gap-8 mb-20 pb-20 border-bottom border-gray-100">
                                     <img src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&size=54&background=6366f1&color=ffffff' }}"
-                                        alt="" class="w-54 h-54 rounded-circle" onerror="this.src='https://via.placeholder.com/54/6366f1/ffffff?text={{ substr(Auth::user()->name, 0, 1) }}'">
+                                        alt="" class="w-54 h-54 rounded-circle">
                                     <div class="">
                                         <h4 class="mb-0">{{ Auth::user()->name }}</h4>
                                         <p class="fw-medium text-13 text-gray-200">{{ Auth::user()->email }}</p>
@@ -356,11 +353,9 @@
                     </div>
                 </div>
                 <!-- User Profile Start -->
-
             </div>
+
         </div>
-
-
         <div class="dashboard-body">
             @yield('main')
         </div>
@@ -381,6 +376,8 @@
             </div>
         </div> --}}
     </div>
+    <!-- ============================ Main Wrapper Start ============================ -->
+
     <!-- jQuery Scrollbar -->
     <script src="{{ asset('assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
     <!-- Jquery js -->
@@ -413,10 +410,176 @@
     <!-- main js -->
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#tanggal_range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "id",
+            allowInput: true
+        });
+    </script>
+
+    <style>
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination-info {
+            color: #666;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-btn {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f0f0f0;
+        }
+
+        .page-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .page-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        #loading-spinner {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+
+
+
+
+    <script>
+        let currentPage = 1;
+        let perPage = 10;
+        let totalPages = 1;
+        // Fungsi untuk render pagination
+        function renderPagination(pagination) {
+            if (!pagination) return;
+
+            // Sinkronisasi state
+            currentPage = pagination.current_page || 1;
+            totalPages = pagination.last_page || 1;
+
+            const paginationInfo = document.getElementById('pagination-info');
+            const paginationControls = document.getElementById('pagination-controls');
+
+            // =========================
+            // INFO PAGINATION
+            // =========================
+            paginationInfo.textContent =
+                `Menampilkan ${pagination.from ?? 0} sampai ${pagination.to ?? 0} dari ${pagination.total ?? 0} data`;
+
+            // =========================
+            // RESET CONTROLS
+            // =========================
+            paginationControls.innerHTML = '';
+
+            // =========================
+            // PREVIOUS BUTTON
+            // =========================
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.textContent = '« Previous';
+            prevBtn.disabled = currentPage <= 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    fetchPetugasData(currentPage - 1);
+                }
+            };
+            paginationControls.appendChild(prevBtn);
+
+            // =========================
+            // PAGE RANGE
+            // =========================
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            // FIRST PAGE + DOTS
+            if (startPage > 1) {
+                const firstBtn = document.createElement('button');
+                firstBtn.className = 'page-btn';
+                firstBtn.textContent = '1';
+                firstBtn.onclick = () => fetchPetugasData(1);
+                paginationControls.appendChild(firstBtn);
+
+                if (startPage > 2) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    dots.style.padding = '0 8px';
+                    paginationControls.appendChild(dots);
+                }
+            }
+
+            // PAGE BUTTONS
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+                pageBtn.textContent = i;
+                pageBtn.disabled = i === currentPage;
+                pageBtn.onclick = () => fetchPetugasData(i);
+                paginationControls.appendChild(pageBtn);
+            }
+
+            // LAST PAGE + DOTS
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    dots.style.padding = '0 8px';
+                    paginationControls.appendChild(dots);
+                }
+
+                const lastBtn = document.createElement('button');
+                lastBtn.className = 'page-btn';
+                lastBtn.textContent = totalPages;
+                lastBtn.onclick = () => fetchPetugasData(totalPages);
+                paginationControls.appendChild(lastBtn);
+            }
+
+            // =========================
+            // NEXT BUTTON
+            // =========================
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.textContent = 'Next »';
+            nextBtn.disabled = currentPage >= totalPages;
+            nextBtn.onclick = () => {
+                if (currentPage < totalPages) {
+                    fetchPetugasData(currentPage + 1);
+                }
+            };
+            paginationControls.appendChild(nextBtn);
+        }
+
+
+        // Load data saat halaman pertama kali dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchPetugasData(1);
+        });
+    </script>
     @yield('scripts')
     @stack('scripts')
-
-
 </body>
 
 </html>

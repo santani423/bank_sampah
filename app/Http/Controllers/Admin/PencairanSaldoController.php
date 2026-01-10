@@ -52,14 +52,15 @@ class PencairanSaldoController extends Controller
     /**
      * Proses persetujuan permintaan pencairan saldo.
      */
-    public function setujui(Request $request, $id)
+    public function setujui(Request $request)
     {
         $request->validate([
             'jumlah_pencairan' => 'required|numeric|min:0',
+            'id' => 'required|numeric|min:0',
         ]);
-
+        $id = $request->input('id');
         $pencairan = PencairanSaldo::findOrFail($id);
-
+        // dd($pencairan);
         // Pastikan statusnya masih pending
         if ($pencairan->status !== 'pending') {
             return redirect()->back()->withErrors(['msg' => 'Permintaan sudah diproses sebelumnya.']);
@@ -74,84 +75,75 @@ class PencairanSaldoController extends Controller
 
         // Proses pengurangan saldo
         $saldo->saldo -= $pencairan->jumlah_pencairan;
-        $saldo->save();
+
 
         // Update status pencairan saldo
         $pencairan->status = 'disetujui';
         $pencairan->tanggal_proses = now();
         $pencairan->updated_at = now();
-        $pencairan->save();
 
-        $nasabahUser  = UserNasabah::with('nasabah')->where('nasabah_id', $pencairan->nasabah_id)->first();
+
+        $nasabahUser  = UserNasabah::with('nasabah.metodePencairan.jenisMetodePenarikan')->where('nasabah_id', $pencairan->nasabah_id)->first();
         $user = User::where('id', $nasabahUser->user_id)->first();
-
+        $nasabah = $nasabahUser->nasabah;
+        // dd($nasabah->metodePencairan[0]->jenisMetodePenarikan->code);
         // Generate external_id unik
         $externalId = 'disb-dana-' . time() . '-' . Str::random(5);
         // Buat payload sesuai format disbursement Xendit
         $payload = [
             'external_id' => $externalId,
             'amount' => (int) $pencairan->jumlah_pencairan,
-            'bank_code' => 'DANA', // ✅ HARUS: gunakan DANA sebagai bank_code
+            'bank_code' => $nasabah->metodePencairan[0]->jenisMetodePenarikan->code, // ✅ HARUS: gunakan DANA sebagai bank_code
             'account_holder_name' => $user->name,
-            'account_number' => "085778674418", // ✅ HARUS: ini nomor telepon penerima
+            'account_number' => $nasabah->no_hp, // ✅ HARUS: ini nomor telepon penerima
             'description' =>  'Disbursement ke DANA'
         ];
         $response = Http::withBasicAuth(config('xendit.api_key'), '')
             ->post('https://api.xendit.co/disbursements', $payload);
+        // dd($response->json());
 
         if ($response->successful()) {
             Log::info('DANA Disbursement berhasil', [
                 'external_id' => $externalId,
                 'response' => $response->json()
             ]);
+            $saldo->save();
+            $pencairan->save();
+            if ($nasabah) {
+                $setting = Setting::first();
+                $pesan = "*Pemberitahuan Pencairan Saldo*\n\n"
+                    . "Halo *{$nasabah->nama_lengkap}*, 👋\n"
+                    . "Permintaan pencairan saldo Anda sebesar *Rp " . number_format($pencairan->jumlah_pencairan, 0, ',', '.') . "* telah *DISETUJUI* dan sedang dalam proses pengiriman ke akun DANA Anda.\n\n"
+                    . "📅 *Tanggal Proses:* " . now()->format('d-m-Y H:i') . "\n"
+                    . "💸 *Status:* Disetujui ✅\n\n"
+                    . "Terima kasih telah menggunakan layanan *{$setting->nama}*. 🌱";
 
-            // return response()->json([
-            //     'message' => 'Disbursement DANA berhasil dikirim',
-            //     'data' => $response->json()
-            // ]);
+                // 🔥 Kirim pesan via WhatsApp Service
+                $result = $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
+            }
+
+
+            return back()->with('success', 'Permintaan pencairan saldo telah disetujui.');
         } else {
             Log::error('Gagal kirim DANA Disbursement', [
                 'payload' => $payload,
                 'response' => $response->json()
             ]);
 
-            // return response()->json([
-            //     'message' => 'Gagal kirim DANA Disbursement',
-            //     'error' => $response->json()
-            // ], $response->status());
+            return back()->with('error', 'Gagal kirim DANA Disbursement: ' . ($response->json()['message'] ?? 'Unknown error'));
         }
-
-        $nasabah = $nasabahUser->nasabah;
-
-
-
-
-        if ($nasabah) {
-            $setting = Setting::first();
-            $pesan = "*Pemberitahuan Pencairan Saldo*\n\n"
-                . "Halo *{$nasabah->nama_lengkap}*, 👋\n"
-                . "Permintaan pencairan saldo Anda sebesar *Rp " . number_format($pencairan->jumlah_pencairan, 0, ',', '.') . "* telah *DISETUJUI* dan sedang dalam proses pengiriman ke akun DANA Anda.\n\n"
-                . "📅 *Tanggal Proses:* " . now()->format('d-m-Y H:i') . "\n"
-                . "💸 *Status:* Disetujui ✅\n\n"
-                . "Terima kasih telah menggunakan layanan *{$setting->nama}*. 🌱";
-
-            // 🔥 Kirim pesan via WhatsApp Service
-            $result = $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
-        }
-
-
-        return back()->with('success', 'Permintaan pencairan saldo telah disetujui.');
     }
 
     /**
      * Proses penolakan permintaan pencairan saldo.
      */
-    public function tolak(Request $request, $id)
+    public function tolak(Request $request)
     {
         $request->validate([
             'keterangan' => 'required|string|max:255',
         ]);
 
+        $id = $request->input('id');
         // Ambil data pencairan saldo berdasarkan ID
         $pencairan = PencairanSaldo::findOrFail($id);
 
@@ -170,7 +162,7 @@ class PencairanSaldoController extends Controller
         $userNasabah = UserNasabah::with('nasabah')->where('nasabah_id', $pencairan->nasabah_id)->first();
         $nasabah = $userNasabah ? $userNasabah->nasabah : null;
 
-        
+
 
         if ($nasabah) {
             $setting = Setting::first();

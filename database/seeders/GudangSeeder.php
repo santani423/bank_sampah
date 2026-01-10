@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cabang;
+use App\Models\Gudang;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class GudangSeeder extends Seeder
 {
@@ -13,43 +15,31 @@ class GudangSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('gudangs')->insert([
-            [
-                'kode_gudang' => 'GDG-001',
-                'nama_gudang' => 'Gudang Pusat Bogor',
-                'alamat' => 'Jl. Raya Pajajaran No. 45, Tanah Sareal, Bogor',
-                'kota' => 'Bogor',
-                'provinsi' => 'Jawa Barat',
-                'kode_pos' => '16161',
-                'telepon' => '0251-8888888',
-                'status' => 'aktif',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'kode_gudang' => 'GDG-002',
-                'nama_gudang' => 'Gudang Cabang Depok',
-                'alamat' => 'Jl. Margonda Raya No. 22, Pancoran Mas, Depok',
-                'kota' => 'Depok',
-                'provinsi' => 'Jawa Barat',
-                'kode_pos' => '16431',
-                'telepon' => '021-7777777',
-                'status' => 'aktif',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'kode_gudang' => 'GDG-003',
-                'nama_gudang' => 'Gudang Jakarta Selatan',
-                'alamat' => 'Jl. Fatmawati No. 88, Cilandak, Jakarta Selatan',
-                'kota' => 'Jakarta Selatan',
-                'provinsi' => 'DKI Jakarta',
-                'kode_pos' => '12430',
-                'telepon' => '021-9999999',
-                'status' => 'nonaktif',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        $faker = Faker::create('id_ID');
+
+        $cabangs = Cabang::all();
+
+        foreach ($cabangs as $index => $cabang) {
+
+            $jumlahGudang = rand(1, 10);
+
+            for ($i = 1; $i <= $jumlahGudang; $i++) {
+
+                Gudang::create([
+                    'cabang_id'   => $cabang->id,
+                    'kode_gudang' => 'CST' . Str::padLeft($cabang->id, 3, '0') . '-' . $i,
+                    'nama_gudang' => 'Customer ' . $i . ' ' . $cabang->nama_cabang,
+
+                    // alamat disesuaikan tapi tetap masuk akal
+                    'alamat'   => $faker->streetAddress,
+                    'kota'     => $cabang->kota,
+                    'provinsi' => $cabang->provinsi,
+                    'kode_pos' => $faker->postcode,
+                    'telepon'  => $faker->phoneNumber,
+
+                    'status' => 'aktif',
+                ]);
+            }
+        }
     }
 }

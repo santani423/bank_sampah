@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Edit Gudang')
+@section('title', 'Edit Customer')
 
 @push('style')
     <style>
@@ -14,16 +14,16 @@
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Edit Gudang</h3>
-            <h6 class="op-7 mb-2">Ubah data gudang sesuai kebutuhan.</h6>
+            <h3 class="fw-bold mb-3">Edit Customer</h3>
+            <h6 class="op-7 mb-2">Ubah data customer sesuai kebutuhan.</h6>
         </div>
         <div class="ms-md-auto py-2 py-md-0">
-            <a href="{{ route('admin.gudangs.index') }}" class="btn btn-secondary btn-round">Kembali ke List Gudang</a>
+            <a href="{{ route('admin.gudangs.index') }}" class="btn btn-secondary btn-round">Kembali ke List Customer</a>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
                     @if ($errors->any())
@@ -40,9 +40,20 @@
                         @csrf
                         @method('PUT')
 
+
                         <div class="mb-3">
                             <label for="kode_gudang" class="form-label">Kode Gudang</label>
                             <input type="text" class="form-control" id="kode_gudang" name="kode_gudang" value="{{ old('kode_gudang', $gudang->kode_gudang) }}" required maxlength="20">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cabang_id" class="form-label">Cabang</label>
+                            <select class="form-select" id="cabang_id" name="cabang_id">
+                                <option value="">-- Pilih Cabang --</option>
+                                @foreach($cabangs as $cabang)
+                                    <option value="{{ $cabang->id }}" {{ old('cabang_id', $gudang->cabang_id) == $cabang->id ? 'selected' : '' }}>{{ $cabang->nama_cabang ?? $cabang->id }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-3">
