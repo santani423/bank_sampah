@@ -469,8 +469,8 @@ class PengirimanLapakController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data pengiriman lapak berhasil diambil.',
-                'data' => $pengiriman,
+                'message' => 'Pencairan lapak berhasil diproses.',
+                'data' => $pencairan,
                 'sumber_dana' => $sumber_dana,
                 'wa' => $wa
             ], 200);

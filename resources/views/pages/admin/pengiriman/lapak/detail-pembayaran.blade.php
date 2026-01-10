@@ -380,9 +380,9 @@
                                 preview.innerHTML = '';
 
                                 setTimeout(() => {
-                                    if (data.kode_pengiriman) {
+                                    if (data.kode_pencairan) {
                                         window.location.href =
-                                            "{{ route('admin.invoic.pencairan-lapak', '') }}" + data.kode_pengiriman;
+                                            "{{ route('admin.invoic.pencairan-lapak', '') }}" + data.kode_pencairan;
                                     } else {
                                         feedback.innerHTML +=
                                             '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
