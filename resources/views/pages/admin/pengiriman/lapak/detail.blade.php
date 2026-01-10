@@ -158,7 +158,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <x-select.select-status-pengiriman name="status_pengiriman" value="{{ old('status_pengiriman', $status_pengiriman ?? $pengiriman->status_pengiriman ?? '') }}" />
+                    <x-select.select-status-pengiriman name="status_pengiriman"
+                        value="{{ old('status_pengiriman', $status_pengiriman ?? ($pengiriman->status_pengiriman ?? '')) }}" />
                 </div>
                 <div class="mb-3">
                     <label for="file_sampah" class="form-label">Catatan</label>
@@ -222,21 +223,26 @@
                         })
                         .then(response => response.json())
                         .then(data => {
+                            console.log('kode_pengiriman', data.kode_pengiriman);
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
-                            if (data.success) {
+                            if (data.status) {
                                 feedback.innerHTML =
                                     '<span class="text-success">' + (data.message ||
                                         'Upload berhasil!') + '</span>';
 
-                                form.reset();
+
                                 preview.innerHTML = '';
 
                                 setTimeout(() => {
                                     if (data.kode_pengiriman) {
-                                        window.location.href = "/admin/pengiriman/sampah-lapak/detail-pembayaran/" + data.kode_pengiriman;
+
+                                        window.location.href =
+                                            "{{ route('admin.pengiriman.lapak') }}";
+
                                     } else {
-                                        feedback.innerHTML += '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
+                                        feedback.innerHTML +=
+                                            '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
                                     }
                                 }, 800);
                             } else {
