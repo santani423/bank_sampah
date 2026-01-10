@@ -10,7 +10,9 @@ use Illuminate\View\Component;
 
 class SelectCabang extends Component
 {
-     
+    /**
+     * Create a new component instance.kontol
+     */
     public $cabang, $name;
     public function __construct($name = 'cabang')
     {
