@@ -31,12 +31,16 @@
                             <div class="fw-bold fs-5">{{ $pengiriman->lapak->nama_lapak ?? '-' }}</div>
                             <div class="mb-1">
                                 <span class="fw-bold">No Rekening:</span>
-                                <span id="noRek" class="text-muted small">{{ $pengiriman->lapak->nomor_rekening ?? '-' }}</span>
-                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i class="bi bi-clipboard"></i> Copy</button>
+                                <span id="noRek"
+                                    class="text-muted small">{{ $pengiriman->lapak->nomor_rekening ?? '-' }}</span>
+                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i
+                                        class="bi bi-clipboard"></i> Copy</button>
                             </div>
-                            <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert" style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
+                            <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert"
+                                style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
                                 No rekening berhasil disalin!
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="mb-1">
                                 <span class="fw-bold">Atas Nama:</span>
@@ -151,8 +155,9 @@
                                         <td>{{ $idx + 1 }}</td>
                                         <td>{{ $item->sampah->nama_sampah ?? '-' }}</td>
                                         <td>{{ number_format($item->berat_kg, 2, ',', '.') }}</td>
-                                        <td>{{ number_format($item->berat_terupdate ?? $item->berat_kg, 2, ',', '.') }}</td>
-                                        
+                                        <td>{{ number_format($item->berat_terupdate ?? $item->berat_kg, 2, ',', '.') }}
+                                        </td>
+
                                         <td>Rp {{ number_format($item->harga_per_kg, 0, ',', '.') }}</td>
                                         <td>
                                             <span id="subtotal-{{ $detailPengirimanLapaks->id }}-{{ $item->id }}">
@@ -195,8 +200,11 @@
                             @php
                                 $summarySampah = [];
                                 $grandTotal = 0;
-                                foreach (($pengiriman->detailPengirimanLapaks ?? []) as $detailPengirimanLapaks) {
-                                    foreach (($detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? []) as $item) {
+                                foreach ($pengiriman->detailPengirimanLapaks ?? [] as $detailPengirimanLapaks) {
+                                    foreach (
+                                        $detailPengirimanLapaks->transaksiLapak->detailTransaksiLapak ?? []
+                                        as $item
+                                    ) {
                                         $nama = $item->sampah->nama_sampah ?? '-';
                                         $berat = $item->berat_terupdate ?? $item->berat_kg;
                                         $subtotal = $berat * $item->harga_per_kg;
@@ -356,7 +364,7 @@
                     fetch("{{ route('api.lapak.bayar-sampah', $pengiriman->kode_pengiriman ?? '') }}", {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || 
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ||
                                     '{{ csrf_token() }}'
                             },
                             body: formData
@@ -366,12 +374,22 @@
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
                             if (data.success) {
-                                feedback.innerHTML = '<span class="text-success">' + (data.message || 
+                                feedback.innerHTML = '<span class="text-success">' + (data.message ||
                                     'Upload berhasil!') + '</span>';
                                 form.reset();
                                 preview.innerHTML = '';
+
+                                setTimeout(() => {
+                                    if (data.kode_pengiriman) {
+                                        window.location.href =
+                                            "{{ route('admin.invoic.pencairan-lapak', '') }}" + data.kode_pengiriman;
+                                    } else {
+                                        feedback.innerHTML +=
+                                            '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
+                                    }
+                                }, 1500);
                             } else {
-                                feedback.innerHTML = '<span class="text-danger">' + (data.message || 
+                                feedback.innerHTML = '<span class="text-danger">' + (data.message ||
                                     'Upload gagal!') + '</span>';
                             }
                         })

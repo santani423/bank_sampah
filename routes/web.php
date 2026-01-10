@@ -95,7 +95,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-customers', GudangController::class)->names('admin.gudangs');
     Route::post('admin/customers/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
     
-    Route::get('/invoic/pencairan-lapak/{kode}', [AdminDashboardController::class, 'invoicPencairanLapak'])->name('petugas.invoic.pencairan-lapak');
+    Route::get('/invoic/pencairan-lapak/{kode}', [AdminDashboardController::class, 'invoicPencairanLapak'])->name('admin.invoic.pencairan-lapak');
 
     // Approval Setoran Lapak
     Route::get('/setor-lapak', [AdminLapakController::class, 'approvalSetoranLapak'])->name('admin.setor-lapak.index');
