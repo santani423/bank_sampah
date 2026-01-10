@@ -38,27 +38,26 @@ use App\Models\PengirimanLapak;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+ 
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
-
+ 
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
-    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
+     
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
     Route::get('/nasabah', [ApiNasabahController::class, 'index']);
-
+    
     Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
     Route::post('/lapak/{id}/bayar-sampah-lapak', [PengirimanLapakController::class, 'bayarSampahLapak'])->name('api.lapak.bayar-sampah');
+    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
 
 
     Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);
