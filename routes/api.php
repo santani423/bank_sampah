@@ -45,6 +45,7 @@ Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
+    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
      
 });
 Route::middleware('auth:sanctum')->group(function () {
@@ -57,7 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/lapak/{id}/finalisasi', [PengirimanLapakController::class, 'finalisasi'])->name('api.lapak.transaksi.index');
     Route::post('/lapak/{id}/penerimaan-sampah-customer', [PengirimanLapakController::class, 'penerimaanSampahCustomer'])->name('api.lapak.penerimaan-sampah-customer');
     Route::post('/lapak/{id}/bayar-sampah-lapak', [PengirimanLapakController::class, 'bayarSampahLapak'])->name('api.lapak.bayar-sampah');
-    Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
 
 
     Route::get('/gudang-by-cabang/{id}', [GudangController::class, 'gudangByCabang']);

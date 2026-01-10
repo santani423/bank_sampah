@@ -118,8 +118,8 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                       AMBIL FILTER TANGGAL
-                                                    ================================ */
+                                                           AMBIL FILTER TANGGAL
+                                                        ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
@@ -181,9 +181,9 @@
             });
 
 
+            const alldata = "{{ route('api.lapak.pengiriman.index', ':kode') }}";
 
-
-            fetch(`/api/lapak/pengiriman?${params.toString()}`)
+            fetch(`${alldata}?${params.toString()}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.success) {
@@ -227,10 +227,10 @@
                 <td>${no}</td>
                 <td>
                     ${item.status_pengiriman === 'diterima' ? `
-                                <a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>
-                                ` : `
-                                <a href="${url}" class="btn btn-sm btn-info">Detail</a>
-                                `}
+                                    <a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>
+                                    ` : `
+                                    <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                                    `}
                 </td>
                 <td>${item.kode_pengiriman}</td>
                 <td>${item.tanggal_pengiriman}</td>

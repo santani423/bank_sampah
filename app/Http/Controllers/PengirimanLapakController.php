@@ -258,6 +258,13 @@ class PengirimanLapakController extends Controller
                 );
             }
 
+            if ($request->has('customer')) {
+                $customer = $request->get('customer');
+                $query->whereHas('gudang', function ($q) use ($customer) {
+                    $q->where('nama_gudang', 'LIKE', '%' . $customer . '%');
+                });
+            }
+
             if ($request->has('cabang')) {
                 $cabang = $request->get('cabang');
                 $query->whereHas('gudang.cabang', function ($q) use ($cabang) {
