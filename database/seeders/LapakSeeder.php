@@ -46,7 +46,7 @@ class LapakSeeder extends Seeder
                     'kota' => $randomKota,
                     'provinsi' => $randomProvinsi,
                     'kode_pos' => rand(10000, 99999),
-                    'no_telepon' => '08' . rand(1000000000, 9999999999),
+                    'no_telepon' => '088289445437',
                     'deskripsi' => 'Lapak sampah ' . strtolower($randomNama) . ' melayani dengan baik',
                     'status' => $status,
                     'jenis_metode_penarikan_id' => 1,

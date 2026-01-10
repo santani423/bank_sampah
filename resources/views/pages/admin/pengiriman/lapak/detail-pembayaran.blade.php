@@ -31,7 +31,7 @@
                             <div class="fw-bold fs-5">{{ $pengiriman->lapak->nama_lapak ?? '-' }}</div>
                             <div class="mb-1">
                                 <span class="fw-bold">No Rekening:</span>
-                                <span id="noRek" class="text-muted small">{{ $pengiriman->lapak->no_rekening ?? '-' }}</span>
+                                <span id="noRek" class="text-muted small">{{ $pengiriman->lapak->nomor_rekening ?? '-' }}</span>
                                 <button type="button" class="btn btn-sm btn-primary ms-2" onclick="copyRekening()"><i class="bi bi-clipboard"></i> Copy</button>
                             </div>
                             <div id="alertCopy" class="alert alert-success alert-dismissible fade" role="alert" style="display:none;position:absolute;z-index:999;top:10px;right:10px;">
