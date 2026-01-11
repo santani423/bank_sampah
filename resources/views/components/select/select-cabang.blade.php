@@ -1,7 +1,16 @@
-  <label for="{{ $name }}" class="form-label">Cabang</label>
-  <select class="form-control" name="{{ $name }}" id="{{ $name }}" aria-label="Default select example">
-        <option value="">-- Pilih Collatin Center --</option>
-      @foreach ($cabang as $item)
-          <option value="{{ $item->kode_cabang }}">{{ $item->nama_cabang }}</option>
-      @endforeach
-  </select>
+ <label for="{{ $name }}">Cabang <span class="text-danger">*</span></label>
+ <select id="{{ $name }}" class="form-control @error($name) is-invalid @enderror" name="{{ $name }}"
+     required>
+     <option value="" disabled selected>Pilih Cabang</option>
+     @php
+         $selected = old($name, $value ?? '');
+     @endphp
+     @foreach ($cabang as $cabang)
+         <option value="{{ $cabang->id }}" {{ $selected == $cabang->id ? 'selected' : '' }}>
+             {{ $cabang->nama_cabang }} - {{ $cabang->kode_cabang }}
+         </option>
+     @endforeach
+ </select>
+ @error($name)
+     <div class="invalid-feedback">{{ $message }}</div>
+ @enderror

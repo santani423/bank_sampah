@@ -43,7 +43,7 @@ class UserNasabahSeeder extends Seeder
                 'username' => "nasabahuser$i",
                 'password' => Hash::make('12345678'),
                 'alamat_lengkap' => "Jl. Contoh $i, Kota $i",
-                'foto' => 'profil.png',
+                'foto' => '',
                 'status' => 'aktif',
                 'created_at' => $now,
                 'updated_at' => $now,

@@ -11,3 +11,6 @@
       <option value="batal" {{ $selected == 'batal' ? 'selected' : '' }}>Batal</option>
       <option value="draft" {{ $selected == 'draft' ? 'selected' : '' }}>Draft</option>
   </select>
+  @error($name)
+      <div class="invalid-feedback">{{ $message }}</div>
+  @enderror

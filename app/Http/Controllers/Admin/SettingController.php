@@ -72,7 +72,7 @@ class SettingController extends Controller
                 Storage::disk('public')->delete($setting->logo);
             }
             $path = $request->file('logo')->store('logos', 'public');
-            $setting->logo = $path;
+            $setting->logo = 'storage/' . $path;
         }
 
         // === Upload Favicon Baru (jika ada) ===
@@ -81,7 +81,7 @@ class SettingController extends Controller
                 Storage::disk('public')->delete($setting->favicon);
             }
             $path = $request->file('favicon')->store('favicons', 'public');
-            $setting->favicon = $path;
+            $setting->favicon =  'storage/' . $path;
         }
 
         $setting->save();

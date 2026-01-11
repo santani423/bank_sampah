@@ -13,8 +13,8 @@ class SelectCabang extends Component
     /**
      * Create a new component instance
      */
-    public $cabang, $name;
-    public function __construct($name = 'cabang')
+    public $cabang, $name, $value;
+    public function __construct($name = 'cabang',$value = null)
     {
         //
         $authUser = auth()->user();
@@ -38,6 +38,7 @@ class SelectCabang extends Component
         $cabang = $query->get();
 
         $this->cabang = $cabang;
+        $this->value = $value;
         $this->name = $name;
     }
 

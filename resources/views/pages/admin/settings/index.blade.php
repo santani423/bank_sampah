@@ -50,7 +50,7 @@
                     <input type="file" name="logo" class="form-control" id="logoInput" accept="image/*">
                     <div id="logoPreview" class="mt-3">
                         @if ($setting->logo)
-                            <img src="{{ asset('storage/' . $setting->logo) }}" alt="Logo Sekarang" class="rounded border" height="80">
+                            <img src="{{ asset($setting->logo) }}" alt="Logo Sekarang" class="rounded border" height="80">
                         @endif
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                     <input type="file" name="favicon" class="form-control" id="faviconInput" accept="image/*">
                     <div id="faviconPreview" class="mt-3">
                         @if ($setting->favicon)
-                            <img src="{{ asset('storage/' . $setting->favicon) }}" alt="Favicon Sekarang" class="rounded border" height="50">
+                            <img src="{{ asset($setting->favicon) }}" alt="Favicon Sekarang" class="rounded border" height="50">
                         @endif
                     </div>
                 </div>

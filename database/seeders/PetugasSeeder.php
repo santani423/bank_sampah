@@ -111,7 +111,6 @@ class PetugasSeeder extends Seeder
                 'username' => $username . '_nasabah',
                 'password' => Hash::make('12345678'),
                 'alamat_lengkap' => $faker->address,
-                'foto' => 'default.jpg',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now(),

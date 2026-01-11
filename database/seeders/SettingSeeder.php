@@ -14,8 +14,8 @@ class SettingSeeder extends Seeder
     {
         DB::table('settings')->insert([
             'nama' => 'BMPS',
-            'logo' => 'logos/6c1nkTidbnNM7QQu6dvDKiQotAj6LW1PHUkO7Gg6.png',
-            'favicon' => 'logos/6c1nkTidbnNM7QQu6dvDKiQotAj6LW1PHUkO7Gg6.png',
+            'logo' => 'assets/img/logo.png',
+            'favicon' => 'assets/img/logo.png',
             'title' => 'BMPS | Aplikasi Bank Sampah Digital',
             'description' => 'BMPS adalah aplikasi pengelolaan bank sampah modern berbasis web.',
             'keywords' => 'bank sampah, BMPS, daur ulang, lingkungan, digital',

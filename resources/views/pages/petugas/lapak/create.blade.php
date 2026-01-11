@@ -55,31 +55,19 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="cabang_id">Cabang <span class="text-danger">*</span></label>
-                                    <select id="cabang_id" class="form-control @error('cabang_id') is-invalid @enderror"
-                                        name="cabang_id" required>
-                                        <option value="" disabled selected>Pilih Cabang</option>
-                                        @foreach ($cabangs as $cabang)
-                                            <option value="{{ $cabang->id }}"
-                                                {{ old('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                                {{ $cabang->nama_cabang }} - {{ $cabang->kode_cabang }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('cabang_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <x-select.select-cabang name="cabang_id" />
                                 </div>
                             </div>
                         </div>
 
-                            <div class="form-group">
-                                <label for="alamat">Alamat Lengkap <span class="text-danger">*</span></label>
-                                <textarea id="alamat" class="form-control @error('alamat') is-invalid @enderror" name="alamat" rows="3" required>{{ old('alamat') }}</textarea>
-                                @error('alamat')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="form-group">
+                            <label for="alamat">Alamat Lengkap <span class="text-danger">*</span></label>
+                            <textarea id="alamat" class="form-control @error('alamat') is-invalid @enderror" name="alamat" rows="3"
+                                required>{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <div class="form-group">
                             <label for="nama_lapak">Nama Lapak <span class="text-danger">*</span></label>
@@ -192,18 +180,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="jenis_metode_penarikan_id" class="form-label">Jenis Metode <span
-                                    class="text-danger">*</span></label>
-                            <select name="jenis_metode_penarikan_id" id="jenis_metode_penarikan_id"
-                                class="form-select @error('jenis_metode_penarikan_id') is-invalid @enderror" required>
-                                <option value="">Pilih Jenis Metode</option>
-                                @foreach ($jenisMetodePenarikan as $jenis)
-                                    <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>
-                                @endforeach
-                            </select>
-                            @error('jenis_metode_penarikan_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <x-select.select-metode-bayar name="jenis_metode_penarikan_id" />
+
                         </div>
                         <div class="form-group">
                             <label for="nama_rekening" class="form-label">Atas Nama <span
