@@ -118,8 +118,8 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                           AMBIL FILTER TANGGAL
-                                                        ================================ */
+                                                                       AMBIL FILTER TANGGAL
+                                                                    ================================ */
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
@@ -216,32 +216,37 @@
 
             const detailRoute = "{{ route('admin.pengiriman-lapak.detail', ':kode') }}";
             const detailBayarRoute = "{{ route('admin.pengiriman-lapak.detail.pembayaran', ':kode') }}";
+            const detailInvoiceRoute = "{{ route('admin.invoice.pencairan-lapak', ':kode') }}";
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
                 const url = detailRoute.replace(':kode', item.kode_pengiriman);
                 const urlBayar = detailBayarRoute.replace(':kode', item.kode_pengiriman);
+                const urlInvoice = detailInvoiceRoute.replace(':kode', item.pencairan_lapak?.kode_pencairan ?? item.kode_pengiriman);
 
                 tbody.innerHTML += `
-            <tr>
-                <td>${no}</td>
-                <td>
-                    ${item.status_pengiriman === 'diterima' ? `
-                                    <a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>
-                                    ` : `
-                                    <a href="${url}" class="btn btn-sm btn-info">Detail</a>
-                                    `}
-                </td>
-                <td>${item.kode_pengiriman}</td>
-                <td>${item.tanggal_pengiriman}</td>
-                <td>${item.gudang?.cabang?.nama_cabang ?? '-'}</td>
-                <td>${item.gudang?.nama_gudang ?? '-'}</td>
-                <td>${item.driver ?? '-'}</td>
-                <td>${item.driver_hp ?? '-'}</td>
-                <td>${item.plat_nomor ?? '-'}</td>
-                <td>${item.status_pengiriman ?? '-'}</td>
-            </tr>
-        `;
+  <tr>
+    <td>${no}</td>
+    <td>
+      ${
+        item.status_pengiriman === 'diterima'
+          ? `<a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>`
+          : item.status_pengiriman === 'dibayar'
+            ? `<a href="${urlInvoice}" class="btn btn-sm btn-success">Invoice</a>`
+            : `<a href="${url}" class="btn btn-sm btn-info">Detail</a>`
+      }
+    </td>
+    <td>${item.kode_pengiriman}</td>
+    <td>${item.tanggal_pengiriman}</td>
+    <td>${item.gudang?.cabang?.nama_cabang ?? '-'}</td>
+    <td>${item.gudang?.nama_gudang ?? '-'}</td>
+    <td>${item.driver ?? '-'}</td>
+    <td>${item.driver_hp ?? '-'}</td>
+    <td>${item.plat_nomor ?? '-'}</td>
+    <td>${item.status_pengiriman ?? '-'}</td>
+  </tr>
+`;
+
             });
         }
 

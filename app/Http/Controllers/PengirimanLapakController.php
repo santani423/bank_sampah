@@ -232,6 +232,7 @@ class PengirimanLapakController extends Controller
             // =========================
             $query = PengirimanLapak::with([
                 'detailPengirimanLapaks.transaksiLapak.lapak',
+                'pencairanLapak',
                 'gudang.cabang',
                 'petugas'
             ]);
@@ -332,7 +333,13 @@ class PengirimanLapakController extends Controller
                 'gudang.cabang',
                 'petugas'
             ])->where('kode_pengiriman', $code)->firstOrFail();
-
+            $pcr = PencairanLapak::where('pengiriman_lapak_id', $pengiriman->id)->first();
+            if ($pcr) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pencairan untuk pengiriman lapak ini sudah diproses sebelumnya.',
+                ], 400);
+            }
 
             $detailPengirimanLapaks = $pengiriman->detailPengirimanLapaks;
             $jenisMetodePenarikan = $pengiriman->lapak->jenisMetodePenarikan;

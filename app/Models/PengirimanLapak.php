@@ -46,4 +46,9 @@ class PengirimanLapak extends Model
     {
         return $this->belongsTo(Lapak::class, 'lapak_id');
     }
+
+    public function pencairanLapak()
+    {
+        return $this->hasOne(PencairanLapak::class, 'pengiriman_lapak_id');
+    }
 }

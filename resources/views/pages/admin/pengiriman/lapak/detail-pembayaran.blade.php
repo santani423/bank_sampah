@@ -373,16 +373,19 @@
                         .then(data => {
                             btnUploadText.classList.remove('d-none');
                             btnUploadSpinner.classList.add('d-none');
+
                             if (data.success) {
+                                console.log("btnUploadText", data.data.kode_pencairan);
                                 feedback.innerHTML = '<span class="text-success">' + (data.message ||
                                     'Upload berhasil!') + '</span>';
-                                form.reset();
-                                preview.innerHTML = '';
+                                // form.reset();
+                                // preview.innerHTML = '';
 
                                 setTimeout(() => {
                                     if (data.data.kode_pencairan) {
                                         window.location.href =
-                                            "{{ route('admin.invoic.pencairan-lapak', '') }}" + data.kode_pencairan;
+                                            "{{ route('admin.invoic.pencairan-lapak', '') }}/" +
+                                            data.data.kode_pencairan;
                                     } else {
                                         feedback.innerHTML +=
                                             '<br><span class="text-warning">Kode pengiriman tidak ditemukan, silakan refresh halaman.</span>';
