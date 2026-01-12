@@ -97,7 +97,7 @@
 <!-- Modal Penarikan -->
 <div class="modal fade" id="modalPenarikan" tabindex="-1" aria-labelledby="modalPenarikanLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="formPenarikan" action="{{ route('nasabah.transaksi.store') }}" method="POST">
+        <form id="formPenarikan" action="{{ route('api.nasabah.requestWithdrawal') }}" method="POST">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
@@ -183,13 +183,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Validasi sebelum submit
+    // Submit form pakai AJAX
     form.addEventListener('submit', function (e) {
+        e.preventDefault();
         const jumlah = parseFloat(inputHidden.value || 0);
         if (jumlah < minPenarikan) {
-            e.preventDefault();
             alert(`Jumlah penarikan minimal adalah Rp ${minPenarikan.toLocaleString('id-ID')}`);
+            return;
         }
+
+        // Ambil data form
+        const formData = new FormData(form);
+
+        // AJAX pakai jQuery
+        $.ajax({
+            url: form.action,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            },
+            success: function(res) {
+                // Tampilkan notifikasi sukses
+                alert('Penarikan berhasil diajukan!');
+                // Tutup modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('modalPenarikan'));
+                if (modal) modal.hide();
+                // Reset form
+                form.reset();
+                inputManual.value = '';
+                inputHidden.value = '';
+                // Optional: reload tabel riwayat (bisa pakai AJAX atau location.reload())
+                location.reload();
+            },
+            error: function(xhr) {
+                let msg = 'Terjadi kesalahan. Mohon coba lagi.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                alert(msg);
+            }
+        });
     });
 });
 </script>

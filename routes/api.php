@@ -49,7 +49,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 });
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
     // API Nasabah Badan Transaction History
-    Route::post('/requestWithdrawal', [ApiNasabahController::class, 'requestWithdrawal']);
+    Route::post('/requestWithdrawal', [ApiNasabahController::class, 'requestWithdrawal'])->name('api.nasabah.requestWithdrawal');
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
