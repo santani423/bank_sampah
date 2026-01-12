@@ -81,7 +81,10 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary w-100">Kirim Penarikan</button>
+                        <button type="submit" class="btn btn-primary w-100" id="btnKirimPenarikan">
+                            <span id="spinnerPenarikan" class="spinner-border spinner-border-sm me-2" style="display:none;"></span>
+                            Kirim Penarikan
+                        </button>
                     </div>
                 </div>
             </form>
@@ -200,9 +203,13 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const jumlah = parseFloat(inputHidden.value || 0);
             if (jumlah < minPenarikan) {
-                alert(`Jumlah penarikan minimal adalah Rp ${minPenarikan.toLocaleString('id-ID')}`);
+                // alert(`Jumlah penarikan minimal adalah Rp ${minPenarikan.toLocaleString('id-ID')}`);
                 return;
             }
+            const btn = document.getElementById('btnKirimPenarikan');
+            const spinner = document.getElementById('spinnerPenarikan');
+            btn.disabled = true;
+            spinner.style.display = '';
             const formData = new FormData(form);
             $.ajax({
                 url: form.action,
@@ -214,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 },
                 success: function(res) {
-                    alert('Penarikan berhasil diajukan!');
                     var modal = bootstrap.Modal.getInstance(document.getElementById('modalPenarikan'));
                     if (modal) modal.hide();
                     form.reset();
@@ -223,11 +229,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     location.reload();
                 },
                 error: function(xhr) {
-                    let msg = 'Terjadi kesalahan. Mohon coba lagi.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                    }
-                    alert(msg);
+                    // Tidak ada alert, bisa tambahkan notifikasi lain jika perlu
+                },
+                complete: function() {
+                    btn.disabled = false;
+                    spinner.style.display = 'none';
                 }
             });
         });
