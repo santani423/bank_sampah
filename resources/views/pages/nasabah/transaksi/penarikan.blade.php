@@ -48,8 +48,12 @@
                     <form id="filter-form">
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Nasabah</label>
-                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                                <label class="form-label">Dari Tanggal</label>
+                                <input type="date" class="form-control" id="tanggal_dari" name="tanggal_dari">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Sampai Tanggal</label>
+                                <input type="date" class="form-control" id="tanggal_sampai" name="tanggal_sampai">
                             </div>
 
 
@@ -102,16 +106,14 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                                                                               AMBIL FILTER TANGGAL
-                                                                                                                                                            ================================ */
+                                                                                                                                                                   AMBIL FILTER TANGGAL
+                                                                                                                                                                ================================ */
         function getFilterParams() {
-
-            const nasabah = document.getElementById('nasabah').value;
-
-
-
+            const tanggalDari = document.getElementById('tanggal_dari').value;
+            const tanggalSampai = document.getElementById('tanggal_sampai').value;
             return {
-                nasabah: nasabah,
+                tanggal_dari: tanggalDari,
+                tanggal_sampai: tanggalSampai,
             };
         }
 
@@ -132,9 +134,11 @@
             const params = new URLSearchParams({
                 page,
                 per_page: perPage,
-
-                ...(filters.nasabah && {
-                    search: filters.nasabah,
+                ...(filters.tanggal_dari && {
+                    tanggal_dari: filters.tanggal_dari
+                }),
+                ...(filters.tanggal_sampai && {
+                    tanggal_sampai: filters.tanggal_sampai
                 })
             });
             fetch(`/api/nasabah/withdrawalList?${params.toString()}`)
