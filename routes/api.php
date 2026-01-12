@@ -38,20 +38,23 @@ use App\Models\PengirimanLapak;
 |
 */
 
- 
+
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
- 
+
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
-     
+});
+Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
+    // API Nasabah Badan Transaction History
+    Route::post('/requestWithdrawal', [ApiNasabahController::class, 'requestWithdrawal']);
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
     Route::get('/nasabah', [ApiNasabahController::class, 'index']);
-    
+
     Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
     Route::get('/lapak/{id}/transaksi', [LapakTransaksiController::class, 'index']);
@@ -77,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Nasabah Badan (moved to controller)
     Route::get('/nasabah-badan', [ApiNasabahBadanController::class, 'index']);
 
+    Route::get('/nasabah-badan/{id}/transactions', [NasabahBadanTransaksiController::class, 'getTransactionHistory']);
 
     // API Nasabah Perorangan (moved to controller)
     Route::get('/nasabah-petugas', [ApiNasabahController::class, 'nasabahPetugas']);
@@ -85,8 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/nasabah-badan/{id}', [App\Http\Controllers\Petugas\NasabahUserBadanController::class, 'apiShow']);
 
-    // API Nasabah Badan Transaction History
-    Route::get('/nasabah-badan/{id}/transactions', [NasabahBadanTransaksiController::class, 'getTransactionHistory']);
+
 
     Route::post('/user-face/create', [UserFaceController::class, 'create'])
         ->withoutMiddleware(['throttle:api']);

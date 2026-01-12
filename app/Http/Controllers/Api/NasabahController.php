@@ -5,11 +5,25 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
+use App\Models\PencairanSaldo;
 use App\Models\Petugas;
+use App\Models\Saldo;
+use App\Models\Setting;
+use App\Models\UserNasabah;
 use Illuminate\Support\Facades\DB;
+use App\Services\WhatsAppService; // ✅ Tambahkan ini
+use Illuminate\Support\Facades\Validator;
 
 class NasabahController extends Controller
 {
+    protected $whatsappService;
+
+    // ✅ Injeksi service WhatsApp melalui konstruktor
+    public function __construct(WhatsAppService $whatsappService)
+    {
+        $this->whatsappService = $whatsappService;
+    }
+
     /**
      * Handle listing nasabah (perorangan) with pagination & search.
      */
@@ -208,5 +222,81 @@ class NasabahController extends Controller
         $nasabahs = $query->orderBy('nasabah.nama_lengkap')->paginate($perPage);
 
         return response()->json($nasabahs);
+    }
+
+
+    public function requestWithdrawal(Request $request)
+    {
+        // 1. Validasi
+        $validator = Validator::make($request->all(), [
+            'jumlah_pencairan' => 'required|numeric|min:10000',
+            'metode_pencairan_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $userNasabah = UserNasabah::with('nasabah')
+                ->where('user_id', auth()->id())
+                ->firstOrFail();
+
+            $nasabahId = $userNasabah->nasabah_id;
+            $saldo = Saldo::where('nasabah_id', $nasabahId)->first();
+            $adminPey = env('ADMIN_PEY', 0);
+
+            // 2. Cek Saldo
+            if (($saldo->saldo - $adminPey) < $request->jumlah_pencairan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Saldo tidak mencukupi untuk melakukan penarikan.'
+                ], 400); // 400 Bad Request
+            }
+
+            // 3. Simpan pencairan
+            $pencairan = PencairanSaldo::create([
+                'nasabah_id' => $nasabahId,
+                'jumlah_pencairan' => $request->jumlah_pencairan,
+                'metode_id' => $request->metode_pencairan_id,
+                'status' => 'pending',
+            ]);
+
+            $nasabah = $userNasabah->nasabah;
+
+            // 4. Notifikasi WhatsApp
+            if ($nasabah) {
+                $setting = Setting::first();
+                $pesan = "*Pemberitahuan Penarikan Saldo*\n\n"
+                    . "Halo *{$nasabah->nama_lengkap}*,\n"
+                    . "Permintaan pencairan saldo sebesar *Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "* telah diterima.\n\n"
+                    . "_Status: Pending_";
+
+                $pesanAdmin = "*Pemberitahuan Admin*\n\n"
+                    . "Nasabah *{$nasabah->nama_lengkap}* mengajukan pencairan sebesar *Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "*";
+
+                $this->whatsappService->sendMessage($setting->no_notifikasi, $pesanAdmin);
+                $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
+            }
+
+            // 5. Response Sukses
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan penarikan berhasil dikirim dan notifikasi telah dikirim.',
+                'data'    => $pencairan
+            ], 201); // 201 Created
+
+        } catch (\Exception $e) {
+            // Tangani jika terjadi error sistem
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada server.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }
