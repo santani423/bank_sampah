@@ -299,4 +299,44 @@ class NasabahController extends Controller
             ], 500);
         }
     }
+
+    public function withdrawalList(Request $request)
+    {
+        try {
+            $userNasabah = UserNasabah::where('user_id', auth()->id())->firstOrFail();
+            $nasabahId = $userNasabah->nasabah_id;
+
+            $query = PencairanSaldo::with(['metodePencairan.jenisMetodePenarikan'])
+                ->where('nasabah_id', $nasabahId)
+                ->orderByDesc('tanggal_pengajuan');
+
+            // Pagination
+            $perPage = (int) $request->get('per_page', 10);
+            if ($perPage <= 0 || $perPage > 100) {
+                $perPage = 10;
+            }
+
+            $pencairans = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pencairan berhasil diambil.',
+                'data'    => $pencairans->items(),
+                'pagination' => [
+                    'current_page' => $pencairans->currentPage(),
+                    'last_page'    => $pencairans->lastPage(),
+                    'per_page'     => $pencairans->perPage(),
+                    'total'        => $pencairans->total(),
+                    'from'         => $pencairans->firstItem(),
+                    'to'           => $pencairans->lastItem(),
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data pencairan.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 }

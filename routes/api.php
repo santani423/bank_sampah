@@ -46,14 +46,15 @@ Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
+    Route::get('/nasabah', [ApiNasabahController::class, 'index'])->name('api.admin.nasabah.index');
 });
 Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(function () {
     // API Nasabah Badan Transaction History
+    Route::get('/withdrawalList', [ApiNasabahController::class, 'withdrawalList'])->name('api.nasabah.withdrawalList');
     Route::post('/requestWithdrawal', [ApiNasabahController::class, 'requestWithdrawal'])->name('api.nasabah.requestWithdrawal');
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
-    Route::get('/nasabah', [ApiNasabahController::class, 'index']);
 
     Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');

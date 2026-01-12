@@ -153,7 +153,7 @@
 
 
 
-            fetch(`/api/nasabah?${params.toString()}`)
+            fetch(`/api/admin/nasabah?${params.toString()}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.success) {
