@@ -1,6 +1,6 @@
 @extends('layouts.template')
 
-@section('title', 'Data Nasabah')
+@section('title', 'Penarikan Saldo Nasabah')
 
 @push('style')
     <style>
@@ -26,7 +26,7 @@
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Nasabah</h3>
+            <h3 class="fw-bold mb-3">Penarikan Saldo Nasabah</h3>
         </div>
     </div>
 
@@ -43,15 +43,13 @@
                         </div>
                     @endif
 
+
                     {{-- FILTER FORM --}}
                     <form id="filter-form">
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Nasabah</label>
                                 <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <x-select.select-cabang name="cabang" />
                             </div>
 
 
@@ -68,7 +66,6 @@
                             </div>
                         </div>
                     </form>
-
                     {{-- TABLE --}}
                     <div class="table-responsive">
                         <div id="loading-spinner">
@@ -105,18 +102,16 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                                                               AMBIL FILTER TANGGAL
-                                                                                                                                            ================================ */
+                                                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                                                            ================================ */
         function getFilterParams() {
 
             const nasabah = document.getElementById('nasabah').value;
-            const cabang = document.getElementById('cabang').value;
 
 
 
             return {
                 nasabah: nasabah,
-                cabang: cabang,
             };
         }
 
@@ -140,16 +135,8 @@
 
                 ...(filters.nasabah && {
                     search: filters.nasabah,
-                }),
-                ...(filters.cabang && {
-                    cabang: filters.cabang,
-                }),
+                })
             });
-
-
-
-
-
             fetch(`/api/nasabah/withdrawalList?${params.toString()}`)
                 .then(res => res.json())
                 .then(res => {
@@ -159,7 +146,8 @@
                         renderTable(res.data, res.pagination);
                         renderPagination(res.pagination);
 
-                        spinner.style.display = 'none';""
+                        spinner.style.display = 'none';
+                        ""
                         table.style.display = 'table';
                         pagination.style.display = 'flex';
                     }
