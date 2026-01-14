@@ -31,6 +31,8 @@
     </div>
 
 
+    <!-- Pesan Sukses/Gagal -->
+    <div id="msgPenarikan" style="display:none;"></div>
     <!-- Fitur Tambah Penarikan Saldo -->
     <div class="card mb-4">
         <div class="card-body">
@@ -141,8 +143,7 @@
                             style="display:none;">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Aksi</th>
+                                    <th>#</th> 
                                     <th>Tanggal</th>
                                     <th>Jumlah Penarikan</th>
                                     <th>Metode Penarikan</th>
@@ -203,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const jumlah = parseFloat(inputHidden.value || 0);
             if (jumlah < minPenarikan) {
-                // alert(`Jumlah penarikan minimal adalah Rp ${minPenarikan.toLocaleString('id-ID')}`);
+                showMsg('Jumlah penarikan minimal adalah Rp ' + minPenarikan.toLocaleString('id-ID'), 'danger');
                 return;
             }
             const btn = document.getElementById('btnKirimPenarikan');
@@ -226,10 +227,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     form.reset();
                     inputManual.value = '';
                     inputHidden.value = '';
-                    location.reload();
+                    showMsg('Penarikan berhasil diajukan!', 'success');
+                    fetchPetugasData(1); // refresh data list tanpa reload
                 },
                 error: function(xhr) {
-                    // Tidak ada alert, bisa tambahkan notifikasi lain jika perlu
+                    let msg = 'Terjadi kesalahan. Mohon coba lagi.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    showMsg(msg, 'danger');
+                    fetchPetugasData(1); // tetap refresh data list
                 },
                 complete: function() {
                     btn.disabled = false;
@@ -237,6 +244,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
+    }
+
+    // Fungsi tampilkan pesan
+    function showMsg(msg, type) {
+        const el = document.getElementById('msgPenarikan');
+        el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        el.style.display = '';
+        setTimeout(() => {
+            el.style.display = 'none';
+        }, 4000);
     }
 });
 </script>
@@ -332,12 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td>
-                <td>
-                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalSetujui"
-                        >
-                        Detail
-                    </button> 
-                </td>
+               
                 <td>${tanggal}</td>
                 <td>${item?.jumlah_pencairan}</td>
                 <td>${item?.metode_pencairan?.jenis_metode_penarikan?.nama}</td>

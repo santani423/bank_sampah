@@ -16,8 +16,13 @@ return new class extends Migration
             $table->foreignId('nasabah_id')->constrained('nasabah')->onDelete('cascade');
             $table->foreignId('metode_id')->constrained('metode_pencairan')->onDelete('cascade');
             $table->decimal('jumlah_pencairan', 15, 2);
+            $table->decimal('total_pencairan', 15, 2);
             $table->timestamp('tanggal_pengajuan')->nullable();
             $table->timestamp('tanggal_proses')->nullable();
+            $table->string('ppn_percent')->nullable();
+            $table->string('fee_gross')->nullable();
+            $table->string('fee_net')->nullable();
+            $table->enum('fee_bearer', ['COMPANY', 'NASABAH'])->default('NASABAH');
             $table->enum('status', ['pending', 'disetujui', 'ditolak']);
             $table->text('keterangan')->nullable();
             $table->longText('temp_before_data')->nullable();  

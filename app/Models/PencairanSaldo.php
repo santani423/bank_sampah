@@ -14,15 +14,15 @@ class PencairanSaldo extends Model
 
     protected $table = 'pencairan_saldo';
 
-    protected $fillable = [
-        'nasabah_id',
-        'metode_id',
-        'jumlah_pencairan',
-        'tanggal_pengajuan',
-        'tanggal_proses',
-        'status',
-        'keterangan'
-    ];
+    // protected $fillable = [
+    //     'nasabah_id',
+    //     'metode_id',
+    //     'jumlah_pencairan',
+    //     'tanggal_pengajuan',
+    //     'tanggal_proses',
+    //     'status',
+    //     'keterangan'
+    // ];
 
     public function nasabah()
     {

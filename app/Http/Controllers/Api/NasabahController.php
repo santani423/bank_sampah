@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\MetodePencairan;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
 use App\Models\PencairanSaldo;
@@ -227,78 +228,159 @@ class NasabahController extends Controller
 
     public function requestWithdrawal(Request $request)
     {
-        // 1. Validasi
+        // 1. Validasi Request
         $validator = Validator::make($request->all(), [
-            'jumlah_pencairan' => 'required|numeric|min:10000',
+            'jumlah_pencairan'    => 'required|numeric|min:10000',
             'metode_pencairan_id' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
+                'message' => 'Data yang dikirim tidak valid.',
                 'errors'  => $validator->errors()
             ], 422);
         }
 
         try {
+            // 2. Ambil Data Nasabah
             $userNasabah = UserNasabah::with('nasabah')
                 ->where('user_id', auth()->id())
                 ->firstOrFail();
 
+            $nasabah   = $userNasabah->nasabah;
             $nasabahId = $userNasabah->nasabah_id;
-            $saldo = Saldo::where('nasabah_id', $nasabahId)->first();
-            $adminPey = env('ADMIN_PEY', 0);
+            $saldo     = Saldo::where('nasabah_id', $nasabahId)->firstOrFail();
+            $adminPey  = (float) env('ADMIN_PEY', 0);
 
-            // 2. Cek Saldo
+            // 3. Cek Pencairan Pending (RULE BISNIS)
+            $pendingExist = PencairanSaldo::where('nasabah_id', $nasabahId)
+                ->where('status', 'pending')
+                ->exists();
+
+            if ($pendingExist) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda masih memiliki pengajuan pencairan yang sedang diproses. Mohon tunggu hingga selesai.'
+                ], 400);
+            }
+
+            // 4. Cek Saldo
             if (($saldo->saldo - $adminPey) < $request->jumlah_pencairan) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Saldo tidak mencukupi untuk melakukan penarikan.'
-                ], 400); // 400 Bad Request
+                    'message' => 'Saldo Anda tidak mencukupi untuk melakukan penarikan.'
+                ], 400);
             }
 
-            // 3. Simpan pencairan
+            // 5. Ambil Metode Pencairan
+            $metodePencairan = MetodePencairan::with('jenisMetodePenarikan')
+                ->find($request->metode_pencairan_id);
+
+            if (!$metodePencairan || !$metodePencairan->jenisMetodePenarikan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Metode pencairan tidak valid.'
+                ], 400);
+            }
+
+            $jenisMetode = $metodePencairan->jenisMetodePenarikan;
+
+            // 6. Hitung Fee
+            $baseFee    = (float) ($jenisMetode->base_fee ?? 0);
+            $ppnPercent = (float) ($jenisMetode->ppn_percent ?? 0);
+            $ppnValue   = $baseFee * $ppnPercent / 100;
+            $feeNet     = $baseFee + $ppnValue;
+
+            $totalPencairan = $request->jumlah_pencairan;
+
+            // Jika fee ditanggung nasabah
+            if ($jenisMetode->fee_bearer !== 'COMPANY') {
+                $totalPencairan -= $feeNet;
+            }
+
+            if ($totalPencairan <= 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jumlah pencairan tidak valid setelah dikurangi biaya.'
+                ], 400);
+            }
+
+            // 7. Simpan Pencairan (SESUAI STRUKTUR TABEL)
             $pencairan = PencairanSaldo::create([
-                'nasabah_id' => $nasabahId,
-                'jumlah_pencairan' => $request->jumlah_pencairan,
-                'metode_id' => $request->metode_pencairan_id,
-                'status' => 'pending',
+                'nasabah_id'        => $nasabahId,
+                'metode_id'         => $request->metode_pencairan_id,
+                'jumlah_pencairan'  => $request->jumlah_pencairan,
+                'total_pencairan'   => $totalPencairan,
+                'ppn_percent'       => $ppnPercent,
+                'fee_gross'         => $baseFee,
+                'fee_net'           => $feeNet,
+                'fee_bearer'        => $jenisMetode->fee_bearer === 'COMPANY'
+                    ? 'COMPANY'
+                    : 'NASABAH',
+                'status'            => 'pending',
+                'tanggal_pengajuan' => now(),
             ]);
 
-            $nasabah = $userNasabah->nasabah;
+            // 8. Notifikasi WhatsApp
+            $setting = Setting::first();
 
-            // 4. Notifikasi WhatsApp
-            if ($nasabah) {
-                $setting = Setting::first();
-                $pesan = "*Pemberitahuan Penarikan Saldo*\n\n"
-                    . "Halo *{$nasabah->nama_lengkap}*,\n"
-                    . "Permintaan pencairan saldo sebesar *Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "* telah diterima.\n\n"
-                    . "_Status: Pending_";
+            if ($nasabah && $setting) {
 
-                $pesanAdmin = "*Pemberitahuan Admin*\n\n"
-                    . "Nasabah *{$nasabah->nama_lengkap}* mengajukan pencairan sebesar *Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "*";
+                $pesanNasabah =
+                    "🔔 PEMBERITAHUAN PENARIKAN SALDO\n\n" .
+                    "Yth. Bapak/Ibu *{$nasabah->nama_lengkap}*,\n\n" .
+                    "Kami telah menerima pengajuan penarikan saldo dengan rincian berikut:\n\n" .
+                    "────────────────────────\n" .
+                    "📌 Detail Transaksi\n" .
+                    "────────────────────────\n" .
+                    "• Jumlah Pengajuan : Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "\n" .
+                    "• Biaya Administrasi : Rp " . number_format($feeNet, 0, ',', '.') . "\n" .
+                    "• Jumlah Diterima : Rp " . number_format($totalPencairan, 0, ',', '.') . "\n" .
+                    "• Metode Pencairan : {$metodePencairan->nama}\n" .
+                    "• Tanggal Pengajuan : " . now()->format('d M Y H:i') . "\n" .
+                    "• Status : *Menunggu Persetujuan Admin*\n\n" .
+                    "────────────────────────\n" .
+                    "Terima kasih atas kepercayaan Anda.\n\n" .
+                    "Hormat kami,\n" .
+                    "*BANK SAMPAH DIGITAL*";
+
+                $pesanAdmin =
+                    "🚨 NOTIFIKASI PENCAIRAN SALDO\n\n" .
+                    "Pengajuan pencairan saldo baru telah masuk.\n\n" .
+                    "────────────────────────\n" .
+                    "👤 Data Nasabah\n" .
+                    "────────────────────────\n" .
+                    "• Nama : {$nasabah->nama_lengkap}\n" .
+                    "• ID Nasabah : {$nasabahId}\n\n" .
+                    "────────────────────────\n" .
+                    "💰 Detail Pencairan\n" .
+                    "────────────────────────\n" .
+                    "• Jumlah Pengajuan : Rp " . number_format($request->jumlah_pencairan, 0, ',', '.') . "\n" .
+                    "• Biaya Administrasi : Rp " . number_format($feeNet, 0, ',', '.') . "\n" .
+                    "• Jumlah Diterima : Rp " . number_format($totalPencairan, 0, ',', '.') . "\n" .
+                    "• Metode Pencairan : {$metodePencairan->nama}\n" .
+                    "• Status : *Pending*";
 
                 $this->whatsappService->sendMessage($setting->no_notifikasi, $pesanAdmin);
-                $this->whatsappService->sendMessage($nasabah->no_hp, $pesan);
+                $this->whatsappService->sendMessage($nasabah->no_hp, $pesanNasabah);
             }
 
-            // 5. Response Sukses
+            // 9. Response Sukses
             return response()->json([
                 'success' => true,
-                'message' => 'Pengajuan penarikan berhasil dikirim dan notifikasi telah dikirim.',
+                'message' => 'Pengajuan penarikan saldo berhasil diajukan.',
                 'data'    => $pencairan
-            ], 201); // 201 Created
-
+            ], 201);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error sistem
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan pada server.',
+                'message' => 'Terjadi kesalahan pada sistem.',
                 'error'   => $e->getMessage()
             ], 500);
         }
     }
+
 
     public function withdrawalList(Request $request)
     {
