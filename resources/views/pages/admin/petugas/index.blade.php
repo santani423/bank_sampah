@@ -2,41 +2,91 @@
 
 @section('title', 'Petugas')
 
+@push('style')
+    <style>
+        #loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .pagination-controls button {
+            margin: 0 2px;
+        }
+    </style>
+@endpush
 
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
-            <h3 class="fw-bold mb-3">Manajem Petugas</h3>
-        </div>
-        <div class="ms-md-auto py-2 py-md-0">
-            <div class="section-header-button">
-                <a href="{{ route('admin.petugas.create') }}" class="btn btn-primary btn-round">Tambah Petugas</a>
-            </div>
+            <h3 class="fw-bold mb-3">Petugas</h3>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="clearfix mb-3"></div>
+
+                    {{-- ALERT --}}
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
 
-                    <div class="table-responsive" style="overflow-x:auto;">
-                        <div id="loading-spinner">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                    {{-- FILTER FORM --}}
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang name="cabang" />
+                            </div>
+
+
+
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
                             </div>
                         </div>
+                    </form>
+
+                    {{-- TABLE --}}
+                    <div class="table-responsive">
+                        <div id="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+
+
                         <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
-                            style="display: none;">
+                            style="display:none;">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>No</th>
                                     <th>Aksi</th>
                                     <th>Nama</th>
                                     <th>Email</th>
@@ -44,16 +94,80 @@
                                     <th>Role</th>
                                 </tr>
                             </thead>
-                            <tbody id="petugas-tbody">
-                                <!-- Data akan diisi oleh JavaScript -->
-                            </tbody>
+                            <tbody id="petugas-tbody"></tbody>
                         </table>
 
-                        <div id="pagination-wrapper" class="pagination-wrapper" style="display: none;">
-                            <div class="pagination-info" id="pagination-info"></div>
-                            <div class="pagination-controls" id="pagination-controls"></div>
+                        <!-- Modal Konfirmasi Setujui -->
+                        <div class="modal fade" id="modalSetujui" tabindex="-1" aria-labelledby="modalSetujuiLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form id="formSetujui" method="POST" action="{{ route('admin.tarik-saldo.setujui') }}">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalSetujuiLabel">Konfirmasi Setujui</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menyetujui pencairan saldo <span id="setujuiNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="setujuiJumlah"
+                                                class="fw-bold"></span>?
+                                            <input type="hidden" name="id" id="setujuiId">
+                                            <input type="hidden" name="jumlah_pencairan" id="setujuiJumlahInput">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success"
+                                                id="btnKonfirmasiSetujui">Setujui</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Konfirmasi Tolak -->
+                        <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form id="formTolak" method="POST" action="">
+                                        @csrf
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalTolakLabel">Konfirmasi Tolak</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Apakah Anda yakin ingin menolak pencairan saldo <span id="tolakNamaNasabah"
+                                                class="fw-bold"></span> sebesar <span id="tolakJumlah"
+                                                class="fw-bold"></span>?
+                                            <input type="hidden" name="id" id="tolakId">
+                                            <input type="hidden" name="jumlah_pencairan" id="tolakJumlahInput">
+                                            <div class="mb-3 mt-3">
+                                                <label for="tolakKeterangan" class="form-label">Keterangan
+                                                    Penolakan</label>
+                                                <textarea class="form-control" name="keterangan" id="tolakKeterangan" rows="2" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-danger"
+                                                id="btnKonfirmasiTolak">Tolak</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
+                            <div id="pagination-info"></div>
+                            <div id="pagination-controls"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -61,93 +175,162 @@
 @endsection
 
 @push('scripts')
-    <!-- JS Libraies -->
     <script>
-        let currentPage = 1;
-        let perPage = 10;
-        let totalPages = 1;
+        /* ===============================
+                                                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                                                            ================================ */
+        function getFilterParams() {
 
-        // Fungsi untuk mengambil data dari API
+            const nasabah = document.getElementById('nasabah').value;
+            const cabang = document.getElementById('cabang').value;
+
+
+
+            return {
+                nasabah: nasabah,
+                cabang: cabang,
+            };
+        }
+
+
+        /* ===============================
+           FETCH DATA API
+        ================================ */
         function fetchPetugasData(page = 1) {
-            const loadingSpinner = document.getElementById('loading-spinner');
+            const spinner = document.getElementById('loading-spinner');
             const table = document.getElementById('petugas-table');
-            const paginationWrapper = document.getElementById('pagination-wrapper');
+            const pagination = document.getElementById('pagination-wrapper');
 
-            // Tampilkan loading
-            loadingSpinner.style.display = 'block';
+            spinner.style.display = 'block';
             table.style.display = 'none';
-            paginationWrapper.style.display = 'none';
+            pagination.style.display = 'none';
 
-            fetch(`/api/petugas?page=${page}&per_page=${perPage}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        currentPage = data.pagination.current_page;
-                        totalPages = data.pagination.last_page;
+            const filters = getFilterParams();
+            const params = new URLSearchParams({
+                page,
+                per_page: perPage,
 
-                        renderTable(data.data, data.pagination);
-                        renderPagination(data.pagination);
+                ...(filters.nasabah && {
+                    search: filters.nasabah,
+                }),
+                ...(filters.cabang && {
+                    cabang: filters.cabang,
+                }),
+            });
 
-                        // Sembunyikan loading dan tampilkan table
-                        loadingSpinner.style.display = 'none';
+
+
+
+
+            fetch(`/api/petugas?${params.toString()}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        current_page = res.pagination.current_page;
+                        totalPages = res.pagination.last_page;
+                        renderTable(res.data, res.pagination);
+                        renderPagination(res.pagination);
+
+                        spinner.style.display = 'none';
                         table.style.display = 'table';
-                        paginationWrapper.style.display = 'flex';
+                        pagination.style.display = 'flex';
                     }
                 })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    loadingSpinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
+                .catch(() => {
+                    spinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
                 });
         }
 
-        // Fungsi untuk render tabel
+        /* ===============================
+           RENDER TABLE
+        ================================ */
         function renderTable(data, pagination) {
             const tbody = document.getElementById('petugas-tbody');
             tbody.innerHTML = '';
 
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            Belum ada petugas.
-                        </td>
-                    </tr>
-                `;
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
 
-            data.forEach((petugas, index) => {
-                const rowNumber = pagination.from + index;
-                const row = `
-                    <tr>
-                        <td>${rowNumber}</td>
-                         <td>
-                            <form onsubmit="return confirm('Apakah Anda yakin?');"
-                                action="/admin/data-petugas/${petugas.id}" method="POST">
-                                <a href="/admin/data-petugas/${petugas.id}"
-                                    class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                                <a href="/admin/data-petugas/${petugas.id}/edit"
-                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-pencil-alt"></i> Edit
-                                </a>
-                                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </form>
-                        </td>
-                        <td>${petugas.nama}</td>
-                        <td>${petugas.email}</td>
-                        <td>${petugas.username}</td>
-                        <td>${petugas.role.charAt(0).toUpperCase() + petugas.role.slice(1)}</td>
-                       
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+
+            data.forEach((item, index) => {
+                const no = pagination.from + index;
+                // Format tanggal
+                let tanggal = '-';
+                if (item?.created_at) {
+                    const dateObj = new Date(item.created_at);
+                    const pad = n => n.toString().padStart(2, '0');
+                    tanggal =
+                        `${dateObj.getFullYear()}-${pad(dateObj.getMonth()+1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+                }
+                // Format jumlah penarikan
+                const jumlahRupiah = formatRupiah(item?.jumlah_pencairan);
+                tbody.innerHTML += `
+             <tr>
+            
+                <td>${no}</td>
+                <td>
+                    <form action="/admin/data-petugas/${item.id}" method="POST"
+                        onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        <a href="/admin/data-petugas/${item.id}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/admin/data-petugas/${item.id}/edit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <input type="hidden" name="_token"
+                            value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td> 
+                <td>${item.nama}</td>
+                <td>${item.email}</td>
+                <td>${item.username}</td>
+                <td>${item.role.charAt(0).toUpperCase() + item.role.slice(1)}</td>
+            </tr>
+        `;
             });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            if (angka == null) return '-';
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+
+
+        /* ===============================
+           EVENT
+        ================================ */
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchPetugasData(1);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPetugasData(1);
+        });
+        // Fungsi untuk menampilkan modal Setujui dengan data dinamis
+        function showSetujuiModal(nama, jumlah, kode) {
+            document.getElementById('setujuiNamaNasabah').textContent = nama;
+            document.getElementById('setujuiJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('setujuiId').value = kode;
+            document.getElementById('setujuiJumlahInput').value = jumlah;
+        }
+
+        // Fungsi untuk menampilkan modal Tolak dengan data dinamis
+        function showTolakModal(nama, jumlah, kode) {
+            document.getElementById('tolakNamaNasabah').textContent = nama;
+            document.getElementById('tolakJumlah').textContent = formatRupiah(jumlah);
+            document.getElementById('tolakJumlahInput').value = jumlah;
+            document.getElementById('tolakId').value = kode;
+            // Set action form sesuai route dan id
+            document.getElementById('formTolak').action = `/admin/tarik-saldo/tolak`;
         }
     </script>
 @endpush
