@@ -367,49 +367,65 @@ class TransaksiController extends Controller
             Log::info('📩 Xendit Callback Received (Admin TopUp)', $request->all());
 
             $payload = $request->all();
-            $data    = $payload['data'] ?? [];
 
-            // Validasi payload minimum
-            if (empty($data['reference']) || empty($payload['event'])) {
-                Log::warning('⚠️ Xendit Callback Missing Fields (Admin TopUp)', $payload);
-                return response()->json(['message' => 'Invalid callback data'], 400);
+            // =========================
+            // VALIDASI PAYLOAD WAJIB
+            // =========================
+            if (empty($payload['external_id']) || empty($payload['status'])) {
+                Log::warning('⚠️ Invalid Xendit Callback Payload', $payload);
+                return response()->json(['message' => 'Invalid callback payload'], 400);
             }
 
-            $externalId     = $data['reference'];
-            $incomingStatus = strtolower($payload['event']) === 'payment.completed'
-                ? 'paid'
-                : 'pending';
+            $externalId = $payload['external_id'];
+            $xenditStatus = strtoupper($payload['status']);
+
+            // Mapping status Xendit → internal
+            $incomingStatus = match ($xenditStatus) {
+                'PAID', 'SETTLED' => 'paid',
+                'PENDING' => 'pending',
+                'EXPIRED' => 'expired',
+                'FAILED' => 'failed',
+                default => 'pending',
+            };
 
             DB::beginTransaction();
 
-            // Ambil transaksi dengan lock (anti race-condition)
+            // =========================
+            // AMBIL TRANSAKSI (LOCK)
+            // =========================
             $transaction = TopUpAdmin::where('xendit_external_id', $externalId)
                 ->lockForUpdate()
                 ->first();
 
             if (!$transaction) {
                 DB::rollBack();
-                Log::warning('🚫 Transaksi Admin TopUp tidak ditemukan.', [
-                    'xendit_external_id' => $externalId
+                Log::warning('🚫 TopUp Admin tidak ditemukan.', [
+                    'external_id' => $externalId
                 ]);
                 return response()->json(['message' => 'Transaction not found'], 404);
             }
 
-            // Idempotency check
-            if (in_array(strtolower($transaction->status), ['paid', 'success', 'settlement'])) {
+            // =========================
+            // IDEMPOTENCY CHECK
+            // =========================
+            if (in_array($transaction->status, ['paid', 'success', 'settlement'])) {
                 DB::commit();
                 Log::info('🟢 Callback diabaikan (sudah diproses).', [
-                    'xendit_external_id' => $externalId,
+                    'external_id' => $externalId,
                     'status' => $transaction->status,
                 ]);
                 return response()->json(['message' => 'Already processed'], 200);
             }
 
-            // Update status transaksi
+            // =========================
+            // UPDATE STATUS TRANSAKSI
+            // =========================
             $transaction->status = $incomingStatus;
             $transaction->save();
 
-            // Jika pembayaran berhasil → tambahkan saldo utama
+            // =========================
+            // JIKA PAID → TAMBAH SALDO
+            // =========================
             if ($incomingStatus === 'paid') {
 
                 $saldoUtama = SaldoUtama::lockForUpdate()->first();
@@ -421,32 +437,33 @@ class TransaksiController extends Controller
                 }
 
                 $oldSaldo = $saldoUtama->saldo;
-                $saldoUtama->saldo += $transaction->jumlah;
+                $saldoUtama->saldo += (float) $payload['paid_amount'];
                 $saldoUtama->save();
 
-                Log::info('✅ Saldo utama berhasil ditambahkan (Admin TopUp)', [
+                Log::info('✅ Saldo utama bertambah (Admin TopUp)', [
                     'old_saldo' => $oldSaldo,
                     'new_saldo' => $saldoUtama->saldo,
-                    'topup_amount' => $transaction->jumlah,
-                    'xendit_external_id' => $externalId,
+                    'topup_amount' => $payload['paid_amount'],
+                    'external_id' => $externalId,
                 ]);
 
                 // =========================
-                // Pesan WhatsApp ke Admin
+                // NOTIFIKASI WHATSAPP ADMIN
                 // =========================
                 $setting = Setting::first();
 
                 if ($setting) {
                     $pesanAdmin =
                         "🔔 *TOP UP SALDO ADMIN BERHASIL*\n\n" .
-                        "Sistem telah menerima dan memverifikasi pembayaran Top Up Admin dengan detail berikut:\n\n" .
+                        "Pembayaran Top Up Admin telah berhasil diverifikasi.\n\n" .
                         "────────────────────────\n" .
                         "📌 *Detail Transaksi*\n" .
                         "────────────────────────\n" .
                         "• Reference ID : {$externalId}\n" .
-                        "• Jumlah Top Up : Rp " . number_format($transaction->jumlah, 0, ',', '.') . "\n" .
-                        "• Status Pembayaran : *BERHASIL*\n" .
-                        "• Waktu Konfirmasi : " . now()->format('d M Y H:i') . "\n\n" .
+                        "• Metode Pembayaran : {$payload['payment_method']}\n" .
+                        "• Bank : {$payload['bank_code']}\n" .
+                        "• Jumlah Dibayar : Rp " . number_format($payload['paid_amount'], 0, ',', '.') . "\n" .
+                        "• Waktu Pembayaran : " . now()->format('d M Y H:i') . "\n\n" .
                         "────────────────────────\n" .
                         "💰 *Saldo Utama*\n" .
                         "────────────────────────\n" .
@@ -463,27 +480,24 @@ class TransaksiController extends Controller
 
             DB::commit();
 
-            Log::info('💾 Callback Xendit Admin TopUp berhasil diproses.', [
+            Log::info('💾 Callback Xendit berhasil diproses.', [
                 'external_id' => $externalId,
-                'status' => $transaction->status,
+                'status' => $incomingStatus,
             ]);
 
-            return response()->json([
-                'message' => 'Callback processed successfully'
-            ], 200);
+            return response()->json(['message' => 'Callback processed successfully'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Log::error('💥 Callback Xendit error (Admin TopUp)', [
+            Log::error('💥 Callback Xendit Error', [
                 'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json([
-                'message' => 'Internal server error'
-            ], 500);
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+
 
 
     public function callbackPetugas(Request $request)
