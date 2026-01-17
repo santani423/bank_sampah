@@ -13,16 +13,17 @@ class SelectCabang extends Component
     /**
      * Create a new component instance
      */
-    public $cabang, $name, $value;
-    public function __construct($name = 'cabang',$value = null)
+    public $cabang, $name, $value, $required;
+    public function __construct($name = 'cabang', $value = null, $required = true)
     {
+        // dd($required);
         //
         $authUser = auth()->user();
 
         // Cari petugas berdasarkan email user login
         $petugas = Petugas::where('email', $authUser->email)->first();
 
-        
+
 
         $query = Cabang::query()
             ->join('petugas_cabangs', 'cabangs.id', '=', 'petugas_cabangs.cabang_id')
@@ -40,6 +41,7 @@ class SelectCabang extends Component
         $this->cabang = $cabang;
         $this->value = $value;
         $this->name = $name;
+        $this->required = $required;
     }
 
     /**

@@ -47,11 +47,11 @@
                     <form id="filter-form">
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Nasabah</label>
-                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                                <label class="form-label">Lapak</label>
+                                <input type="text" class="form-control" id="lapak" placeholder="Nama Lapak">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <x-select.select-cabang name="cabang" />
+                                <x-select.select-cabang name="cabang" required="false" />
                             </div>
 
 
@@ -107,17 +107,17 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                                           AMBIL FILTER TANGGAL
-                                                                                                                        ================================ */
+                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                            ================================ */
         function getFilterParams() {
 
-            const nasabah = document.getElementById('nasabah').value;
+            const lapak = document.getElementById('lapak').value;
             const cabang = document.getElementById('cabang').value;
 
 
 
             return {
-                nasabah: nasabah,
+                lapak: lapak,
                 cabang: cabang,
             };
         }
@@ -140,8 +140,8 @@
                 page,
                 per_page: perPage,
 
-                ...(filters.nasabah && {
-                    search: filters.nasabah,
+                ...(filters.lapak && {
+                    search: filters.lapak,
                 }),
                 ...(filters.cabang && {
                     cabang: filters.cabang,

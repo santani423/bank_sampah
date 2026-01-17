@@ -1,5 +1,5 @@
- <label for="{{ $name }}">Cabang <span class="text-danger">*</span></label>
- <select id="{{ $name }}" class="form-control @error($name) is-invalid @enderror" name="{{ $name }}">
+ <label for="{{ $name }}">Cabang @if($required == 'true')<span class="text-danger">*</span>@endif</label>
+ <select id="{{ $name }}" class="form-control @error($name) is-invalid @enderror" name="{{ $name }}" @if($required == 'true') required @endif>
      <option value="" disabled selected>Pilih Cabang</option>
      @php
          $selected = old($name, $value ?? '');
