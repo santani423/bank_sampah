@@ -136,15 +136,17 @@
             pagination.style.display = 'none';
 
             const filters = getFilterParams();
+            console.log('Filters:', filters);
+            
             const params = new URLSearchParams({
                 page,
                 per_page: perPage,
 
                 ...(filters.lapak && {
-                    search: filters.lapak,
+                    nama_lapak: filters.lapak,
                 }),
                 ...(filters.cabang && {
-                    cabang: filters.cabang,
+                    cabang_id: filters.cabang,
                 }),
             });
 

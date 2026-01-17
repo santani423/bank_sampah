@@ -1,6 +1,6 @@
- <label for="{{ $name }}">Cabang @if($required == 'true')<span class="text-danger">*</span>@endif</label>
+ <label for="{{ $name }}">Collation Center @if($required == 'true')<span class="text-danger">*</span>@endif</label>
  <select id="{{ $name }}" class="form-control @error($name) is-invalid @enderror" name="{{ $name }}" @if($required == 'true') required @endif>
-     <option value="" disabled selected>Pilih Cabang</option>
+     <option value="" disabled selected>Pilih Collation Center</option>
      @php
          $selected = old($name, $value ?? '');
      @endphp

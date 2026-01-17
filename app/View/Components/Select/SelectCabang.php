@@ -30,9 +30,9 @@ class SelectCabang extends Component
             ->join('petugas', 'petugas_cabangs.petugas_id', '=', 'petugas.id')
             ->select('cabangs.*')
             ->distinct();
-
+    
         // Jika petugas ditemukan, filter berdasarkan petugas
-        if ($petugas) {
+        if ($petugas && $petugas->role !== 'admin') {
             $query->where('petugas.id', $petugas->id);
         }
 
