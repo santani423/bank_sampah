@@ -48,7 +48,7 @@
                         <div class="row align-items-end">
 
                             <div class="col-md-4 mb-3">
-                                <x-select.select-cabang name="cabang" />
+                                <x-select.select-cabang name="cabang" required="false" />
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -147,6 +147,7 @@
                 tanggal_mulai: tanggalMulai,
                 tanggal_selesai: tanggalSelesai,
                 customer: customer,
+                lapak: lapak,
                 cabang: cabang,
                 status_pengiriman: status_pengiriman,
             };
@@ -165,8 +166,8 @@
             table.style.display = 'none';
             pagination.style.display = 'none';
 
-            const filters = getFilterParams();
-
+            const filters = getFilterParams(); 
+            
             const params = new URLSearchParams({
                 page,
                 per_page: perPage,
