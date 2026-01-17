@@ -51,7 +51,7 @@
                                 <input type="text" class="form-control" id="lapak" placeholder="Nama Lapak">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <x-select.select-cabang name="cabang" required="false" />
+                                <x-select.select-cabang name="cabang" required="@{}" />
                             </div>
 
 
