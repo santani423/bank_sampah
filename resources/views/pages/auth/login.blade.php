@@ -68,7 +68,7 @@
                     </div>
                     <button type="submit" class="btn btn-main rounded-pill w-100">Masuk</button>
                     <p class="mt-32 text-gray-600 text-center">Belum punya akun?
-                        <a href="{{ route('register') }}" class="text-main-600 hover-text-decoration-underline">Daftar</a>
+                        <a href="{{ route('register.form') }}" class="text-main-600 hover-text-decoration-underline">Daftar</a>
                     </p>
 
                     <div class="divider my-32 position-relative text-center">

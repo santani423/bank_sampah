@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\RegisterController;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/cabang', [RegisterController::class, 'getCabang']);
 Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
+Route::post('/check-availability', [RegisterController::class, 'checkAvailability']);
 
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 

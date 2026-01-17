@@ -3,7 +3,7 @@
 @section('title', 'Verifikasi OTP')
 @section('favicon', asset($setting->logo))
 
-@push('style')
+@section('style')
     <style>
         .otp-input {
             width: 50px;
@@ -25,7 +25,7 @@
             margin: 20px 0;
         }
     </style>
-@endpush
+@endsection
 
 @section('main')
 <section class="auth d-flex">

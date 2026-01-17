@@ -4,7 +4,7 @@
 @section('favicon', asset($setting->logo))
 
 @push('style')
-    <link rel="stylesheet" href="{{ asset('asset/library/bootstrap-social/bootstrap-social.css') }}">
+<link rel="stylesheet" href="{{ asset('asset/library/bootstrap-social/bootstrap-social.css') }}">
 @endpush
 
 @section('main')
@@ -24,113 +24,81 @@
 
             <h2 class="mb-8">Register</h2>
 
-            @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-
-            <form method="POST" id="registerForm">
+            <form id="registerForm">
                 @csrf
 
                 {{-- Nama --}}
                 <div class="mb-24">
                     <label class="form-label h6">Nama Lengkap</label>
-                    <input type="text" id="nama_lengkap" name="nama_lengkap"
-                        class="form-control @error('nama_lengkap') is-invalid @enderror"
-                        value="{{ old('nama_lengkap') }}">
-                    @error('nama_lengkap')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <input type="text" id="nama_lengkap" name="nama_lengkap" class="form-control">
+                    <div class="alert alert-danger mt-2 d-none" id="error-nama_lengkap"></div>
                 </div>
 
                 {{-- Jenis Kelamin --}}
                 <div class="mb-24">
                     <label class="form-label h6">Jenis Kelamin</label>
-                    <select id="jenis_kelamin" name="jenis_kelamin"
-                        class="form-control @error('jenis_kelamin') is-invalid @enderror">
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="form-control">
                         <option value="">Pilih</option>
                         <option value="Laki-laki">Laki-laki</option>
                         <option value="Perempuan">Perempuan</option>
                     </select>
-                    @error('jenis_kelamin')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <div class="alert alert-danger mt-2 d-none" id="error-jenis_kelamin"></div>
                 </div>
 
                 {{-- No HP --}}
                 <div class="mb-24">
                     <label class="form-label h6">No HP</label>
-                    <input type="text" id="no_hp" name="no_hp"
-                        class="form-control @error('no_hp') is-invalid @enderror"
-                        value="{{ old('no_hp') }}">
-                    @error('no_hp')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <input type="text" id="no_hp" name="no_hp" class="form-control">
+                    <div class="alert alert-danger mt-2 d-none" id="error-no_hp"></div>
                 </div>
 
                 {{-- Email --}}
                 <div class="mb-24">
                     <label class="form-label h6">Email</label>
-                    <input type="email" id="email" name="email"
-                        class="form-control @error('email') is-invalid @enderror"
-                        value="{{ old('email') }}">
-                    @error('email')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <input type="email" id="email" name="email" class="form-control">
+                    <div class="alert alert-danger mt-2 d-none" id="error-email"></div>
                 </div>
 
                 {{-- Username --}}
                 <div class="mb-24">
                     <label class="form-label h6">Username</label>
-                    <input type="text" id="username" name="username"
-                        class="form-control @error('username') is-invalid @enderror"
-                        value="{{ old('username') }}">
-                    @error('username')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <input type="text" id="username" name="username" class="form-control">
+                    <div class="alert alert-danger mt-2 d-none" id="error-username"></div>
                 </div>
 
                 {{-- Password --}}
                 <div class="mb-24">
                     <label class="form-label h6">Password</label>
-                    <input type="password" id="password" name="password"
-                        class="form-control @error('password') is-invalid @enderror">
-                    @error('password')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <input type="password" id="password" name="password" class="form-control">
+                    <div class="alert alert-danger mt-2 d-none" id="error-password"></div>
                 </div>
 
                 {{-- Konfirmasi Password --}}
                 <div class="mb-24">
                     <label class="form-label h6">Konfirmasi Password</label>
-                    <input type="password" id="password_confirmation"
-                        name="password_confirmation" class="form-control">
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control">
                 </div>
 
                 {{-- Alamat --}}
                 <div class="mb-24">
                     <label class="form-label h6">Alamat Lengkap</label>
-                    <textarea id="alamat_lengkap" name="alamat_lengkap"
-                        class="form-control">{{ old('alamat_lengkap') }}</textarea>
+                    <textarea id="alamat_lengkap" name="alamat_lengkap" class="form-control"></textarea>
+                    <div class="alert alert-danger mt-2 d-none" id="error-alamat_lengkap"></div>
                 </div>
 
                 {{-- Cabang --}}
                 <div class="mb-24">
                     <label class="form-label h6">Cabang</label>
-                    <select id="cabang_id" name="cabang_id"
-                        class="form-control @error('cabang_id') is-invalid @enderror">
+                    <select id="cabang_id" name="cabang_id" class="form-control">
                         <option value="">Pilih Cabang</option>
                         @foreach ($cabangs as $cabang)
                             <option value="{{ $cabang->id }}">{{ $cabang->nama_cabang }}</option>
                         @endforeach
                     </select>
-                    @error('cabang_id')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
+                    <div class="alert alert-danger mt-2 d-none" id="error-cabang_id"></div>
                 </div>
 
-                {{-- Button --}}
-                <button type="button" id="btnRegister"
-                    class="btn btn-main w-100 rounded-pill">
+                <button type="button" id="btnRegister" class="btn btn-main w-100 rounded-pill">
                     Register
                 </button>
 
@@ -150,24 +118,21 @@
 
             <div class="modal-header">
                 <h5 class="modal-title">Konfirmasi Registrasi</h5>
-                <button type="button" class="btn-close"
-                    data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
                 <ul class="list-group">
-                    <li class="list-group-item"><b>Nama:</b> <span id="cNama">-</span></li>
-                    <li class="list-group-item"><b>No HP:</b> <span id="cHp">-</span></li>
-                    <li class="list-group-item"><b>Email:</b> <span id="cEmail">-</span></li>
-                    <li class="list-group-item"><b>Username:</b> <span id="cUsername">-</span></li>
+                    <li class="list-group-item"><b>Nama:</b> <span id="cNama"></span></li>
+                    <li class="list-group-item"><b>No HP:</b> <span id="cHp"></span></li>
+                    <li class="list-group-item"><b>Email:</b> <span id="cEmail"></span></li>
+                    <li class="list-group-item"><b>Username:</b> <span id="cUsername"></span></li>
                 </ul>
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary"
-                    data-bs-dismiss="modal">Batal</button>
-                <button class="btn btn-main"
-                    id="btnSubmitFinal">Kirim OTP</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-main" id="btnSubmitFinal">Kirim OTP</button>
             </div>
 
         </div>
@@ -175,63 +140,77 @@
 </div>
 
 {{-- SCRIPT --}}
-<script>
-    const btnRegister = document.getElementById('btnRegister');
-    const form = document.getElementById('registerForm');
-    const btnSubmitFinal = document.getElementById('btnSubmitFinal');
-
-    btnRegister.addEventListener('click', () => {
-        const nama = document.getElementById('nama_lengkap').value || '-';
-        const hp = document.getElementById('no_hp').value || '-';
-        const email = document.getElementById('email').value || '-';
-        const username = document.getElementById('username').value || '-';
-
-        document.getElementById('cNama').innerText = nama;
-        document.getElementById('cHp').innerText = hp;
-        document.getElementById('cEmail').innerText = email;
-        document.getElementById('cUsername').innerText = username;
-
-        new bootstrap.Modal(
-            document.getElementById('confirmModal')
-        ).show();
-    });
-
-    btnSubmitFinal.addEventListener('click', async () => {
-        // Disable button to prevent double click
-        btnSubmitFinal.disabled = true;
-        btnSubmitFinal.textContent = 'Mengirim OTP...';
-
-        try {
-            // Get form data
-            const formData = new FormData(form);
-            
-            // Send OTP request
-            const response = await fetch('{{ route("send.otp") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Redirect to OTP verification page
-                window.location.href = '{{ route("verify.otp.form") }}';
-            } else {
-                alert(data.message || 'Terjadi kesalahan. Silakan coba lagi.');
-                btnSubmitFinal.disabled = false;
-                btnSubmitFinal.textContent = 'Konfirmasi & Daftar';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
-            btnSubmitFinal.disabled = false;
-            btnSubmitFinal.textContent = 'Konfirmasi & Daftar';
-        }
-    });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+const form = document.getElementById('registerForm');
+const btnRegister = document.getElementById('btnRegister');
+const btnSubmitFinal = document.getElementById('btnSubmitFinal');
+
+function resetErrors() {
+    document.querySelectorAll('.alert-danger').forEach(el => {
+        el.classList.add('d-none');
+        el.innerText = '';
+    });
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+function showError(field, message) {
+    const input = document.getElementById(field);
+    const error = document.getElementById(`error-${field}`);
+    if (input) input.classList.add('is-invalid');
+    if (error) {
+        error.innerText = message;
+        error.classList.remove('d-none');
+    }
+}
+
+btnRegister.addEventListener('click', () => {
+    document.getElementById('cNama').innerText = nama_lengkap.value || '-';
+    document.getElementById('cHp').innerText = no_hp.value || '-';
+    document.getElementById('cEmail').innerText = email.value || '-';
+    document.getElementById('cUsername').innerText = username.value || '-';
+
+    new bootstrap.Modal(confirmModal).show();
+});
+
+btnSubmitFinal.addEventListener('click', async () => {
+    btnSubmitFinal.disabled = true;
+    btnSubmitFinal.innerText = 'Mengirim OTP...';
+    resetErrors();
+
+    try {
+        const response = await fetch('{{ route("send.otp") }}', {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok && data.type === 'validation_error') {
+            Object.entries(data.errors).forEach(([field, msgs]) => {
+                showError(field, msgs[0]);
+            });
+            btnSubmitFinal.disabled = false;
+            btnSubmitFinal.innerText = 'Kirim OTP';
+            return;
+        }
+
+        if (!data.success) {
+            alert(data.message || 'Terjadi kesalahan.');
+            btnSubmitFinal.disabled = false;
+            btnSubmitFinal.innerText = 'Kirim OTP';
+            return;
+        }
+
+        window.location.href = '{{ route("verify.otp.form") }}';
+
+    } catch (err) {
+        alert('Terjadi kesalahan jaringan.');
+        btnSubmitFinal.disabled = false;
+        btnSubmitFinal.innerText = 'Kirim OTP';
+    }
+});
+</script>
 @endsection

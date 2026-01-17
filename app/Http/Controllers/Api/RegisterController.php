@@ -49,6 +49,63 @@ class RegisterController extends Controller
     }
 
     /**
+     * Check availability of email, username, or phone number
+     */
+    public function checkAvailability(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'field' => 'required|in:email,username,no_hp',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $field = $request->field;
+        $value = $request->value;
+
+        try {
+            // Check in nasabah table
+            $existsInNasabah = Nasabah::where($field, $value)->exists();
+            
+            // Check in users table (untuk email dan username)
+            $existsInUsers = false;
+            if ($field === 'email' || $field === 'username') {
+                $existsInUsers = User::where($field, $value)->exists();
+            }
+
+            $exists = $existsInNasabah || $existsInUsers;
+
+            if ($exists) {
+                $fieldName = $field === 'no_hp' ? 'Nomor HP' : ucfirst($field);
+                return response()->json([
+                    'success' => false,
+                    'available' => false,
+                    'message' => "{$fieldName} sudah terdaftar"
+                ], 200);
+            }
+
+            return response()->json([
+                'success' => true,
+                'available' => true,
+                'message' => 'Data tersedia'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengecek data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Register new nasabah
      */
     public function register(Request $request)

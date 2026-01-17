@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function showLoginForm()
     {
         $setting  =  Setting::first();
-        return view('pages.auth.login',compact('setting'));
+        return view('pages.auth.login', compact('setting'));
     }
 
     public function login(Request $request)
@@ -40,12 +41,12 @@ class AuthController extends Controller
             } elseif ($user->role === 'nasabah') {
                 return redirect()->route('nasabah.dashboard');
             } else {
-                
+
                 return redirect()->route('login')->with('error', 'Role tidak dikenali');
             }
         }
 
-        
+
         return back()->with('error', 'Username atau password salah.');
     }
 
@@ -61,8 +62,8 @@ class AuthController extends Controller
     public function showRegistrationForm()
     {
         $cabangs = cabang::all();
-        $setting  =  setting::first();   
-        return view('pages.auth.register', compact('cabangs','setting'));
+        $setting  =  setting::first();
+        return view('pages.auth.register', compact('cabangs', 'setting'));
     }
 
     public function register(Request $request)
@@ -119,53 +120,101 @@ class AuthController extends Controller
      */
     public function sendOTP(Request $request)
     {
-        $request->validate([
-            'no_hp' => 'required|string',
-            'cabang_id'   => 'required|string',
-            'nama_lengkap'   => 'required|string',
-            'jenis_kelamin'  => 'required|in:Laki-laki,Perempuan',
-            'email'          => 'required|email|unique:nasabah,email',
-            'username'       => 'required|string|unique:nasabah,username',
-            'password'       => 'required|string|confirmed|min:6',
-            'alamat_lengkap' => 'required|string',
-        ]);
-
         try {
-            // Format nomor telepon (pastikan dimulai dengan 62)
+            /**
+             * =================================
+             * 1. VALIDASI (TIDAK REDIRECT)
+             * =================================
+             */
+            $validator = Validator::make($request->all(), [
+                'no_hp'           => 'required|string',
+                'cabang_id'       => 'required|string',
+                'nama_lengkap'    => 'required|string',
+                'jenis_kelamin'   => 'required|in:Laki-laki,Perempuan',
+                'email'           => 'required|email|unique:nasabah,email',
+                'username'        => 'required|string|unique:nasabah,username',
+                'password'        => 'required|string|confirmed|min:6',
+                'alamat_lengkap'  => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'type'    => 'validation_error',
+                    'message' => 'Validasi gagal',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
+
+            /**
+             * =================================
+             * 2. FORMAT NOMOR HP (62)
+             * =================================
+             */
             $phoneNumber = $request->no_hp;
-            if (substr($phoneNumber, 0, 1) === '0') {
+
+            if (str_starts_with($phoneNumber, '0')) {
                 $phoneNumber = '62' . substr($phoneNumber, 1);
-            } elseif (substr($phoneNumber, 0, 2) !== '62') {
+            } elseif (!str_starts_with($phoneNumber, '62')) {
                 $phoneNumber = '62' . $phoneNumber;
             }
 
-            // Generate OTP
+            /**
+             * =================================
+             * 3. GENERATE OTP (DB)
+             * =================================
+             */
             $otp = OtpVerification::generateOTP($phoneNumber, 'registration');
 
-            // Kirim OTP via WhatsApp
+            /**
+             * =================================
+             * 4. KIRIM OTP VIA WHATSAPP
+             * =================================
+             */
             $whatsappService = new WhatsAppService();
             $result = $whatsappService->sendOTP($phoneNumber, $otp->otp_code);
 
-            if ($result['status']) {
-                // Simpan data registrasi di session
-                Session::put('registration_data', $request->except(['password_confirmation']));
-                Session::put('otp_phone', $phoneNumber);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Kode OTP telah dikirim ke WhatsApp Anda',
-                    'phone' => $phoneNumber
-                ]);
-            } else {
+            if (!$result['status']) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal mengirim OTP. Silakan coba lagi.'
+                    'type'    => 'whatsapp_failed',
+                    'message' => 'Gagal mengirim OTP. Silakan coba lagi.',
                 ], 500);
             }
-        } catch (\Exception $e) {
+
+            /**
+             * =================================
+             * 5. SIMPAN DATA REGISTRASI KE SESSION
+             * =================================
+             */
+            Session::put('registration_data', $request->except([
+                'password_confirmation'
+            ]));
+
+            Session::put('otp_phone', $phoneNumber);
+
+            /**
+             * =================================
+             * 6. RESPONSE SUKSES
+             * =================================
+             */
+            return response()->json([
+                'success' => true,
+                'message' => 'Kode OTP telah dikirim ke WhatsApp Anda',
+                'phone'   => $phoneNumber,
+            ]);
+        } catch (\Throwable $e) {
+
+            /**
+             * =================================
+             * 7. ERROR GLOBAL (PASTI JSON)
+             * =================================
+             */
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'type'    => 'server_error',
+                'message' => 'Terjadi kesalahan pada server',
+                'error'   => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -181,7 +230,7 @@ class AuthController extends Controller
 
         $setting = Setting::first();
         $phoneNumber = Session::get('otp_phone');
-        
+
         return view('pages.auth.verify-otp', compact('setting', 'phoneNumber'));
     }
 
@@ -260,7 +309,7 @@ class AuthController extends Controller
     public function resendOTP(Request $request)
     {
         $phoneNumber = Session::get('otp_phone');
-        
+
         if (!$phoneNumber) {
             return response()->json([
                 'success' => false,
