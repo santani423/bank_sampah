@@ -43,6 +43,7 @@ use App\Http\Controllers\Api\RegisterController;
 // Public Routes - Authentication
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/cabang', [RegisterController::class, 'getCabang']);
+Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
 
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 

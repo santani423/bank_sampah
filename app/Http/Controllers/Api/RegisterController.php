@@ -6,14 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\cabang;
 use App\Models\CabangUser;
 use App\Models\Nasabah;
+use App\Models\Otp;
 use App\Models\User;
 use App\Models\UserNasabah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Services\WhatsAppService; // ✅ Tambahkan ini
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
+    protected $whatsappService;
+
+    // ✅ Injeksi service WhatsApp melalui konstruktor
+    public function __construct(WhatsAppService $whatsappService)
+    {
+        $this->whatsappService = $whatsappService;
+    }
     /**
      * Get list cabang
      */
@@ -21,7 +33,7 @@ class RegisterController extends Controller
     {
         try {
             $cabangs = cabang::select('id', 'nama_cabang')->get();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data cabang berhasil diambil',
@@ -77,7 +89,7 @@ class RegisterController extends Controller
         }
 
         DB::beginTransaction();
-        
+
         try {
             // Create Nasabah
             $nasabah = new Nasabah();
@@ -125,14 +137,97 @@ class RegisterController extends Controller
                     'email' => $nasabah->email,
                 ]
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Registrasi gagal. Silakan coba lagi.',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function sendOTP(Request $request)
+    {
+        /**
+         * ================================
+         * 1. VALIDASI (AKTIFKAN SAAT PROD)
+         * ================================
+         */
+    // $request->validate([
+    //     'no_hp' => 'required|string'
+    // ]);
+
+        /**
+         * ================================
+         * 2. TENTUKAN NOMOR TUJUAN
+         * ================================
+         */
+        // $no_hp = $request->no_hp; // PRODUKSI
+        $no_hp = '088289445437';     // TESTING
+
+        /**
+         * ================================
+         * 3. GENERATE OTP (AMAN)
+         * ================================
+         */
+        $otpData = Otp::generate($no_hp, 'verification', 5);
+        $otp = $otpData['otp'];
+
+        /**
+         * ================================
+         * 4. SIMPAN OTP KE DATABASE
+         * ================================
+         */
+        Otp::create([
+            'identifier' => $no_hp,
+            'otp_hash'   => Hash::make($otp),
+            'type'       => 'verification',
+            'expired_at' => now()->addMinutes(5),
+            'is_used'    => false,
+        ]);
+
+        /**
+         * ================================
+         * 5. FORMAT PESAN WHATSAPP
+         * ================================
+         */
+        $appName = config('app.name');
+
+        $pesanAdmin = "🔐 *{$appName} – Verifikasi Akun*\n\n"
+            . "Kode OTP Anda: *{$otp}*\n\n"
+            . "Kode ini berlaku selama *5 menit*.\n"
+            . "Demi keamanan akun Anda, jangan bagikan kode ini kepada siapa pun.\n\n"
+            . "Jika Anda tidak merasa melakukan permintaan ini, silakan abaikan pesan ini.";
+
+        try {
+            /**
+             * ================================
+             * 6. KIRIM WHATSAPP
+             * ================================
+             */
+            $this->whatsappService->sendMessage($no_hp, $pesanAdmin);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP berhasil dikirim via WhatsApp'
+            ]);
+        } catch (\Throwable $e) {
+
+            /**
+             * ================================
+             * 7. LOG ERROR
+             * ================================
+             */
+            Log::error('Gagal kirim OTP WhatsApp', [
+                'no_hp' => $no_hp,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim OTP'
             ], 500);
         }
     }
