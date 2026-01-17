@@ -27,6 +27,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\PengirimanLapakController;
 use App\Models\PengirimanLapak;
+use App\Http\Controllers\Api\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,14 +40,17 @@ use App\Models\PengirimanLapak;
 |
 */
 
+// Public Routes - Authentication
+Route::post('/register', [RegisterController::class, 'register']);
+Route::get('/cabang', [RegisterController::class, 'getCabang']);
 
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
 
-Route::get('/lapak', [LapakController::class, 'index'])->name('api.admin.lapak.index');
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
+    Route::get('/lapak', [LapakController::class, 'index'])->name('api.admin.lapak.index');
     Route::get('/lapak/pengiriman', [PengirimanLapakController::class, 'index'])->name('api.lapak.pengiriman.index');
     Route::get('/nasabah', [ApiNasabahController::class, 'index'])->name('api.admin.nasabah.index');
 });

@@ -4,160 +4,202 @@
 @section('favicon', asset($setting->logo))
 
 @push('style')
-    <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('asset/library/bootstrap-social/bootstrap-social.css') }}">
 @endpush
 
 @section('main')
-    <section class="auth d-flex">
-        <div class="auth-left bg-main-50 flex-center p-24">
-            <img src="{{ asset('edmate/assets/images/thumbs/register.png') }}" alt="">
-        </div>
-        <div class="auth-right py-40 px-24 flex-center flex-column">
-            <div class="auth-right__inner mx-auto w-100">
-                <div style="display: flex; justify-content: center;">
-                    <a href="/" class="auth-right__logo" style="width: 50%;">
-                        <img src="{{ asset($setting->logo) }}" alt="" style="width: 100%; height: auto;" />
-                    </a>
-                </div>
-                <h2 class="mb-8">Register</h2>
+<section class="auth d-flex">
+    <div class="auth-left bg-main-50 flex-center p-24">
+        <img src="{{ asset('edmate/assets/images/thumbs/register.png') }}" alt="">
+    </div>
 
+    <div class="auth-right py-40 px-24 flex-center flex-column">
+        <div class="auth-right__inner mx-auto w-100">
 
-                @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
-
-                <form method="POST" action="{{ route('register.post') }}">
-                    @csrf
-
-
-
-
-                    <div class="mb-24">
-                        <label for="nama_lengkap" class="form-label mb-8 h6">Nama Lengkap</label>
-                        <input type="text" class="form-control @error('nama_lengkap') is-invalid @enderror"
-                            id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}"
-                            placeholder="Masukkan Nama Lengkap">
-                        @error('nama_lengkap')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label class="form-label mb-8 h6">Jenis Kelamin</label>
-                        <select class="form-control @error('jenis_kelamin') is-invalid @enderror" name="jenis_kelamin"
-                            id="jenis_kelamin">
-                            <option value="">Pilih Jenis Kelamin</option>
-                            <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki
-                            </option>
-                            <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan
-                            </option>
-                        </select>
-                        @error('jenis_kelamin')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- <div class="mb-24">
-                        <label for="tempat_lahir" class="form-label mb-8 h6">Tempat Lahir</label>
-                        <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror"
-                            id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}"
-                            placeholder="Masukkan Tempat Lahir">
-                        @error('tempat_lahir')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div> --}}
-
-                    {{-- <div class="mb-24">
-                        <label for="tanggal_lahir" class="form-label mb-8 h6">Tanggal Lahir</label>
-                        <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror"
-                            id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
-                        @error('tanggal_lahir')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div> --}}
-
-                    <div class="mb-24">
-                        <label for="no_hp" class="form-label mb-8 h6">No HP</label>
-                        <input type="text" class="form-control @error('no_hp') is-invalid @enderror" id="no_hp"
-                            name="no_hp" value="{{ old('no_hp') }}" placeholder="Masukkan No HP">
-                        @error('no_hp')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label for="email" class="form-label mb-8 h6">Email</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                            name="email" value="{{ old('email') }}" placeholder="Masukkan Email">
-                        @error('email')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label for="username" class="form-label mb-8 h6">Username</label>
-                        <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
-                            name="username" value="{{ old('username') }}" placeholder="Masukkan Username">
-                        @error('username')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label for="password" class="form-label mb-8 h6">Password</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
-                            name="password" placeholder="Masukkan Password">
-                        @error('password')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label for="password_confirmation" class="form-label mb-8 h6">Konfirmasi Password</label>
-                        <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror"
-                            id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password">
-                        @error('password_confirmation')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-24">
-                        <label for="alamat_lengkap" class="form-label mb-8 h6">Alamat Lengkap</label>
-                        <textarea class="form-control @error('alamat_lengkap') is-invalid @enderror" id="alamat_lengkap"
-                            name="alamat_lengkap" placeholder="Masukkan Alamat Lengkap">{{ old('alamat_lengkap') }}</textarea>
-                        @error('alamat_lengkap')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-24">
-                        <label for="cabang_id" class="form-label mb-8 h6">Cabang</label>
-                        <select class="form-control @error('cabang_id') is-invalid @enderror" name="cabang_id"
-                            id="cabang_id">
-                            <option value="">Pilih Cabang</option>
-                            @foreach ($cabangs as $cabang)
-                                <option value="{{ $cabang->id }}"
-                                    {{ old('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                    {{ $cabang->nama_cabang }}</option>
-                            @endforeach
-                        </select>
-                        @error('cabang_id')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-
-                    <button type="submit" class="btn btn-main rounded-pill w-100">Register</button>
-                    <p class="mt-32 text-gray-600 text-center">Sudah punya akun?
-                        <a href="{{ route('login') }}" class="text-main-600 hover-text-decoration-underline">Sign In</a>
-                    </p>
-                </form>
+            <div class="text-center mb-24">
+                <a href="/" class="auth-right__logo d-inline-block" style="width:50%">
+                    <img src="{{ asset($setting->logo) }}" style="width:100%">
+                </a>
             </div>
-        </div>
-    </section>
-@endsection
 
-@push('scripts')
-    <!-- JS Libraries -->
-    <!-- Page Specific JS File -->
-@endpush
+            <h2 class="mb-8">Register</h2>
+
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('register.post') }}" id="registerForm">
+                @csrf
+
+                {{-- Nama --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Nama Lengkap</label>
+                    <input type="text" id="nama_lengkap" name="nama_lengkap"
+                        class="form-control @error('nama_lengkap') is-invalid @enderror"
+                        value="{{ old('nama_lengkap') }}">
+                    @error('nama_lengkap')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Jenis Kelamin --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin"
+                        class="form-control @error('jenis_kelamin') is-invalid @enderror">
+                        <option value="">Pilih</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                    @error('jenis_kelamin')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- No HP --}}
+                <div class="mb-24">
+                    <label class="form-label h6">No HP</label>
+                    <input type="text" id="no_hp" name="no_hp"
+                        class="form-control @error('no_hp') is-invalid @enderror"
+                        value="{{ old('no_hp') }}">
+                    @error('no_hp')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Email --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Email</label>
+                    <input type="email" id="email" name="email"
+                        class="form-control @error('email') is-invalid @enderror"
+                        value="{{ old('email') }}">
+                    @error('email')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Username --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Username</label>
+                    <input type="text" id="username" name="username"
+                        class="form-control @error('username') is-invalid @enderror"
+                        value="{{ old('username') }}">
+                    @error('username')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Password --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Password</label>
+                    <input type="password" id="password" name="password"
+                        class="form-control @error('password') is-invalid @enderror">
+                    @error('password')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Konfirmasi Password --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Konfirmasi Password</label>
+                    <input type="password" id="password_confirmation"
+                        name="password_confirmation" class="form-control">
+                </div>
+
+                {{-- Alamat --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Alamat Lengkap</label>
+                    <textarea id="alamat_lengkap" name="alamat_lengkap"
+                        class="form-control">{{ old('alamat_lengkap') }}</textarea>
+                </div>
+
+                {{-- Cabang --}}
+                <div class="mb-24">
+                    <label class="form-label h6">Cabang</label>
+                    <select id="cabang_id" name="cabang_id"
+                        class="form-control @error('cabang_id') is-invalid @enderror">
+                        <option value="">Pilih Cabang</option>
+                        @foreach ($cabangs as $cabang)
+                            <option value="{{ $cabang->id }}">{{ $cabang->nama_cabang }}</option>
+                        @endforeach
+                    </select>
+                    @error('cabang_id')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Button --}}
+                <button type="button" id="btnRegister"
+                    class="btn btn-main w-100 rounded-pill">
+                    Register
+                </button>
+
+                <p class="mt-32 text-center">
+                    Sudah punya akun?
+                    <a href="{{ route('login') }}">Sign In</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+{{-- MODAL KONFIRMASI --}}
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Registrasi</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><b>Nama:</b> <span id="cNama">-</span></li>
+                    <li class="list-group-item"><b>No HP:</b> <span id="cHp">-</span></li>
+                    <li class="list-group-item"><b>Email:</b> <span id="cEmail">-</span></li>
+                    <li class="list-group-item"><b>Username:</b> <span id="cUsername">-</span></li>
+                </ul>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary"
+                    data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-main"
+                    id="btnSubmitFinal">Konfirmasi & Daftar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{{-- SCRIPT --}}
+<script>
+    const btnRegister = document.getElementById('btnRegister');
+    const form = document.getElementById('registerForm');
+
+    btnRegister.addEventListener('click', () => {
+        const nama = document.getElementById('nama_lengkap').value || '-';
+        const hp = document.getElementById('no_hp').value || '-';
+        const email = document.getElementById('email').value || '-';
+        const username = document.getElementById('username').value || '-';
+
+        document.getElementById('cNama').innerText = nama;
+        document.getElementById('cHp').innerText = hp;
+        document.getElementById('cEmail').innerText = email;
+        document.getElementById('cUsername').innerText = username;
+
+        new bootstrap.Modal(
+            document.getElementById('confirmModal')
+        ).show();
+    });
+
+    document.getElementById('btnSubmitFinal')
+        .addEventListener('click', () => {
+            form.submit();
+        });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+@endsection

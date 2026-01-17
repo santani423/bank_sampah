@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/jquery-jvectormap-2.0.5.css') }}">
     <!-- Main css -->
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/main.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('style')
 </head> 
 <body>
@@ -41,7 +42,6 @@
 <!--==================== Preloader End ====================-->
 
 <!--==================== Sidebar Overlay End ====================-->
-<div class="side-overlay"></div>
 <!--==================== Sidebar Overlay End ====================-->
 
   
@@ -50,7 +50,7 @@
         <!-- Jquery js -->
     <script src="{{ asset('edmate/assets/js/jquery-3.7.1.min.js') }}"></script>
     <!-- Bootstrap Bundle Js -->
-    <script src="{{ asset('edmate/assets/js/boostrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('edmate/assets/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Phosphor Js -->
     <script src="{{ asset('edmate/assets/js/phosphor-icon.js') }}"></script>
     <!-- file upload -->
