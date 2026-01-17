@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\AllLapakTransaksiController;
 use App\Http\Controllers\Api\LapakTransaksiBuktiController;
 use App\Http\Controllers\Api\LapakTransaksiController;
 use App\Http\Controllers\Api\NasabahBadanTransaksiController;
+use App\Http\Controllers\Api\LapakController;
 use App\Http\Controllers\GudangController;
 
 use App\Http\Controllers\Api\UploadController;
@@ -42,6 +43,7 @@ use App\Models\PengirimanLapak;
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 
 
+Route::get('/lapak', [LapakController::class, 'index'])->name('api.admin.lapak.index');
 
 Route::apiResource('cleans', CleanController::class);
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {

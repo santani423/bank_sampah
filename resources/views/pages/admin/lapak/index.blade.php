@@ -44,57 +44,27 @@
                     @endif
 
                     {{-- FILTER FORM --}}
-                    <form method="GET" action="{{ route('admin.lapak.index') }}">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Nama Lapak</label>
-                                    <input type="text" name="nama_lapak" class="form-control"
-                                        placeholder="Cari nama lapak..." value="{{ request('nama_lapak') }}">
-                                </div>
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Status Approval</label>
-                                    <select name="approval_status" class="form-control">
-                                        <option value="">Semua Status</option>
-                                        <option value="pending"
-                                            {{ request('approval_status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="approved"
-                                            {{ request('approval_status') == 'approved' ? 'selected' : '' }}>Approved
-                                        </option>
-                                        <option value="rejected"
-                                            {{ request('approval_status') == 'rejected' ? 'selected' : '' }}>Rejected
-                                        </option>
-                                    </select>
-                                </div>
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang name="cabang" />
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Cabang</label>
-                                    <select name="cabang_id" class="form-control">
-                                        <option value="">Semua Cabang</option>
-                                        @foreach ($cabangs as $cabang)
-                                            <option value="{{ $cabang->id }}"
-                                                {{ request('cabang_id') == $cabang->id ? 'selected' : '' }}>
-                                                {{ $cabang->nama_cabang }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    <div>
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            <i class="fas fa-search"></i> Filter
-                                        </button>
-                                        <a href="{{ route('admin.lapak.index') }}" class="btn btn-secondary btn-block mt-1">
-                                            <i class="fas fa-redo"></i> Reset
-                                        </a>
-                                    </div>
-                                </div>
+
+
+
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -110,14 +80,13 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th style="width: 250px">Aksi</th>
-                                    <th>Nama</th>
-                                    <th>Username</th>
-                                    <th>No. Registrasi</th>
-                                    <th>Cabang</th>
-                                    <th>No. HP</th>
-                                    <th>Saldo</th>
+                                    <th>Aksi</th>
+                                    <th>Kode Lapak</th>
+                                    <th>Nama Lapak</th>
+                                    <th>Collation Center</th>
+                                    <th>Alamat</th>
                                     <th>Status</th>
+                                    <th>Approval</th>
                                 </tr>
                             </thead>
                             <tbody id="petugas-tbody"></tbody>
@@ -142,15 +111,14 @@
                                                                                                             ================================ */
         function getFilterParams() {
 
-            const nama_lapak = document.getElementById('nama_lapak').value;
-            const approval_status = document.getElementById('approval_status').value;
-            const cabang_id = document.getElementById('cabang_id').value;
+            const nasabah = document.getElementById('nasabah').value;
+            const cabang = document.getElementById('cabang').value;
+
 
 
             return {
-                nama_lapak: nama_lapak,
-                approval_status: approval_status,
-                cabang_id: cabang_id,
+                nasabah: nasabah,
+                cabang: cabang,
             };
         }
 
@@ -172,14 +140,11 @@
                 page,
                 per_page: perPage,
 
-                ...(filters.nama_lapak && {
-                    nama_lapak: filters.nama_lapak,
+                ...(filters.nasabah && {
+                    search: filters.nasabah,
                 }),
-                ...(filters.approval_status && {
-                    approval_status: filters.approval_status,
-                }),
-                ...(filters.cabang_id && {
-                    cabang_id: filters.cabang_id,
+                ...(filters.cabang && {
+                    cabang: filters.cabang,
                 }),
             });
 
@@ -187,7 +152,7 @@
 
 
 
-            fetch(`/api/admin/nasabah?${params.toString()}`)
+            fetch(`/api/lapak?${params.toString()}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.success) {
@@ -228,18 +193,14 @@
 
                 tbody.innerHTML += `
             <tr>
-                <td>${no}</td>
-                <td>
-                     <a href="${url}" class="btn btn-sm btn-info">Detail</a>
-                     <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
-                </td>
-                <td>${item.nama_lengkap}</td> 
-                <td>${item.username}</td> 
-                <td>${item.no_registrasi}</td>
-                <td>${item.nama_cabang}</td>
-                <td>${item.no_hp}</td>
-                <td>${formatRupiah(item.saldo.saldo)}</td>
-                <td>${item.status}</td>
+                <td>${no}</td> 
+                <td>${item.kode_lapak}</td> 
+                <td>${item.nama_lapak}</td> 
+                <td>${item.cabang ? item.cabang.nama_cabang : '-'}</td> 
+                <td>${item.alamat}</td> 
+                <td>${item.status}</td> 
+                <td>${item.approval_status}</td> 
+                
             </tr>
         `;
             });
