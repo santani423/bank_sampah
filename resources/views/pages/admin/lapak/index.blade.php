@@ -107,8 +107,8 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                               AMBIL FILTER TANGGAL
-                                                                                                            ================================ */
+                                                                                                                           AMBIL FILTER TANGGAL
+                                                                                                                        ================================ */
         function getFilterParams() {
 
             const nasabah = document.getElementById('nasabah').value;
@@ -191,29 +191,40 @@
                 const no = pagination.from + index;
                 const showUrl = detailRoute.replace(':id', item.id);
                 const editUrl = editRoute.replace(':id', item.id);
-                const deleteUrl = deleteRoute.replace(':id', item.id);
+
+                let approveButton = '';
+
+                if (item.approval_status === 'pending' || item.approval_status === 'rejected') {
+                    approveButton = `
+            <button 
+                onclick="approveItem('${editUrl}', '${item.nama_lapak}')" 
+                class="btn btn-sm btn-success" 
+                title="Approve"
+            >
+                <i class="bi bi-check-circle-fill"></i>
+            </button>
+        `;
+                }
 
                 tbody.innerHTML += `
-            <tr>
-                <td>${no}</td> 
-                <td>
-                    <a href="${showUrl}" class="btn btn-sm btn-info" title="Detail">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    <button onclick="approveItem('${editUrl}', '${item.nama_lapak}')" class="btn btn-sm btn-success" title="Approve">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </button> 
-                </td>
-                <td>${item.kode_lapak}</td> 
-                <td>${item.nama_lapak}</td> 
-                <td>${item.cabang ? item.cabang.nama_cabang : '-'}</td> 
-                <td>${item.alamat}</td> 
-                <td>${item.status}</td> 
-                <td>${item.approval_status}</td> 
-                
-            </tr>
-        `;
+        <tr>
+            <td>${no}</td>
+            <td>
+                <a href="${showUrl}" class="btn btn-sm btn-info" title="Detail">
+                    <i class="bi bi-eye"></i>
+                </a>
+                ${approveButton}
+            </td>
+            <td>${item.kode_lapak}</td>
+            <td>${item.nama_lapak}</td>
+            <td>${item.cabang ? item.cabang.nama_cabang : '-'}</td>
+            <td>${item.alamat}</td>
+            <td>${item.status}</td>
+            <td>${item.approval_status}</td>
+        </tr>
+    `;
             });
+
         }
 
         // Fungsi format rupiah
@@ -228,52 +239,52 @@
         function approveItem(url, namaLapak) {
             if (confirm(`Apakah Anda yakin ingin menyetujui lapak "${namaLapak}"?`)) {
                 fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success) {
-                        alert('Data berhasil disetujui');
-                        fetchPetugasData(current_page);
-                    } else {
-                        alert('Gagal menyetujui data: ' + (res.message || 'Terjadi kesalahan'));
-                    }
-                })
-                .catch(err => {
-                    alert('Terjadi kesalahan saat menyetujui data');
-                    console.error(err);
-                });
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            alert('Data berhasil disetujui');
+                            fetchPetugasData(current_page);
+                        } else {
+                            alert('Gagal menyetujui data: ' + (res.message || 'Terjadi kesalahan'));
+                        }
+                    })
+                    .catch(err => {
+                        alert('Terjadi kesalahan saat menyetujui data');
+                        console.error(err);
+                    });
             }
         }
 
         function deleteItem(url, namaLapak) {
             if (confirm(`Apakah Anda yakin ingin menghapus lapak "${namaLapak}"?`)) {
                 fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success) {
-                        alert('Data berhasil dihapus');
-                        fetchPetugasData(current_page);
-                    } else {
-                        alert('Gagal menghapus data: ' + (res.message || 'Terjadi kesalahan'));
-                    }
-                })
-                .catch(err => {
-                    alert('Terjadi kesalahan saat menghapus data');
-                    console.error(err);
-                });
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            alert('Data berhasil dihapus');
+                            fetchPetugasData(current_page);
+                        } else {
+                            alert('Gagal menghapus data: ' + (res.message || 'Terjadi kesalahan'));
+                        }
+                    })
+                    .catch(err => {
+                        alert('Terjadi kesalahan saat menghapus data');
+                        console.error(err);
+                    });
             }
         }
 
