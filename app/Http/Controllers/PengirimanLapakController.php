@@ -234,7 +234,8 @@ class PengirimanLapakController extends Controller
                 'detailPengirimanLapaks.transaksiLapak.lapak',
                 'pencairanLapak',
                 'gudang.cabang',
-                'petugas'
+                'petugas',
+                'lapak'
             ]);
 
             // =========================
@@ -263,6 +264,13 @@ class PengirimanLapakController extends Controller
                 $customer = $request->get('customer');
                 $query->whereHas('gudang', function ($q) use ($customer) {
                     $q->where('nama_gudang', 'LIKE', '%' . $customer . '%');
+                });
+            }
+
+            if ($request->has('lapak')) {
+                $lapak = $request->get('lapak');
+                $query->whereHas('lapak', function ($q) use ($lapak) {
+                    $q->where('nama_lapak', 'LIKE', '%' . $lapak . '%');
                 });
             }
 

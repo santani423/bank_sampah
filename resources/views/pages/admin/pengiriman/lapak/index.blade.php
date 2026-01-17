@@ -47,20 +47,25 @@
                     <form id="filter-form">
                         <div class="row align-items-end">
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <x-select.select-cabang name="cabang" />
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Lapak</label>
+                                <input type="text" class="form-control" id="lapak" placeholder="Nama lapak">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Customer</label>
                                 <input type="text" class="form-control" id="customer" placeholder="Nama customer">
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <x-select.select-status-pengiriman name="status_pengiriman" />
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Tanggal Pengiriman</label>
                                 <input type="text" class="form-control" id="tanggal_range"
                                     placeholder="YYYY-MM-DD s/d YYYY-MM-DD" autocomplete="off">
@@ -91,6 +96,7 @@
                                     <th>#</th>
                                     <th>Aksi</th>
                                     <th>Kode Pengiriman</th>
+                                    <th>Lapak</th>
                                     <th>Tanggal</th>
                                     <th>Collation Center</th>
                                     <th>Customer</th>
@@ -123,6 +129,7 @@
         function getFilterParams() {
             const tanggalRange = document.getElementById('tanggal_range').value;
             const customer = document.getElementById('customer').value;
+            const lapak = document.getElementById('lapak').value;
             const cabang = document.getElementById('cabang').value;
             const status_pengiriman = document.getElementById('status_pengiriman').value;
             let tanggalMulai = '';
@@ -178,6 +185,9 @@
                 ...(filters.status_pengiriman && {
                     status_pengiriman: filters.status_pengiriman
                 }),
+                ...(filters.lapak && {
+                    lapak: filters.lapak
+                }),
             });
 
 
@@ -220,30 +230,31 @@
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
-                const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlBayar = detailBayarRoute.replace(':kode', item.kode_pengiriman);
-                const urlInvoice = detailInvoiceRoute.replace(':kode', item.pencairan_lapak?.kode_pencairan ?? item.kode_pengiriman);
+                const url = detailRoute.replace(':kode', item?.kode_pengiriman);
+                const urlBayar = detailBayarRoute.replace(':kode', item?.kode_pengiriman);
+                const urlInvoice = detailInvoiceRoute.replace(':kode', item?.pencairan_lapak?.kode_pencairan ?? item?.kode_pengiriman);
 
                 tbody.innerHTML += `
   <tr>
     <td>${no}</td>
     <td>
       ${
-        item.status_pengiriman === 'diterima'
+        item?.status_pengiriman === 'diterima'
           ? `<a href="${urlBayar}" class="btn btn-sm btn-warning">Bayar</a>`
-          : item.status_pengiriman === 'dibayar'
+          : item?.status_pengiriman === 'dibayar'
             ? `<a href="${urlInvoice}" class="btn btn-sm btn-success">Invoice</a>`
             : `<a href="${url}" class="btn btn-sm btn-info">Detail</a>`
       }
     </td>
-    <td>${item.kode_pengiriman}</td>
-    <td>${item.tanggal_pengiriman}</td>
-    <td>${item.gudang?.cabang?.nama_cabang ?? '-'}</td>
-    <td>${item.gudang?.nama_gudang ?? '-'}</td>
-    <td>${item.driver ?? '-'}</td>
-    <td>${item.driver_hp ?? '-'}</td>
-    <td>${item.plat_nomor ?? '-'}</td>
-    <td>${item.status_pengiriman ?? '-'}</td>
+    <td>${item?.kode_pengiriman}</td>
+    <td>${item?.lapak?.nama_lapak ?? '-'}</td>
+    <td>${item?.tanggal_pengiriman}</td>
+    <td>${item?.gudang?.cabang?.nama_cabang ?? '-'}</td>
+    <td>${item?.gudang?.nama_gudang ?? '-'}</td>
+    <td>${item?.driver ?? '-'}</td>
+    <td>${item?.driver_hp ?? '-'}</td>
+    <td>${item?.plat_nomor ?? '-'}</td>
+    <td>${item?.status_pengiriman ?? '-'}</td>
   </tr>
 `;
 
