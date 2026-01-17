@@ -92,4 +92,21 @@ class WhatsAppService
             ];
         }
     }
+
+    /**
+     * Kirim OTP via WhatsApp
+     *
+     * @param string $phone Nomor tujuan
+     * @param string $otpCode Kode OTP 6 digit
+     * @return array
+     */
+    public function sendOTP(string $phone, string $otpCode): array
+    {
+        $message = "Kode OTP Anda untuk registrasi Bank Sampah adalah: *{$otpCode}*\n\n";
+        $message .= "Kode ini berlaku selama 5 menit.\n";
+        $message .= "Jangan berikan kode ini kepada siapapun.\n\n";
+        $message .= "Terima kasih,\nBank Sampah";
+
+        return $this->sendMessage($phone, $message);
+    }
 }

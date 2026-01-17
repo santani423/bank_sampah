@@ -74,8 +74,11 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
     
-    Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
-    Route::post('register', [AuthController::class, 'register'])->name('register.post');
+    Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
+    Route::post('register/send-otp', [AuthController::class, 'sendOTP'])->name('send.otp');
+    Route::get('register/verify-otp', [AuthController::class, 'showVerifyOTP'])->name('verify.otp.form');
+    Route::post('register/verify-otp', [AuthController::class, 'verifyOTP'])->name('verify.otp');
+    Route::post('register/resend-otp', [AuthController::class, 'resendOTP'])->name('resend.otp');
 });
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {

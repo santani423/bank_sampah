@@ -28,7 +28,7 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('register.post') }}" id="registerForm">
+            <form method="POST" id="registerForm">
                 @csrf
 
                 {{-- Nama --}}
@@ -167,7 +167,7 @@
                 <button class="btn btn-secondary"
                     data-bs-dismiss="modal">Batal</button>
                 <button class="btn btn-main"
-                    id="btnSubmitFinal">Konfirmasi & Daftar</button>
+                    id="btnSubmitFinal">Kirim OTP</button>
             </div>
 
         </div>
@@ -178,6 +178,7 @@
 <script>
     const btnRegister = document.getElementById('btnRegister');
     const form = document.getElementById('registerForm');
+    const btnSubmitFinal = document.getElementById('btnSubmitFinal');
 
     btnRegister.addEventListener('click', () => {
         const nama = document.getElementById('nama_lengkap').value || '-';
@@ -195,10 +196,41 @@
         ).show();
     });
 
-    document.getElementById('btnSubmitFinal')
-        .addEventListener('click', () => {
-            form.submit();
-        });
+    btnSubmitFinal.addEventListener('click', async () => {
+        // Disable button to prevent double click
+        btnSubmitFinal.disabled = true;
+        btnSubmitFinal.textContent = 'Mengirim OTP...';
+
+        try {
+            // Get form data
+            const formData = new FormData(form);
+            
+            // Send OTP request
+            const response = await fetch('{{ route("send.otp") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Redirect to OTP verification page
+                window.location.href = '{{ route("verify.otp.form") }}';
+            } else {
+                alert(data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                btnSubmitFinal.disabled = false;
+                btnSubmitFinal.textContent = 'Konfirmasi & Daftar';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan. Silakan coba lagi.');
+            btnSubmitFinal.disabled = false;
+            btnSubmitFinal.textContent = 'Konfirmasi & Daftar';
+        }
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
