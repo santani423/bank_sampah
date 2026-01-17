@@ -183,17 +183,30 @@
                 return;
             }
 
-            const detailRoute = "{{ route('admin.nasabah.show', ':kode') }}";
-            const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
+            const detailRoute = "{{ route('admin.lapak.show', ':id') }}";
+            const editRoute = "{{ route('admin.lapak.approve', ':id') }}";
+            const deleteRoute = "{{ route('admin.lapak.destroy', ':id') }}";
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
-                const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
+                const showUrl = detailRoute.replace(':id', item.id);
+                const editUrl = editRoute.replace(':id', item.id);
+                const deleteUrl = deleteRoute.replace(':id', item.id);
 
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td> 
+                <td>
+                    <a href="${showUrl}" class="btn btn-sm btn-info" title="Detail">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="${editUrl}" class="btn btn-sm btn-warning" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <button onclick="deleteItem('${deleteUrl}', '${item.nama_lapak}')" class="btn btn-sm btn-danger" title="Hapus">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
                 <td>${item.kode_lapak}</td> 
                 <td>${item.nama_lapak}</td> 
                 <td>${item.cabang ? item.cabang.nama_cabang : '-'}</td> 
@@ -210,6 +223,35 @@
         function formatRupiah(angka) {
             if (angka == null) return '-';
             return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        /* ===============================
+           DELETE FUNCTION
+        ================================ */
+        function deleteItem(url, namaLapak) {
+            if (confirm(`Apakah Anda yakin ingin menghapus lapak "${namaLapak}"?`)) {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        alert('Data berhasil dihapus');
+                        fetchPetugasData(current_page);
+                    } else {
+                        alert('Gagal menghapus data: ' + (res.message || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(err => {
+                    alert('Terjadi kesalahan saat menghapus data');
+                    console.error(err);
+                });
+            }
         }
 
 
