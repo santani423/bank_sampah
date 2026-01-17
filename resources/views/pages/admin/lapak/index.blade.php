@@ -200,12 +200,9 @@
                     <a href="${showUrl}" class="btn btn-sm btn-info" title="Detail">
                         <i class="bi bi-eye"></i>
                     </a>
-                    <a href="${editUrl}" class="btn btn-sm btn-warning" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    <button onclick="deleteItem('${deleteUrl}', '${item.nama_lapak}')" class="btn btn-sm btn-danger" title="Hapus">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <button onclick="approveItem('${editUrl}', '${item.nama_lapak}')" class="btn btn-sm btn-success" title="Approve">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </button> 
                 </td>
                 <td>${item.kode_lapak}</td> 
                 <td>${item.nama_lapak}</td> 
@@ -228,6 +225,32 @@
         /* ===============================
            DELETE FUNCTION
         ================================ */
+        function approveItem(url, namaLapak) {
+            if (confirm(`Apakah Anda yakin ingin menyetujui lapak "${namaLapak}"?`)) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        alert('Data berhasil disetujui');
+                        fetchPetugasData(current_page);
+                    } else {
+                        alert('Gagal menyetujui data: ' + (res.message || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(err => {
+                    alert('Terjadi kesalahan saat menyetujui data');
+                    console.error(err);
+                });
+            }
+        }
+
         function deleteItem(url, namaLapak) {
             if (confirm(`Apakah Anda yakin ingin menghapus lapak "${namaLapak}"?`)) {
                 fetch(url, {
