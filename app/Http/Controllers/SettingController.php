@@ -15,7 +15,7 @@ class SettingController extends Controller
         $setting = Setting::first();
 
         if ($setting) {
-            $baseUrl = url('storage');
+            $baseUrl = url();
 
             $setting->logo = $setting->logo
                 ? $baseUrl . '/' . ltrim($setting->logo, '/')
