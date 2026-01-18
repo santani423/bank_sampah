@@ -47,6 +47,7 @@ Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
 Route::post('/check-availability', [RegisterController::class, 'checkAvailability']);
 
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
+Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
 
 
 
@@ -82,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transaksi-lapak/{id}/ambil-saldo', [LapakTransaksiController::class, 'ambilSaldo']);
 
     Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
-    Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
+    
     Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
 
 
