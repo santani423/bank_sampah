@@ -109,4 +109,22 @@ class WhatsAppService
 
         return $this->sendMessage($phone, $message);
     }
+
+    /**
+     * Kirim OTP untuk Reset Password via WhatsApp
+     *
+     * @param string $phone Nomor tujuan
+     * @param string $otpCode Kode OTP 6 digit
+     * @return array
+     */
+    public function sendForgotPasswordOTP(string $phone, string $otpCode): array
+    {
+        $message = "Kode OTP Anda untuk reset password Bank Sampah adalah: *{$otpCode}*\n\n";
+        $message .= "Kode ini berlaku selama 5 menit.\n";
+        $message .= "Jangan berikan kode ini kepada siapapun.\n\n";
+        $message .= "Jika Anda tidak merasa melakukan reset password, abaikan pesan ini.\n\n";
+        $message .= "Terima kasih,\nBank Sampah";
+
+        return $this->sendMessage($phone, $message);
+    }
 }

@@ -343,4 +343,184 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Show Forgot Password Form
+     */
+    public function showForgotPasswordForm()
+    {
+        $setting = Setting::first();
+        return view('pages.auth.forgot-password', compact('setting'));
+    }
+
+    /**
+     * Send OTP for forgot password
+     */
+    public function sendForgotPasswordOTP(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'no_hp' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nomor WhatsApp wajib diisi',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $phoneNumber = $request->no_hp;
+
+            // Check if user with this phone number exists
+            $nasabah = Nasabah::where('no_hp', $phoneNumber)->first();
+            
+            if (!$nasabah) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nomor WhatsApp tidak terdaftar',
+                ], 404);
+            }
+
+            // Generate OTP
+            $otp = OtpVerification::generateOTP($phoneNumber, 'forgot_password');
+
+            // Send OTP via WhatsApp
+            $whatsappService = new WhatsAppService();
+            $result = $whatsappService->sendOTP($phoneNumber, $otp->otp_code);
+
+            if (!$result['status']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengirim OTP ke WhatsApp',
+                ], 500);
+            }
+
+            // Store phone number in session
+            Session::put('forgot_password_phone', $phoneNumber);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kode OTP telah dikirim ke WhatsApp Anda',
+                'phone' => $phoneNumber,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada server',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+    /**
+     * Show Reset Password Form
+     */
+    public function showResetPasswordForm()
+    {
+        if (!Session::has('forgot_password_phone')) {
+            return redirect()->route('forgot.password.form')->with('error', 'Silakan masukkan nomor WhatsApp terlebih dahulu');
+        }
+
+        $setting = Setting::first();
+        $phoneNumber = Session::get('forgot_password_phone');
+
+        return view('pages.auth.reset-password', compact('setting', 'phoneNumber'));
+    }
+
+    /**
+     * Reset Password with OTP verification
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'otp_code' => 'required|string|size:6',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
+
+        $phoneNumber = Session::get('forgot_password_phone');
+
+        if (!$phoneNumber) {
+            return back()->with('error', 'Sesi telah berakhir. Silakan ulangi proses reset password.');
+        }
+
+        // Verify OTP
+        if (OtpVerification::verifyOTP($phoneNumber, $request->otp_code, 'forgot_password')) {
+            try {
+                DB::beginTransaction();
+
+                // Find nasabah by phone number
+                $nasabah = Nasabah::where('no_hp', $phoneNumber)->first();
+                
+                if (!$nasabah) {
+                    return back()->with('error', 'User tidak ditemukan.');
+                }
+
+                // Update password in User table
+                $userNasabah = \App\Models\UserNasabah::where('nasabah_id', $nasabah->id)->first();
+                if ($userNasabah) {
+                    $user = User::find($userNasabah->user_id);
+                    if ($user) {
+                        $user->password = bcrypt($request->password);
+                        $user->save();
+                    }
+                }
+
+                DB::commit();
+
+                // Clear session
+                Session::forget('forgot_password_phone');
+
+                Alert::success('Berhasil!', 'Password berhasil diubah! Silakan login dengan password baru.');
+                return redirect()->route('login');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return back()->with('error', 'Terjadi kesalahan saat mengubah password: ' . $e->getMessage());
+            }
+        } else {
+            return back()->with('error', 'Kode OTP salah atau sudah kadaluarsa. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Resend OTP for forgot password
+     */
+    public function resendForgotPasswordOTP(Request $request)
+    {
+        $phoneNumber = Session::get('forgot_password_phone');
+
+        if (!$phoneNumber) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sesi telah berakhir'
+            ], 400);
+        }
+
+        try {
+            // Generate new OTP
+            $otp = OtpVerification::generateOTP($phoneNumber, 'forgot_password');
+
+            // Send OTP via WhatsApp
+            $whatsappService = new WhatsAppService();
+            $result = $whatsappService->sendOTP($phoneNumber, $otp->otp_code);
+
+            if ($result['status']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kode OTP baru telah dikirim'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengirim OTP'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

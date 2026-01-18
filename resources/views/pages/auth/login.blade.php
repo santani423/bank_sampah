@@ -58,12 +58,8 @@
                         </div>
                     </div>
                     <div class="mb-32 flex-between flex-wrap gap-8">
-                        <div class="form-check mb-0 flex-shrink-0">
-                            <input class="form-check-input flex-shrink-0 rounded-4" type="checkbox" name="remember"
-                                id="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label class="form-check-label text-15 flex-grow-1" for="remember">Remember Me</label>
-                        </div>
-                        <a href=" " class="text-main-600 hover-text-decoration-underline text-15 fw-medium">Forgot
+                         
+                        <a href="{{ route('forgot.password.form') }}" class="text-main-600 hover-text-decoration-underline text-15 fw-medium">Forgot
                             Password?</a>
                     </div>
                     <button type="submit" class="btn btn-main rounded-pill w-100">Masuk</button>

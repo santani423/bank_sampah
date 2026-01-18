@@ -79,6 +79,13 @@ Route::middleware('guest')->group(function () {
     Route::get('register/verify-otp', [AuthController::class, 'showVerifyOTP'])->name('verify.otp.form');
     Route::post('register/verify-otp', [AuthController::class, 'verifyOTP'])->name('verify.otp');
     Route::post('register/resend-otp', [AuthController::class, 'resendOTP'])->name('resend.otp');
+    
+    // Forgot Password Routes
+    Route::get('forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot.password.form');
+    Route::post('forgot-password/send-otp', [AuthController::class, 'sendForgotPasswordOTP'])->name('forgot.password.send.otp');
+    Route::get('forgot-password/reset', [AuthController::class, 'showResetPasswordForm'])->name('forgot.password.reset.form');
+    Route::post('forgot-password/reset', [AuthController::class, 'resetPassword'])->name('forgot.password.reset');
+    Route::post('forgot-password/resend-otp', [AuthController::class, 'resendForgotPasswordOTP'])->name('forgot.password.resend.otp');
 });
 
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
