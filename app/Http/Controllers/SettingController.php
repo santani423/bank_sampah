@@ -18,11 +18,11 @@ class SettingController extends Controller
             $baseUrl = url();
 
             $setting->logo = $setting->logo
-                ? $baseUrl . '/' . ltrim($setting->logo, '/')
+                ? ltrim($setting->logo, '/')
                 : null;
 
             $setting->favicon = $setting->favicon
-                ? $baseUrl . '/' . ltrim($setting->favicon, '/')
+                ? ltrim($setting->favicon, '/')
                 : null;
         }
 
