@@ -13,15 +13,15 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         DB::table('settings')->insert([
-            'nama' => 'BMPS',
+            'nama' => 'PT. Berkah Mitra Perdana Sukses',
             'logo' => 'assets/img/logo.png',
             'favicon' => 'assets/img/logo.png',
             'title' => 'BMPS | Aplikasi Bank Sampah Digital',
             'description' => 'BMPS adalah aplikasi pengelolaan bank sampah modern berbasis web.',
             'keywords' => 'bank sampah, BMPS, daur ulang, lingkungan, digital',
-            'address' => 'Jl. Raya Hijau No. 88, Kota Bersih, Indonesia',
+            'address' => 'Ruko Puri Jaya Blok AA No. 26 RT 002/011, Desa Sukamantri Kecamatan Pasar Kemis Kabupaten Tangerang-Banten',
             'phone' => '021-555-8888',
-            'email' => 'info@BMPS.id',
+            'email' => 'info@berkahmitra.id',
             'google_map' => 'https://goo.gl/maps/example123',
             'whatsapp' => '088289445437',
             'instagram' => 'https://instagram.com/BMPS.id',
