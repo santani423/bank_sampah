@@ -15,19 +15,21 @@ class SettingController extends Controller
         $setting = Setting::first();
 
         if ($setting) {
-            $baseUrl = url('');
+            // Ambil APP_URL dari config (bersumber dari .env)
+            $appUrl = rtrim(config('app.url'), '/');
 
             $setting->logo = $setting->logo
-                ? $baseUrl . '/' . ltrim($setting->logo, '/')
+                ? $appUrl . '/' . ltrim($setting->logo, '/')
                 : null;
 
             $setting->favicon = $setting->favicon
-                ? $baseUrl . '/' . ltrim($setting->favicon, '/')
+                ? $appUrl . '/' . ltrim($setting->favicon, '/')
                 : null;
         }
 
         return response()->json($setting);
     }
+
 
 
     /**
