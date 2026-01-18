@@ -127,7 +127,8 @@
                                 text: response.message,
                                 confirmButtonColor: '#3085d6',
                             }).then(() => {
-                                window.location.href = "{{ route('forgot.password.reset.form') }}";
+                                window.location.href =
+                                    "{{ route('forgot.password.reset.form') }}";
                             });
                         } else {
                             Swal.fire({

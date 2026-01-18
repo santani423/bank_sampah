@@ -18,6 +18,13 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    protected $whatsappService;
+
+    // ✅ Injeksi service WhatsApp melalui konstruktor
+    public function __construct(WhatsAppService $whatsappService)
+    {
+        $this->whatsappService = $whatsappService;
+    }
     public function showLoginForm()
     {
         $setting  =  Setting::first();
@@ -359,6 +366,7 @@ class AuthController extends Controller
     public function sendForgotPasswordOTP(Request $request)
     {
         try {
+            // 1. Validasi input
             $validator = Validator::make($request->all(), [
                 'no_hp' => 'required|string',
             ]);
@@ -367,15 +375,15 @@ class AuthController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Nomor WhatsApp wajib diisi',
-                    'errors' => $validator->errors(),
+                    'errors'  => $validator->errors(),
                 ], 422);
             }
 
             $phoneNumber = $request->no_hp;
 
-            // Check if user with this phone number exists
+            // 2. Cek apakah nomor terdaftar
             $nasabah = Nasabah::where('no_hp', $phoneNumber)->first();
-            
+
             if (!$nasabah) {
                 return response()->json([
                     'success' => false,
@@ -383,37 +391,40 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            // Generate OTP
+            // 3. Generate OTP
             $otp = OtpVerification::generateOTP($phoneNumber, 'forgot_password');
 
-            // Send OTP via WhatsApp
-            $whatsappService = new WhatsAppService();
-            $result = $whatsappService->sendOTP($phoneNumber, $otp->otp_code);
+            // 4. Susun pesan WhatsApp OTP
+            $message = "Halo {$nasabah->nama},\n\n"
+                . "Kode OTP Anda untuk proses *Reset Password* adalah:\n\n"
+                . "🔐 {$otp->otp_code}\n\n"
+                . "Kode ini berlaku selama 5 menit.\n"
+                . "JANGAN bagikan kode ini kepada siapa pun, termasuk pihak yang mengatasnamakan kami.\n\n"
+                . "Jika Anda tidak merasa meminta reset password, silakan abaikan pesan ini.\n\n"
+                . "Terima kasih.";
 
-            if (!$result['status']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal mengirim OTP ke WhatsApp',
-                ], 500);
-            }
+            // 5. Kirim OTP via WhatsApp
+            $this->whatsappService->sendMessage($phoneNumber, $message);
 
-            // Store phone number in session
+            // 6. Simpan nomor ke session (untuk verifikasi selanjutnya)
             Session::put('forgot_password_phone', $phoneNumber);
 
+            // 7. Response sukses
             return response()->json([
                 'success' => true,
                 'message' => 'Kode OTP telah dikirim ke WhatsApp Anda',
-                'phone' => $phoneNumber,
-            ]);
+                'phone'   => $phoneNumber,
+            ], 200);
         } catch (\Throwable $e) {
+
+            // 8. Error handling
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan pada server',
-                'error' => config('app.debug') ? $e->getMessage() : null,
+                'error'   => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
-
     /**
      * Show Reset Password Form
      */
@@ -452,7 +463,7 @@ class AuthController extends Controller
 
                 // Find nasabah by phone number
                 $nasabah = Nasabah::where('no_hp', $phoneNumber)->first();
-                
+
                 if (!$nasabah) {
                     return back()->with('error', 'User tidak ditemukan.');
                 }

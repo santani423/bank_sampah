@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="{{ asset('edmate/assets/css/main.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('style')
+    @stack('style')
 </head> 
 <body>
     
@@ -78,6 +79,7 @@
     <script src="{{ asset('edmate/assets/js/main.js') }}"></script>
 
     @yield('script')
+    @stack('scripts')
 
     </body>
 </html>
