@@ -47,8 +47,9 @@
 
                 {{-- No HP --}}
                 <div class="mb-24">
-                    <label class="form-label h6">No HP</label>
-                    <input type="text" id="no_hp" name="no_hp" class="form-control">
+                    <label class="form-label h6">No WhatsApp</label>
+                    <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="Contoh: 081234567890" pattern="08[0-9]*" title="No HP harus diawali dengan 08 dan hanya berisi angka">
+                    <small class="text-muted">Nomor harus diawali dengan 08</small>
                     <div class="alert alert-danger mt-2 d-none" id="error-no_hp"></div>
                 </div>
 
@@ -165,7 +166,35 @@ function showError(field, message) {
     }
 }
 
+// Validasi No HP - hanya angka
+document.getElementById('no_hp').addEventListener('input', function(e) {
+    // Hapus karakter non-angka
+    this.value = this.value.replace(/[^0-9]/g, '');
+    
+    // Validasi harus diawali dengan 08
+    if (this.value.length > 0 && !this.value.startsWith('08')) {
+        showError('no_hp', 'Nomor HP harus diawali dengan 08');
+    } else {
+        document.getElementById('error-no_hp').classList.add('d-none');
+        this.classList.remove('is-invalid');
+    }
+});
+
 btnRegister.addEventListener('click', () => {
+    resetErrors();
+    
+    // Validasi No HP sebelum menampilkan modal
+    const noHp = document.getElementById('no_hp').value;
+    if (noHp && !noHp.startsWith('08')) {
+        showError('no_hp', 'Nomor HP harus diawali dengan 08');
+        return;
+    }
+    
+    if (noHp && noHp.length < 10) {
+        showError('no_hp', 'Nomor HP minimal 10 digit');
+        return;
+    }
+    
     document.getElementById('cNama').innerText = nama_lengkap.value || '-';
     document.getElementById('cHp').innerText = no_hp.value || '-';
     document.getElementById('cEmail').innerText = email.value || '-';
