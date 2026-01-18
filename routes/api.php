@@ -49,6 +49,13 @@ Route::post('/check-availability', [RegisterController::class, 'checkAvailabilit
 Route::post('/callback', [PetugasTransaksiController::class, 'callback']);
 Route::get('/settings', [SettingController::class, 'index'])->name('api.settings');
 Route::get('/summary/counts', [countConttroller::class, 'counts'])->name('api.summary.counts');
+Route::prefix('teams')->group(function () {
+    Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
+    Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
+    Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data
+    Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
+    Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
+});
 
 
 
@@ -83,8 +90,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Ambil Saldo Lapak
     Route::post('/transaksi-lapak/{id}/ambil-saldo', [LapakTransaksiController::class, 'ambilSaldo']);
 
-    
-    
+
+
     Route::post('/bayar', [TessController::class, 'createDanaDisbursement']);
 
 
@@ -112,13 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    Route::prefix('teams')->group(function () {
-        Route::get('/', [TimeApiController::class, 'index']);       // GET semua data
-        Route::get('/{id}', [TimeApiController::class, 'show']);    // GET satu data berdasarkan id
-        Route::post('/', [TimeApiController::class, 'store']);      // POST tambah data
-        Route::post('/{id}', [TimeApiController::class, 'update']); // POST update data (bisa juga pakai PUT)
-        Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
-    });
+
     Route::get('/petugas', [AdminPetugasController::class, 'apiIndex']);
     Route::post('/transaksi-lapak/{id}/upload-bukti-transfer', [LapakTransaksiBuktiController::class, 'uploadBuktiTransfer']);
 });
