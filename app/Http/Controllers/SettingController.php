@@ -15,14 +15,14 @@ class SettingController extends Controller
         $setting = Setting::first();
 
         if ($setting) {
-            $baseUrl = url();
+            $baseUrl = url('');
 
             $setting->logo = $setting->logo
-                ? ltrim($setting->logo, '/')
+                ? $baseUrl . '/' . ltrim($setting->logo, '/')
                 : null;
 
             $setting->favicon = $setting->favicon
-                ? ltrim($setting->favicon, '/')
+                ? $baseUrl . '/' . ltrim($setting->favicon, '/')
                 : null;
         }
 
