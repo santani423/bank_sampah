@@ -164,7 +164,7 @@
                         console.log('nasabahiiii44rrrwwf1rc',res);
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
-                        // renderTable(res?.data, res?.pagination);
+                        renderTable(res?.data, res?.pagination);
                         // renderPagination(res?.pagination);
                         
                         spinner.style.display = 'none';
@@ -181,6 +181,7 @@
            RENDER TABLE
         ================================ */
         function renderTable(data, pagination) {
+              console.log('nasabahdata',data);
             const tbody = document.getElementById('petugas-tbody');
             tbody.innerHTML = '';
 
