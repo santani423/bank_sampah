@@ -63,7 +63,7 @@
                                 </button>
 
                                 <a href="{{ url()->current() }}" class="btn btn-secondary">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset33
                                 </a>
                             </div>
                         </div>
