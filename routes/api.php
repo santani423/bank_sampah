@@ -57,6 +57,7 @@ Route::prefix('teams')->group(function () {
     Route::delete('/{id}', [TimeApiController::class, 'destroy']); // DELETE hapus data
 });
 
+Route::get('/nasabah', [ApiNasabahController::class, 'index'])->name('api.nasabah.index');
 
 
 Route::apiResource('cleans', CleanController::class);
@@ -72,7 +73,6 @@ Route::middleware(['auth', 'checkRole:nasabah'])->prefix('nasabah')->group(funct
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
-    Route::get('/nasabah', [ApiNasabahController::class, 'index'])->name('api.nasabah.index');
 
     Route::get('/pencairan-nasabah-list', [PencairanSaldoController::class, 'index'])->name('api.pencairan-nasabah.index');
     Route::get('/lapak/pengiriman/pending', [PengirimanLapakController::class, 'pengirimanPending'])->name('api.lapak.pengiriman.pending');
