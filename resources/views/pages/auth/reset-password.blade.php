@@ -68,12 +68,12 @@
                 <!-- OTP Input -->
                 <label for="otp1" class="form-label mb-8 h6">Kode OTP</label>
                 <div class="otp-container">
-                    <input type="text" class="otp-input" maxlength="1" id="otp1" autofocus>
-                    <input type="text" class="otp-input" maxlength="1" id="otp2">
-                    <input type="text" class="otp-input" maxlength="1" id="otp3">
-                    <input type="text" class="otp-input" maxlength="1" id="otp4">
-                    <input type="text" class="otp-input" maxlength="1" id="otp5">
-                    <input type="text" class="otp-input" maxlength="1" id="otp6">
+                    <input type="number" class="otp-input" maxlength="1" id="otp1" autofocus>
+                    <input type="number" class="otp-input" maxlength="1" id="otp2">
+                    <input type="number" class="otp-input" maxlength="1" id="otp3">
+                    <input type="number" class="otp-input" maxlength="1" id="otp4">
+                    <input type="number" class="otp-input" maxlength="1" id="otp5">
+                    <input type="number" class="otp-input" maxlength="1" id="otp6">
                 </div>
 
                 <input type="hidden" name="otp_code" id="otp_code">
