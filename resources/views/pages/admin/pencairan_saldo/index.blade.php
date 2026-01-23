@@ -58,11 +58,7 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <x-select.select-cabang name="cabang" required="false"/>
-                            </div>
-
-
-
-
+                            </div> 
                             <div class="col-md-12 mb-3 d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search"></i> Cari
