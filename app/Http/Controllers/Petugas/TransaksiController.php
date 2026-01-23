@@ -472,6 +472,7 @@ class TransaksiController extends Controller
                         "────────────────────────\n" .
                         "• Saldo Sebelum : Rp " . number_format($oldSaldo, 0, ',', '.') . "\n" .
                         "• Saldo Setelah : Rp " . number_format($saldoUtama->saldo, 0, ',', '.') . "\n\n" .
+                        "• Admin Xendit + PPN 11% : Rp " . number_format(4440, 0, ',', '.') . "\n\n" .
                         "_Pesan ini dikirim otomatis oleh sistem._";
 
                     $this->whatsappService->sendMessage(

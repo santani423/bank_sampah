@@ -189,23 +189,23 @@
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
-                const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
+                const url = detailRoute.replace(':kode', item?.kode_pengiriman);
+                const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
                 tbody.innerHTML += `
             <tr>
                 <td>${no}</td>
                  <td>
-                                <a href='/petugas/data-nasabah/${item.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
-                                <a href='/petugas/transaksi/create?no_registrasi=${item.no_registrasi}' class='btn btn-warning btn-sm mb-1'>Setoran</a>
+                                <a href='/petugas/data-nasabah/${item?.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
+                                <a href='/petugas/transaksi/create?no_registrasi=${item?.no_registrasi}' class='btn btn-warning btn-sm mb-1'>Setoran</a>
                             </td>
-                <td>${item.nama_lengkap}</td> 
-                <td>${item.username}</td> 
-                <td>${item.no_registrasi}</td>
-                <td>${item.nama_cabang}</td>
-                <td>${item.no_hp}</td>
-                <td>${formatRupiah(item.saldo.saldo)}</td>
-                <td>${item.status}</td>
+                <td>${item?.nama_lengkap}</td> 
+                <td>${item?.username}</td> 
+                <td>${item?.no_registrasi}</td>
+                <td>${item?.nama_cabang}</td>
+                <td>${item?.no_hp}</td>
+                <td>${formatRupiah(item?.saldo?.saldo)}</td>
+                <td>${item?.status}</td>
             </tr>
         `;
             });
