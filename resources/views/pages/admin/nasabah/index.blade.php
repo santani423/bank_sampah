@@ -158,9 +158,9 @@
             fetch(`/api/admin/nasabah?${params.toString()}`)
                 .then(res => res?.json())
                 .then(res => {
-                    console.log('nasabah',res);
                     
                     if (res?.success) {
+                        console.log('nasabah',res);
                         current_page = res?.pagination.current_page;
                         totalPages = res?.pagination.last_page;
                         renderTable(res?.data, res?.pagination);
