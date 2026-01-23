@@ -161,9 +161,9 @@
                     
                     console.log('nasabahiiii44',res);
                     if (res?.success) {
-                        console.log('nasabahiiii44rrrwwf1r',res);
+                        console.log('nasabahiiii44rrrwwf1rc',res);
                         current_page = res?.pagination?.current_page;
-                        // totalPages = res?.pagination?.last_page;
+                        totalPages = res?.pagination?.last_page;
                         // renderTable(res?.data, res?.pagination);
                         // renderPagination(res?.pagination);
                         
