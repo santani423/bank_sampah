@@ -114,7 +114,7 @@
 
             const nasabah = document.getElementById('nasabah').value;
             
-            // const cabang = document.getElementById('cabang').value;
+            
             const cabang = null;
 
            
