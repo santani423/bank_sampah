@@ -199,20 +199,7 @@
                 const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
                 tbody.innerHTML += `
-            <tr>
-                <td>${no}</td>
-                <td>
-                     <a href="${url}" class="btn btn-sm btn-info">Detail</a>
-                     <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
-                </td>
-                <td>${item?.nama_lengkap}</td> 
-                <td>${item?.username}</td> 
-                <td>${item?.no_registrasi}</td>
-                <td>${item?.nama_cabang}</td>
-                <td>${item?.no_hp}</td>
-                <td>${formatRupiah(item?.saldo.saldo)}</td>
-                <td>${item?.status}</td>
-            </tr>
+             
         `;
             });
         }
