@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\JenisBadan;
 use App\Models\NasabahBadan;
+use App\Models\SaldoPetugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -291,7 +292,7 @@ class NasabahUserBadanController extends Controller
         }
 
         // Cek saldo petugas
-        $saldoPetugas = \App\Models\SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
+        $saldoPetugas = SaldoPetugas::join('petugas', 'saldo_petugas.petugas_id', '=', 'petugas.id')
             ->where('petugas.email', auth()->user()->email)
             ->select('saldo_petugas.*')
             ->first();
