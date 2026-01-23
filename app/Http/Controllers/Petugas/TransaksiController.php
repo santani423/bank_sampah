@@ -143,7 +143,7 @@ class TransaksiController extends Controller
         }
         // Ambil ID petugas dari sesi pengguna yang sedang login
         $petugas_id = auth()->user()->id;
-
+        dd($petugas_id);
         // Simpan transaksi utama
         $transaksi = Transaksi::create([
             'kode_transaksi' => $request->kode_transaksi,
