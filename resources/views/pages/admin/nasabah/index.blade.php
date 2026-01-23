@@ -156,13 +156,13 @@
 
 
             fetch(`/api/admin/nasabah?${params.toString()}`)
-                .then(res => res.json())
+                .then(res => res?.json())
                 .then(res => {
-                    if (res.success) {
-                        current_page = res.pagination.current_page;
-                        totalPages = res.pagination.last_page;
-                        renderTable(res.data, res.pagination);
-                        renderPagination(res.pagination);
+                    if (res?.success) {
+                        current_page = res?.pagination.current_page;
+                        totalPages = res?.pagination.last_page;
+                        renderTable(res?.data, res?.pagination);
+                        renderPagination(res?.pagination);
 
                         spinner.style.display = 'none';
                         table.style.display = 'table';
