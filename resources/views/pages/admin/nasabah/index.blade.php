@@ -161,14 +161,14 @@
                     
                     if (res?.success) {
                         console.log('nasabah',res);
-                        current_page = res?.pagination.current_page;
-                        totalPages = res?.pagination.last_page;
-                        renderTable(res?.data, res?.pagination);
-                        renderPagination(res?.pagination);
+                        // current_page = res?.pagination.current_page;
+                        // totalPages = res?.pagination.last_page;
+                        // renderTable(res?.data, res?.pagination);
+                        // renderPagination(res?.pagination);
 
-                        spinner.style.display = 'none';
-                        table.style.display = 'table';
-                        pagination.style.display = 'flex';
+                        // spinner.style.display = 'none';
+                        // table.style.display = 'table';
+                        // pagination.style.display = 'flex';
                     }
                 })
                 .catch(() => {
