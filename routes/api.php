@@ -39,7 +39,7 @@ use App\Http\Controllers\Api\RegisterController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::get('/tes', [ApiNasabahController::class, 'index']);
 // Public Routes - Authentication
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/cabang', [RegisterController::class, 'getCabang']);

@@ -63,8 +63,7 @@ class NasabahController extends Controller
 
                 $q->where(function ($sub) use ($search) {
                     $sub->where('nasabah.nama_lengkap', 'like', "%{$search}%")
-                        ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%")
-                        ->orWhere('user_nasabahs.username', 'like', "%{$search}%");
+                        ->orWhere('nasabah.no_registrasi', 'like', "%{$search}%");
                 });
             });
 

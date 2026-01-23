@@ -50,9 +50,9 @@
                                 <label class="form-label">Nasabah</label>
                                 <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
                             </div>
-                            <div class="col-md-3 mb-3">
+                            {{-- <div class="col-md-3 mb-3">
                                 <x-select.select-cabang name="cabang" required="false" />
-                            </div>
+                            </div> --}}
 
 
 
@@ -113,7 +113,9 @@
         function getFilterParams() {
 
             const nasabah = document.getElementById('nasabah').value;
-            const cabang = document.getElementById('cabang').value;
+            
+            // const cabang = document.getElementById('cabang').value;
+            const cabang = null;
 
            
             
