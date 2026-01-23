@@ -199,7 +199,9 @@
                 const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
                 tbody.innerHTML += `
-             
+            <tr>
+                <td>${no}</td> 
+            </tr>
         `;
             });
         }
