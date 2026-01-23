@@ -462,7 +462,7 @@ class TransaksiController extends Controller
                         "• Reference ID : {$externalId}\n" .
                         "• Metode Pembayaran : {$payload['payment_method']}\n" .
                         "• Bank : {$payload['bank_code']}\n" .
-                        "• Jumlah Dibayar : Rp " . number_format($payload['paid_amount'], 0, ',', '.') . "\n" .
+                        "• Jumlah Dibayar : Rp " . number_format($payload['adjusted_received_amount'], 0, ',', '.') . "\n" .
                         "• Waktu Pembayaran : " . now()->format('d M Y H:i') . "\n\n" .
                         "────────────────────────\n" .
                         "💰 *Saldo Utama*\n" .
