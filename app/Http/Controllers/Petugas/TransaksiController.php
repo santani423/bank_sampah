@@ -437,8 +437,8 @@ class TransaksiController extends Controller
                 }
 
                 $oldSaldo = $saldoUtama->saldo;
-                $saldoUtama->saldo += (float) $payload['paid_amount'];
-               $saldoUtama->keterangan = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
+                $saldoUtama->saldo += (float) $payload['paid_amount'] - 4440; // Kurangi biaya admin 4000
+            //    $saldoUtama->keterangan = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
 
 
                 $saldoUtama->save();
