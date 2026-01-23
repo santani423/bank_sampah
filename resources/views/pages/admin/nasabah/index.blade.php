@@ -165,7 +165,7 @@
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
                         renderTable(res?.data, res?.pagination);
-                        // renderPagination(res?.pagination);
+                        renderPagination(res?.pagination);
                         
                         spinner.style.display = 'none';
                         table.style.display = 'table';
@@ -204,7 +204,14 @@
                 <td>
                      <a href="${url}" class="btn btn-sm btn-info">Detail</a>
                      <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
-                </td> 
+                </td>
+                <td>${item?.nama_lengkap}</td> 
+                <td>${item?.username}</td> 
+                <td>${item?.no_registrasi}</td>
+                <td>${item?.nama_cabang}</td>
+                <td>${item?.no_hp}</td>
+                <td>${formatRupiah(item?.saldo?.saldo)}</td>
+                <td>${item?.status}</td>
             </tr>
         `;
             });
