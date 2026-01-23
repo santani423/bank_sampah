@@ -162,10 +162,10 @@
                     console.log('nasabahiiii44',res);
                     if (res?.success) {
                         console.log('nasabahiiii44rrr',res);
-                        // current_page = res?.pagination.current_page;
-                        // totalPages = res?.pagination.last_page;
-                        // renderTable(res?.data, res?.pagination);
-                        // renderPagination(res?.pagination);
+                        current_page = res?.pagination.current_page;
+                        totalPages = res?.pagination.last_page;
+                        renderTable(res?.data, res?.pagination);
+                        renderPagination(res?.pagination);
                         
                         // spinner.style.display = 'none';
                         // table.style.display = 'table';
