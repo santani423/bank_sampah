@@ -53,7 +53,7 @@
                     <form id="filter-form">
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Nasabah</label>
+                                <label class="form-label">Nasabah3</label>
                                 <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
                             </div>
                             <div class="col-md-3 mb-3">
