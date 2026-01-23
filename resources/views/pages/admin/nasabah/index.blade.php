@@ -200,7 +200,11 @@
 
                 tbody.innerHTML += `
             <tr>
-                <td>${no}</td> 
+                <td>${no}</td>
+                <td>
+                     <a href="${url}" class="btn btn-sm btn-info">Detail</a>
+                     <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
+                </td> 
             </tr>
         `;
             });
