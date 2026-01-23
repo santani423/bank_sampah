@@ -161,7 +161,7 @@
                     
                     console.log('nasabahiiii44',res);
                     if (res?.success) {
-                        console.log('nasabahiiii44rrrwwf1rc4',res);
+                        console.log('nasabahiiii44rrrwwf1rc',res);
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
                         renderTable(res?.data, res?.pagination);
@@ -182,10 +182,10 @@
         ================================ */
         function renderTable(data, pagination) {
             const tbody = document.getElementById('petugas-tbody');
-            tbody?.innerHTML = '';
+            tbody.innerHTML = '';
 
             if (!data.length) {
-                tbody?.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
 
@@ -197,7 +197,7 @@
                 const url = detailRoute.replace(':kode', item?.kode_pengiriman);
                 const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
-                tbody?.innerHTML += `
+                tbody.innerHTML += `
             <tr>
                 <td>${no}</td>
                 <td>
