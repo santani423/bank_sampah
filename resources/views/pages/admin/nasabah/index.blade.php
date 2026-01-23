@@ -164,8 +164,8 @@
                         console.log('nasabahiiii44rrrwwf1',res);
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
-                        // renderTable(res?.data, res?.pagination);
-                        // renderPagination(res?.pagination);
+                        renderTable(res?.data, res?.pagination);
+                        renderPagination(res?.pagination);
                         
                         spinner.style.display = 'none';
                         table.style.display = 'table';
