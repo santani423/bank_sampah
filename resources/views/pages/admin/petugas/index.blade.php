@@ -28,6 +28,11 @@
         <div>
             <h3 class="fw-bold mb-3">Petugas</h3>
         </div>
+        <div class="ms-md-auto py-2 py-md-0">
+            <div class="section-header-button">
+                <a href="{{ route('admin.petugas.create') }}" class="btn btn-primary btn-round">Tambah Petugas</a>
+            </div>
+        </div>
     </div>
 
     <div class="row">
@@ -177,8 +182,8 @@
 @push('scripts')
     <script>
         /* ===============================
-                                                                                                                                                               AMBIL FILTER TANGGAL
-                                                                                                                                                            ================================ */
+                                                                                                                                                                   AMBIL FILTER TANGGAL
+                                                                                                                                                                ================================ */
         function getFilterParams() {
 
             const nasabah = document.getElementById('nasabah').value;
