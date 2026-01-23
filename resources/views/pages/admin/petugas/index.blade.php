@@ -274,16 +274,16 @@
                     <form action="/admin/data-petugas/${item.id}" method="POST"
                         onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                         <a href="/admin/data-petugas/${item.id}" class="btn btn-sm btn-info">
-                            <i class="fas fa-eye"></i>
+                           Detail
                         </a>
                         <a href="/admin/data-petugas/${item.id}/edit" class="btn btn-sm btn-primary">
-                            <i class="fas fa-pencil-alt"></i>
+                           Edit
                         </a>
                         <input type="hidden" name="_token"
                             value="{{ csrf_token() }}">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn btn-sm btn-danger">
-                            <i class="fas fa-trash"></i>
+                           Hapus
                         </button>
                     </form>
                 </td> 
