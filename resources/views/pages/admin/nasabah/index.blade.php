@@ -164,7 +164,7 @@
                         console.log('nasabahiiii44rrrwwf1rc',res);
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
-                        // renderTable(res?.data, res?.pagination);
+                        renderTable(res?.data, res?.pagination);
                         // renderPagination(res?.pagination);
                         
                         spinner.style.display = 'none';
@@ -194,8 +194,8 @@
 
             data.forEach((item, index) => {
                 const no = pagination.from + index;
-                const url = detailRoute.replace(':kode', item.kode_pengiriman);
-                const urlEdit = detailEdit.replace(':kode', item.kode_pengiriman);
+                const url = detailRoute.replace(':kode', item?.kode_pengiriman);
+                const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
                 tbody.innerHTML += `
             <tr>
@@ -204,13 +204,13 @@
                      <a href="${url}" class="btn btn-sm btn-info">Detail</a>
                      <a href="${urlEdit}" class="btn btn-sm btn-primary">Edit</a>
                 </td>
-                <td>${item.nama_lengkap}</td> 
-                <td>${item.username}</td> 
-                <td>${item.no_registrasi}</td>
-                <td>${item.nama_cabang}</td>
-                <td>${item.no_hp}</td>
-                <td>${formatRupiah(item.saldo.saldo)}</td>
-                <td>${item.status}</td>
+                <td>${item?.nama_lengkap}</td> 
+                <td>${item?.username}</td> 
+                <td>${item?.no_registrasi}</td>
+                <td>${item?.nama_cabang}</td>
+                <td>${item?.no_hp}</td>
+                <td>${formatRupiah(item?.saldo.saldo)}</td>
+                <td>${item?.status}</td>
             </tr>
         `;
             });
