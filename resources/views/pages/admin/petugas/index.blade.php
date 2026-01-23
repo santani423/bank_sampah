@@ -57,7 +57,7 @@
                                 <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <x-select.select-cabang name="cabang" />
+                                <x-select.select-cabang name="cabang" required="false" />
                             </div>
 
 
