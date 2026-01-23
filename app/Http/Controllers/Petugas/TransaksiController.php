@@ -142,13 +142,14 @@ class TransaksiController extends Controller
             return back()->with('error', 'Saldo petugas tidak mencukupi untuk melakukan transaksi ini.');
         }
         // Ambil ID petugas dari sesi pengguna yang sedang login
-        $petugas_id = auth()->user()->id;
-        dd($petugas_id);
+        $emailPetugas = auth()->user()->email;
+        $petugas = Petugas::where('email', $emailPetugas)->first();
+        dd($emailPetugas);
         // Simpan transaksi utama
         $transaksi = Transaksi::create([
             'kode_transaksi' => $request->kode_transaksi,
             'nasabah_id' => $request->nasabah_id,
-            'petugas_id' => $petugas_id,
+            'petugas_id' => $petugas->id,
             'tanggal_transaksi' => $request->tanggal_transaksi,
         ]);
 
