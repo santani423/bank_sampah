@@ -165,8 +165,8 @@
                         renderTable(res?.data, res?.pagination);
                         renderPagination(res?.pagination);
                         
-                        spinner.style.display = 'none';
-                        table.style.display = 'table';
+                        // spinner.style.display = 'none';
+                        // table.style.display = 'table';
                         pagination.style.display = 'flex';
                         console.log('nasabahiiii44',res);
                     }
