@@ -161,7 +161,7 @@
                     
                     console.log('nasabahiiii44',res);
                     if (res?.success) {
-                        console.log('nasabahiiii44rrrwwf1rc',res);
+                        console.log('nasabahiiii44rrrwwf1rc4',res);
                         current_page = res?.pagination?.current_page;
                         totalPages = res?.pagination?.last_page;
                         renderTable(res?.data, res?.pagination);
