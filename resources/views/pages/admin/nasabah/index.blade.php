@@ -182,10 +182,10 @@
         ================================ */
         function renderTable(data, pagination) {
             const tbody = document.getElementById('petugas-tbody');
-            tbody.innerHTML = '';
+            tbody?.innerHTML = '';
 
             if (!data.length) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
+                tbody?.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
                 return;
             }
 
@@ -193,11 +193,11 @@
             const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
 
             data.forEach((item, index) => {
-                const no = pagination.from + index;
+                const no = pagination?.from + index;
                 const url = detailRoute.replace(':kode', item?.kode_pengiriman);
                 const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
 
-                tbody.innerHTML += `
+                tbody?.innerHTML += `
             <tr>
                 <td>${no}</td>
                 <td>
