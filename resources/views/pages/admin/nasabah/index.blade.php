@@ -160,15 +160,15 @@
                 .then(res => {
                     
                     if (res?.success) {
-                        console.log('nasabah',res);
-                        // current_page = res?.pagination.current_page;
-                        // totalPages = res?.pagination.last_page;
-                        // renderTable(res?.data, res?.pagination);
-                        // renderPagination(res?.pagination);
-
-                        // spinner.style.display = 'none';
-                        // table.style.display = 'table';
-                        // pagination.style.display = 'flex';
+                        current_page = res?.pagination.current_page;
+                        totalPages = res?.pagination.last_page;
+                        renderTable(res?.data, res?.pagination);
+                        renderPagination(res?.pagination);
+                        
+                        spinner.style.display = 'none';
+                        table.style.display = 'table';
+                        pagination.style.display = 'flex';
+                        console.log('nasabahiiii44',res);
                     }
                 })
                 .catch(() => {
