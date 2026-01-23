@@ -144,7 +144,7 @@ class TransaksiController extends Controller
         // Ambil ID petugas dari sesi pengguna yang sedang login
         $emailPetugas = auth()->user()->email;
         $petugas = Petugas::where('email', $emailPetugas)->first();
-        dd($emailPetugas);
+        // dd($emailPetugas);
         // Simpan transaksi utama
         $transaksi = Transaksi::create([
             'kode_transaksi' => $request->kode_transaksi,
