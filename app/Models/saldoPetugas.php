@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\LogsActivity;
 
-class saldoPetugas extends Model
+class SaldoPetugas extends Model
 {
     use HasFactory, LogsActivity;
     protected $fillable = [
