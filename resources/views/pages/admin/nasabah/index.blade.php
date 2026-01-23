@@ -159,7 +159,9 @@
                 .then(res => res?.json())
                 .then(res => {
                     
+                    console.log('nasabahiiii44',res);
                     if (res?.success) {
+                        console.log('nasabahiiii44',res);
                         // current_page = res?.pagination.current_page;
                         // totalPages = res?.pagination.last_page;
                         // renderTable(res?.data, res?.pagination);
@@ -168,7 +170,6 @@
                         // spinner.style.display = 'none';
                         // table.style.display = 'table';
                         // pagination.style.display = 'flex';
-                        console.log('nasabahiiii44',res);
                     }
                 })
                 .catch(() => {
