@@ -321,15 +321,25 @@
                                 </div>
                                 <ul class="max-h-270 overflow-y-auto scroll-sm pe-4">
                                     <li class="mb-4">
-                                        <a href="{{ route('nasabah.profile') }}"
-                                            class="py-12 text-15 px-20 hover-bg-gray-50 text-gray-300 rounded-8 flex-align gap-8 fw-medium text-15">
-                                            <span class="text-2xl text-primary-600 d-flex"><svg
-                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                                                    <path
-                                                        d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                                </svg></span>
-                                            <span class="text">Profile</span>
+                                        @php
+                                            $profileRoutes = [
+                                                'nasabah' => 'nasabah.profile',
+                                                'petugas' => 'petugas.profile',
+                                                'admin' => 'admin.profile',
+                                            ];
+                                        @endphp
+
+                                        <a href="{{ route($profileRoutes[Auth::user()->role]) }}">
+                                            Profile
+                                        </a>
+                                        class="py-12 text-15 px-20 hover-bg-gray-50 text-gray-300 rounded-8 flex-align gap-8 fw-medium text-15">
+                                        <span class="text-2xl text-primary-600 d-flex"><svg
+                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                            </svg></span>
+                                        <span class="text">Profile</span>
                                         </a>
                                     </li>
 

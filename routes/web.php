@@ -91,7 +91,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser');
-    
+     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('admin.profile');
     // Data Master
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
@@ -175,7 +175,7 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::get('/invoic/kirim-sampah-lapak/{kode}', [PetugasDashboardController::class, 'invoicKirimSampahLapak'])->name('petugas.invoic.kirim-sampah-lapak');
     
     Route::get('/invoic/pencairan-lapak/{kode}', [PetugasDashboardController::class, 'invoicPencairanLapak'])->name('petugas.invoic.pencairan-lapak');
-    
+     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('petugas.profile');
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
