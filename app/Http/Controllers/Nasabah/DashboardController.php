@@ -47,7 +47,7 @@ class DashboardController extends Controller
         // Logic for displaying the profile
         $userNasabah =  UserNasabah::where('user_id', auth()->id())->first();
         $nasabah_id = null;
-        if (!$userNasabah) {
+        if ($userNasabah) {
             $nasabah_id = $userNasabah->nasabah_id;
         }
         $nasabah =  Nasabah::where('id', $nasabah_id)->first();
