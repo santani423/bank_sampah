@@ -106,7 +106,7 @@
                     </div>
 
                     <hr>
-
+                    @if($nasabah)
                     {{-- Bagian Nasabah --}}
                     <h6 class="fw-bold">Data Nasabah</h6>
                     <div class="mb-3">
@@ -143,6 +143,7 @@
                         <textarea name="alamat_lengkap" class="form-control">{{ old('alamat_lengkap', $nasabah->alamat_lengkap) }}</textarea>
                     </div>
 
+                    @endif
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </form>
             </div>
