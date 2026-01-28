@@ -56,7 +56,7 @@
                     <div class="mb-24">
                         <label for="no_hp" class="form-label mb-8 h6">Nomor WhatsApp</label>
                         <div class="position-relative">
-                            <input type="text" class="form-control py-11 ps-40" id="no_hp" name="no_hp"
+                            <input type="number" class="form-control py-11 ps-40" id="no_hp" name="no_hp"
                                 placeholder="Contoh: 628123456789" required>
                             <span class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex">
                                 <i class="ph ph-phone"></i>
