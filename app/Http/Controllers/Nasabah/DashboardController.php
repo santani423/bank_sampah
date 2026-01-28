@@ -59,29 +59,37 @@ class DashboardController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Ambil data nasabah terkait user ini
-        $userNasabah = UserNasabah::where('user_id', $user->id)->firstOrFail();
-        $nasabah = Nasabah::findOrFail($userNasabah->nasabah_id);
+        $isNasabah = auth()->user()->role === 'nasabah';
 
-        // Validasi input
-        $validated = $request->validate([
+        // =====================
+        // VALIDASI
+        // =====================
+        $rules = [
             // User
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:users,email,' . $user->id,
-            'username'      => 'required|string|max:50|unique:users,username,' . $user->id,
-            'password'      => 'nullable|string|min:6',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+            'password' => 'nullable|string|min:6',
+            'foto'     => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+        ];
 
-            // Nasabah
-            'nama_lengkap'  => 'required|string|max:100',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'tempat_lahir'  => 'required|string|max:50',
-            'tanggal_lahir' => 'required|date',
-            'no_hp'         => 'required|string|max:20',
-            'alamat_lengkap' => 'required|string',
-        ]);
+        // Tambahkan validasi NASABAH hanya jika role nasabah
+        if ($isNasabah) {
+            $rules = array_merge($rules, [
+                'nama_lengkap'   => 'required|string|max:100',
+                'jenis_kelamin'  => 'required|in:Laki-laki,Perempuan',
+                'tempat_lahir'   => 'required|string|max:50',
+                'tanggal_lahir'  => 'required|date',
+                'no_hp'          => 'required|string|max:20',
+                'alamat_lengkap' => 'required|string',
+            ]);
+        }
 
-        // Update User
+        $validated = $request->validate($rules);
+
+        // =====================
+        // UPDATE USER
+        // =====================
         $user->name     = $validated['name'];
         $user->email    = $validated['email'];
         $user->username = $validated['username'];
@@ -90,30 +98,40 @@ class DashboardController extends Controller
             $user->password = Hash::make($validated['password']);
         }
 
-        // Foto user
         if ($request->hasFile('foto')) {
             if ($user->foto && $user->foto !== 'default.png') {
-                Storage::delete('public/foto/' . $user->foto);
+                Storage::disk('public')->delete($user->foto);
             }
 
-
-            $fileName = $request->file('foto')->store('foto', 'public');
-
-            $user->foto = $fileName;
+            $user->foto = $request->file('foto')->store('foto', 'public');
         }
 
         $user->save();
 
-        // Update Nasabah
-        $nasabah->nama_lengkap   = $validated['nama_lengkap'];
-        $nasabah->jenis_kelamin  = $validated['jenis_kelamin'];
-        $nasabah->tempat_lahir   = $validated['tempat_lahir'];
-        $nasabah->tanggal_lahir  = $validated['tanggal_lahir'];
-        $nasabah->no_hp          = $validated['no_hp'];
-        $nasabah->alamat_lengkap = $validated['alamat_lengkap'];
-        $nasabah->save();
+        // =====================
+        // UPDATE NASABAH (JIKA ROLE NASABAH)
+        // =====================
+        if ($isNasabah) {
+            $userNasabah = UserNasabah::where('user_id', $user->id)->first();
 
-        return redirect()->route('nasabah.profile', $user->id)
+            if ($userNasabah) {
+                $nasabah = Nasabah::find($userNasabah->nasabah_id);
+
+                if ($nasabah) {
+                    $nasabah->update([
+                        'nama_lengkap'   => $validated['nama_lengkap'],
+                        'jenis_kelamin'  => $validated['jenis_kelamin'],
+                        'tempat_lahir'   => $validated['tempat_lahir'],
+                        'tanggal_lahir'  => $validated['tanggal_lahir'],
+                        'no_hp'          => $validated['no_hp'],
+                        'alamat_lengkap' => $validated['alamat_lengkap'],
+                    ]);
+                }
+            }
+        }
+
+        return redirect()
+            ->route('nasabah.profile', $user->id)
             ->with('success', 'Profile berhasil diperbarui.');
     }
 }

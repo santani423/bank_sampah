@@ -73,13 +73,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLoginForm'])->name('home');
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
-    
+
     Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
     Route::post('register/send-otp', [AuthController::class, 'sendOTP'])->name('send.otp');
     Route::get('register/verify-otp', [AuthController::class, 'showVerifyOTP'])->name('verify.otp.form');
     Route::post('register/verify-otp', [AuthController::class, 'verifyOTP'])->name('verify.otp');
     Route::post('register/resend-otp', [AuthController::class, 'resendOTP'])->name('resend.otp');
-    
+
     // Forgot Password Routes
     Route::get('forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot.password.form');
     Route::post('forgot-password/send-otp', [AuthController::class, 'sendForgotPasswordOTP'])->name('forgot.password.send.otp');
@@ -91,8 +91,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/facek-user', [AdminDashboardController::class, 'faceUser'])->name('admin.faceUser');
-     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('admin.profile');
+    Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('admin.profile');
     // Data Master
+    Route::put('/update/{id}', [NasabahDashboardController::class, 'update'])->name('admin.update');
     Route::resource('/data-nasabah', AdminNasabahController::class)->names('admin.nasabah');
     Route::resource('/data-petugas', AdminPetugasController::class)->names('admin.petugas');
     Route::post('/data-petugas/{id}/alokasi-saldo', [AdminPetugasController::class, 'alokasiSaldo'])->name('admin.petugas.alokasiSaldo');
@@ -104,7 +105,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::resource('/data-activities', ActivityController::class)->names('admin.activities');
     Route::resource('/data-customers', GudangController::class)->names('admin.gudangs');
     Route::post('admin/customers/import', [GudangController::class, 'import'])->name('admin.gudangs.import');
-    
+
     Route::get('/invoice/pencairan-lapak/{kode}', [AdminDashboardController::class, 'invoicPencairanLapak'])->name('admin.invoice.pencairan-lapak');
 
     // Approval Setoran Lapak
@@ -112,21 +113,21 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::get('/setor-lapak/{code}', [AdminLapakController::class, 'approvalSetoranLapakDetail'])->name('admin.setor-lapak.detail');
     // Data Clean
     Route::resource('data-cleans', CleanController::class)->names('admin.cleans');
-    
+
     // Lapak Management
     Route::resource('/data-lapak', AdminLapakController::class)->names('admin.lapak');
     Route::post('/data-lapak/{id}/approve', [AdminLapakController::class, 'approve'])->name('admin.lapak.approve');
     Route::post('/data-lapak/{id}/reject', [AdminLapakController::class, 'reject'])->name('admin.lapak.reject');
     Route::post('/data-collaction-center/update-anggota-cabang', [AdminCabangController::class, 'updateAanggotaCabang'])->name('admin.cabang.updateAanggotaCabang');
-    
+
     // Manajemen Konten
     Route::resource('/data-banner', AdminBannerController::class)->names('admin.banner');
     Route::resource('/data-artikel', AdminArtikelController::class)->names('admin.artikel');
-    
+
     // Transaksi
     Route::resource('/transaksi', AdminTransaksiController::class)->names('admin.transaksi');
     Route::get('/transaksi/print/{transaksi}', [AdminTransaksiController::class, 'print'])->name('admin.transaksi.print');
-    
+
 
 
     Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
@@ -149,11 +150,11 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
     Route::get('/tentang-kami', [TentangKamiController::class, 'index'])->name('admin.tentang_kami.index');
     Route::post('/tentang-kami', [TentangKamiController::class, 'store'])->name('admin.tentang_kami.store');
     Route::put('/tentang-kami/update/{id}', [TentangKamiController::class, 'update'])->name('admin.tentang_kami.update');
-    
+
     // Feedback
     Route::resource('/data-feedback', AdminFeedbackController::class)->names('admin.feedback');
     Route::resource('/settings', SettingController::class)->names('admin.settings');
-    
+
     // Top Up Saldo Utama
     Route::get('/topup', [AdminTopUpController::class, 'index'])->name('admin.topup.index');
     Route::get('/topup/create', [AdminTopUpController::class, 'create'])->name('admin.topup.create');
@@ -173,9 +174,10 @@ Route::middleware(['auth', 'checkRole:petugas'])->prefix('petugas')->group(funct
     Route::post('/data-lapak/{lapak}/kirim-sampah', [PetugasLapakController::class, 'prosesKirimSampah'])->name('petugas.lapak.proses-kirim-sampah');
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
     Route::get('/invoic/kirim-sampah-lapak/{kode}', [PetugasDashboardController::class, 'invoicKirimSampahLapak'])->name('petugas.invoic.kirim-sampah-lapak');
-    
+    Route::put('/update/{id}', [NasabahDashboardController::class, 'update'])->name('petugas.update');
+
     Route::get('/invoic/pencairan-lapak/{kode}', [PetugasDashboardController::class, 'invoicPencairanLapak'])->name('petugas.invoic.pencairan-lapak');
-     Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('petugas.profile');
+    Route::get('/profile', [NasabahDashboardController::class, 'profile'])->name('petugas.profile');
     // Data Master
     Route::resource('/data-nasabah', PetugasNasabahController::class)->names('petugas.nasabah');
     Route::resource('/data-rekanan', NasabahUserBadanController::class)->names('petugas.rekanan');
