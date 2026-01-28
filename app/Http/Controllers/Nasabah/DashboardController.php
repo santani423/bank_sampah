@@ -130,8 +130,8 @@ class DashboardController extends Controller
             }
         }
 
-        return redirect()
-            ->route('nasabah.profile', $user->id)
-            ->with('success', 'Profile berhasil diperbarui.');
+
+
+        return back()->with('success', 'Profile berhasil diperbarui.');
     }
 }
