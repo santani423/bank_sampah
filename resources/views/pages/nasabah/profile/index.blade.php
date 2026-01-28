@@ -77,8 +77,14 @@
                             'petugas' => 'petugas.profile',
                             'admin' => 'admin.profile',
                         ];
+
+                        $role = Auth::user()->role;
+                        $routeName = $profileRoutes[$role] ?? 'profile.index';
                     @endphp
-                    <form action="{{ route($profileRoutes[Auth::user()->role], $user->id) }}" method="POST" enctype="multipart/form-data">
+
+                    <form action="{{ route($routeName, ['id' => $user->id]) }}" method="POST"
+                        enctype="multipart/form-data">
+
                         @csrf
                         @method('PUT')
 
