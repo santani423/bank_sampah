@@ -58,6 +58,7 @@
                             <tbody>
                                 @forelse ($transaksis as $index => $transaksi)
                                     <tr>
+                                        <td>{{ $transaksis->firstItem() + $index }}</td>
                                         <td>
                                             <a href="{{ route('petugas.transaksi.show', $transaksi->id) }}"
                                                 class="btn btn-sm btn-info me-2">
@@ -77,7 +78,6 @@
                                                 </button>
                                             </form> --}}
                                         </td>
-                                        <td>{{ $transaksis->firstItem() + $index }}</td>
                                         <td>{{ \Carbon\Carbon::parse($transaksi->tanggal_transaksi)->format('d-m-Y') }}</td>
                                         <td>{{ $transaksi->nasabah->nama_lengkap }}</td>
                                         <td>{{ number_format($transaksi->total_berat, 2, ',', '.') }}</td>
