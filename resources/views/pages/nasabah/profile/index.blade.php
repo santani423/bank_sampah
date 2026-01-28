@@ -143,8 +143,8 @@
                         <textarea name="alamat_lengkap" class="form-control">{{ old('alamat_lengkap', $nasabah->alamat_lengkap) }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     @endif
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </form>
             </div>
         </div>
