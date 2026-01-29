@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\UserNasabah;
 use App\Models\UserNasabahBadan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -67,9 +68,9 @@ class NasabahUserBadanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis_badan_id' => 'required|exists:jenis_badans,id',
-            'cabang_id' => 'required|exists:cabangs,id',
-            'nama_badan' => 'required|string|max:150',
+            'jenis_badan_id'   => 'required|exists:jenis_badans,id',
+            'cabang_id'        => 'required|exists:cabangs,id',
+            'nama_badan'       => 'required|string|max:150',
             'email' => [
                 'required',
                 'email',
@@ -82,10 +83,9 @@ class NasabahUserBadanController extends Controller
                 'string',
                 'max:50',
                 'unique:nasabah,username',
-                'unique:nasabah,username',
                 'unique:users,username',
             ],
-            'password' => 'required|string|min:6',
+            'password'         => 'required|string|min:6',
             'no_hp' => [
                 'required',
                 'string',
@@ -93,90 +93,59 @@ class NasabahUserBadanController extends Controller
                 'unique:nasabah,no_hp',
                 'regex:/^62[0-9]{8,15}$/'
             ],
-            'alamat_lengkap' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:aktif,tidak_aktif',
+            'alamat_lengkap'   => 'required|string',
+            'foto'             => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'status'           => 'required|in:aktif,tidak_aktif',
         ]);
 
-        $data = $request->all();
-        // dd($data['username']);
-        $password = Hash::make($request->password);
+        DB::transaction(function () use ($request) {
 
-        // Handle file upload
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/nasabah-badan', $filename);
-            $data['foto'] = $filename;
-        } else {
-            $data['foto'] = 'profil.png';
-        }
+            $data = $request->except(['password', 'foto']);
 
-        // dd($data);
+            // Handle upload foto
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('public/nasabah-badan', $filename);
+                $data['foto'] = $filename;
+            } else {
+                $data['foto'] = 'profil.png';
+            }
 
-        $nasabah = new Nasabah();
-        $nasabah->no_registrasi = 'REG-' . strtoupper(uniqid());
-        $nasabah->status = 'aktif';
-        $nasabah->type = 'badan';
-        $nasabah->nama_lengkap = $data['nama_badan'];
-        $nasabah->no_hp = $data['no_hp'];
-        $nasabah->cabang_id = $data['cabang_id'];
-        $nasabah->jenis_badan_id = $data['jenis_badan_id'];
-        $nasabah->alamat_lengkap = $data['alamat_lengkap'];
-        $nasabah->fill($data);
-        $nasabah->save();
+            // ================= NASABAH =================
+            $nasabah = new Nasabah();
+            $nasabah->no_registrasi   = 'REG-' . strtoupper(uniqid());
+            $nasabah->type            = 'badan';
+            $nasabah->nama_lengkap    = $request->nama_badan;
+            $nasabah->fill($data);
+            $nasabah->save();
 
-        $saldo = new Saldo();
-        $saldo->nasabah_id = $nasabah->id;
-        $saldo->saldo = 0;
-        $saldo->save();
+            // ================= SALDO =================
+            Saldo::create([
+                'nasabah_id' => $nasabah->id,
+                'saldo'      => 0
+            ]);
 
+            // ================= USER =================
+            $user = User::create([
+                'name'     => $request->nama_badan,
+                'email'    => $request->email,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'role'     => 'rekanan',
+            ]);
 
+            // ================= RELASI =================
+            $userNasabah = UserNasabah::create([
+                'user_id'    => $user->id,
+                'nasabah_id' => $nasabah->id,
+            ]);
 
-
-        // 1. Buat user di tabel users
-
-        $user = new User();
-        $user->name = $data['nama_badan'];
-        $user->email = $data['email'];
-        $user->username = $data['username'];
-        $user->password = $password;
-        $user->role = 'nasabah_badan';
-        $user->save();
-        
-
-        // Create UserNasabah
-        $userNasabah = new UserNasabah();
-        $userNasabah->user_id = $user->id;
-        $userNasabah->nasabah_id = $nasabah->id;
-        $userNasabah->save();
-
-
-        $cabangUser = new CabangUser();
-        $cabangUser->cabang_id = $data['cabang_id'];
-        $cabangUser->user_nasabah_id = $userNasabah->id;
-        $cabangUser->save();
-
-        // // 2. Buat nasabah badan
-        // $nasabahBadan = NasabahBadan::create([
-
-        //     'nama_badan' => $data['nama_badan'],
-        //     'npwp' => $data['npwp'] ?? null,
-        //     'nib' => $data['nib'] ?? null,
-        //     'email' => $data['email'],
-        //     'username' => $data['username'],
-        //     'password' => $password,
-        //     'no_telp' => $data['no_telp'] ?? null,
-        //     'alamat_lengkap' => $data['alamat_lengkap'] ?? null,
-        //     'foto' => $data['foto'],
-        //     'status' => $data['status'],
-        // ]);
-
-        // // // 3. Simpan relasi ke tabel user_nasabah_badan
-        // UserNasabahBadan::create([
-        //     'user_id' => $user->id,
-        //     'nasabah_badan_id' => $nasabahBadan->id,
-        // ]);
+            CabangUser::create([
+                'cabang_id'        => $request->cabang_id,
+                'user_nasabah_id'  => $userNasabah->id,
+            ]);
+        });
 
         return redirect()
             ->route('petugas.rekanan.index')
