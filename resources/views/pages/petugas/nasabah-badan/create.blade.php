@@ -101,9 +101,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="no_hp">Nomor Telepon</label>
-                                    <input type="text" class="form-control @error('no_hp') is-invalid @enderror"
-                                        id="no_hp" name="no_hp" value="{{ old('no_hp') }}" pattern="62[0-9]{8,15}" title="Nomor HP harus diawali 62 dan hanya angka" required>
+                                    <label for="no_hp">Nomor Telepon <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control @error('no_hp') is-invalid @enderror"
+                                        id="no_hp" name="no_hp" value="{{ old('no_hp') }}" pattern="62[0-9]{8,15}"
+                                        title="Nomor HP harus diawali 62 dan hanya angka" required>
                                     @error('no_hp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -112,7 +113,7 @@
 
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="alamat_lengkap">Alamat Lengkap</label>
+                                    <label for="alamat_lengkap">Alamat Lengkap <span class="text-danger">*</span></label>
                                     <textarea class="form-control @error('alamat_lengkap') is-invalid @enderror" id="alamat_lengkap" name="alamat_lengkap"
                                         rows="3">{{ old('alamat_lengkap') }}</textarea>
                                     @error('alamat_lengkap')
@@ -121,9 +122,9 @@
                                 </div>
 
                                 <div class="form-group">
-                                  
-                                        <x-select.select-cabang name="cabang_id" />
-                                    
+
+                                    <x-select.select-cabang name="cabang_id" />
+
                                 </div>
                                 <div class="form-group">
                                     <label for="foto">Foto</label>
