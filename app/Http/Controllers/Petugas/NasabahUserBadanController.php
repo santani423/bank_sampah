@@ -99,7 +99,7 @@ class NasabahUserBadanController extends Controller
         ]);
 
         $data = $request->all();
-        // dd($data);
+        // dd($data['username']);
         $password = Hash::make($request->password);
 
         // Handle file upload
@@ -135,13 +135,15 @@ class NasabahUserBadanController extends Controller
 
 
         // 1. Buat user di tabel users
-        $user = User::create([
-            'name' => $data['nama_badan'],
-            'email' => $data['email'],
-            'username' => $data['username'],
-            'password' => $password,
-            'role' => 'nasabah_badan',
-        ]);
+
+        $user = new User();
+        $user->name = $data['nama_badan'];
+        $user->email = $data['email'];
+        $user->username = $data['username'];
+        $user->password = $password;
+        $user->role = 'nasabah_badan';
+        $user->save();
+        
 
         // Create UserNasabah
         $userNasabah = new UserNasabah();
@@ -178,7 +180,7 @@ class NasabahUserBadanController extends Controller
 
         return redirect()
             ->route('petugas.rekanan.index')
-            ->with('success', 'Nasabah Badan berhasil ditambahkan!');
+            ->with('success', 'Rekanan berhasil ditambahkan!');
     }
 
     /**
