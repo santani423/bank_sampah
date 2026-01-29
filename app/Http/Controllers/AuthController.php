@@ -37,15 +37,14 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-        // dd($request->all());
-        // dd((Auth::attempt(['username' => $request->username, 'password' => $request->password]) ? 'Login Berhasil' : 'Login Gagal'));
+
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'petugas') {
                 return redirect()->route('petugas.dashboard');
-            } elseif ($user->role === 'nasabah' || $user->role === 'rekanan') {
+            } elseif ($user->role === 'nasabah') {
                 return redirect()->route('nasabah.dashboard');
             } else {
 
