@@ -127,13 +127,13 @@ class NasabahUserBadanController extends Controller
             ]);
 
             // ================= USER =================
-            $user = User::create([
-                'name'     => $request->nama_badan,
-                'email'    => $request->email,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'role'     => 'nasabah',
-            ]);
+            $user = new User();
+            $user->name     = $request->nama_badan;
+            $user->email    = $request->email;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->role     = 'nasabah'; 
+            $user->save();
 
             // ================= RELASI =================
             $userNasabah = UserNasabah::create([

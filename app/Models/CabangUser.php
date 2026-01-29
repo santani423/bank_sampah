@@ -9,4 +9,9 @@ use App\Traits\LogsActivity;
 class CabangUser extends Model
 {
     use HasFactory, LogsActivity; 
-}
+
+    protected $fillable = [
+        'cabang_id', 'user_nasabah_id'
+    ];
+    
+}   
