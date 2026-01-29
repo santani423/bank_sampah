@@ -67,22 +67,21 @@ class NasabahController extends Controller
                 });
             });
 
-            // =========================
-            // 3. FILTER BY KODE CABANG (BARU)
-            // =========================
+           
             $query->when($request->filled('cabang'), function ($q) use ($request) {
                 $q->where('cabangs.kode_cabang', $request->cabang);
             });
 
-            // =========================
-            // 4. VALIDASI PER PAGE
-            // =========================
+
+            // $query->when($request->filled('type'), function ($q) use ($request) {
+            //     $q->where('nasabah.type', $request->type);
+            // });
+
+       
             $perPage = (int) $request->get('per_page', 10);
             $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 10;
 
-            // =========================
-            // 5. PAGINATION
-            // =========================
+          
             $nasabahs = $query
                 ->orderByDesc('nasabah.id')
                 ->paginate($perPage);

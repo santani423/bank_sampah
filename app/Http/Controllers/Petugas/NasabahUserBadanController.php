@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
+use App\Models\CabangUser;
 use App\Models\JenisBadan;
 use App\Models\Nasabah;
 use App\Models\NasabahBadan;
+use App\Models\Saldo;
 use App\Models\SaldoPetugas;
 use App\Models\User;
 use App\Models\UserNasabah;
@@ -67,7 +69,7 @@ class NasabahUserBadanController extends Controller
         $request->validate([
             'jenis_badan_id' => 'required|exists:jenis_badans,id',
             'cabang_id' => 'required|exists:cabangs,id',
-            'nama_badan' => 'required|string|max:150', 
+            'nama_badan' => 'required|string|max:150',
             'email' => [
                 'required',
                 'email',
@@ -119,10 +121,18 @@ class NasabahUserBadanController extends Controller
         $nasabah->nama_lengkap = $data['nama_badan'];
         $nasabah->no_hp = $data['no_hp'];
         $nasabah->cabang_id = $data['cabang_id'];
-        $nasabah->jenis_badan_id = $data['jenis_badan_id']; 
-        $nasabah->alamat_lengkap = $data['alamat_lengkap'];  
+        $nasabah->jenis_badan_id = $data['jenis_badan_id'];
+        $nasabah->alamat_lengkap = $data['alamat_lengkap'];
         $nasabah->fill($data);
         $nasabah->save();
+
+        $saldo = new Saldo();
+        $saldo->nasabah_id = $nasabah->id;
+        $saldo->saldo = 0;
+        $saldo->save();
+
+
+
 
         // 1. Buat user di tabel users
         $user = User::create([
@@ -139,9 +149,15 @@ class NasabahUserBadanController extends Controller
         $userNasabah->nasabah_id = $nasabah->id;
         $userNasabah->save();
 
+
+        $cabangUser = new CabangUser();
+        $cabangUser->cabang_id = $data['cabang_id'];
+        $cabangUser->user_nasabah_id = $userNasabah->id;
+        $cabangUser->save();
+
         // // 2. Buat nasabah badan
         // $nasabahBadan = NasabahBadan::create([
-           
+
         //     'nama_badan' => $data['nama_badan'],
         //     'npwp' => $data['npwp'] ?? null,
         //     'nib' => $data['nib'] ?? null,

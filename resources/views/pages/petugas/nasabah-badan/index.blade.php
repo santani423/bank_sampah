@@ -1,49 +1,25 @@
 @extends('layouts.template')
 
-@section('title', 'Nasabah')
+@section('title', 'Pengiriman Lapak')
 
 @push('style')
-    <!-- CSS Libraries -->
     <style>
-        /* Container for table + pagination to anchor the overlay */
-        #nasabah-container { position: relative; }
-        /* Simple translucent overlay with centered spinner */
-        .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.7);
+        #loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pagination-wrapper {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            z-index: 10;
+            margin-top: 15px;
         }
-        .loading-overlay .spinner {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            gap: .5rem;
+
+        .pagination-controls button {
+            margin: 0 2px;
         }
-        /* Pagination look & feel like the screenshot */
-        #nasabah-pagination .pagination { gap: .5rem; }
-        #nasabah-pagination .page-link {
-            border-radius: .75rem; /* rounded */
-            border: 1px solid #e5e7eb; /* slate-200 */
-            color: #6b7280; /* slate-500 */
-            padding: .375rem .75rem;
-            background: #ffffff;
-        }
-        #nasabah-pagination .page-item.active .page-link {
-            background: #eef4ff; /* soft primary */
-            color: #3b82f6; /* primary text */
-            border-color: #dbeafe; /* primary-100 */
-            box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.08);
-        }
-        #nasabah-pagination .page-item.disabled .page-link {
-            color: #cbd5e1; /* slate-300 */
-            background: #f8fafc; /* slate-50 */
-            border-color: #f1f5f9; /* slate-100 */
-        }
-        #nasabah-pagination .page-link:focus { box-shadow: none; }
     </style>
 @endpush
 
@@ -51,84 +27,84 @@
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
         <div>
             <h3 class="fw-bold mb-3">Rekanan</h3>
-            {{-- <h6 class="op-7 mb-2">Anda dapat mengelola semua nasabah, seperti mengedit, menghapus, dan lainnya.</h6> --}}
         </div>
+
         <div class="ms-md-auto py-2 py-md-0">
             <div class="section-header-button">
                 <a href="{{ route('petugas.rekanan.create') }}" class="btn btn-primary btn-round">Tambah Rekanan Baru</a>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-12">
-            <div class="card mb-5">
-                <div class="card-body">
-
-                    <div class="float-right">
-                        <form method="GET" action="{{ route('petugas.rekanan.index') }}">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Cari Nama" name="nama_nasabah"
-                                    value="{{ request('nama_nasabah') }}">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary">Search</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             <div class="card">
-
                 <div class="card-body">
 
-                    <div class="clearfix mb-3"></div>
+                    {{-- ALERT --}}
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
 
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-                    <div id="nasabah-container">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered table-head-bg-primary">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th style="width: 300px">Aksi</th>
-                                        <th>Nama</th>
-                                        <th>No. Registrasi</th>
-                                        <th>No. HP</th> 
-                                        <th>Cabang</th> 
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                   
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div id="nasabah-summary" class="text-muted small"></div>
-                            <nav id="nasabah-pagination" aria-label="Pagination"></nav>
-                        </div>
-                        <div id="loading-overlay" class="loading-overlay d-none">
-                            <div class="spinner">
-                                <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
-                                <div class="small text-muted">Memuat data...</div>
+                    {{-- FILTER FORM --}}
+                    <form id="filter-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nasabah</label>
+                                <input type="text" class="form-control" id="nasabah" placeholder="Nama nasabah">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <x-select.select-cabang name="cabang" required="false" />
+                            </div>
+
+
+
+
+                            <div class="col-md-12 mb-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari
+                                </button>
+
+                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </a>
                             </div>
                         </div>
+                    </form>
+
+                    {{-- TABLE --}}
+                    <div class="table-responsive">
+                        <div id="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+
+                        <table class="table table-hover table-bordered table-head-bg-primary text-nowrap" id="petugas-table"
+                            style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th style="width: 250px">Aksi</th>
+                                    <th>Nama</th>
+                                    <th>Username</th>
+                                    <th>No. Registrasi</th>
+                                    <th>Cabang</th>
+                                    <th>No. HP</th>
+                                    <th>Saldo</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="petugas-tbody"></tbody>
+                        </table>
+
+                        <div id="pagination-wrapper" class="pagination-wrapper" style="display:none;">
+                            <div id="pagination-info"></div>
+                            <div id="pagination-controls"></div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -136,127 +112,132 @@
 @endsection
 
 @push('scripts')
-<script>
-$(document).ready(function() {
-    let currentPage = 1;
-    let currentSearch = '';
+    <script>
+        /* ===============================
+                                                                                                                               AMBIL FILTER TANGGAL
+                                                                                                                            ================================ */
+        function getFilterParams() {
 
-    function fetchNasabah(page = 1, search = '') {
-        // Show loading overlay while fetching data
-        $('#loading-overlay').removeClass('d-none');
-        $.ajax({
-            url: `/api/nasabah-badan?page=${page}&search=${search}`,
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Bearer {{ auth()->user() ? auth()->user()->createToken('token')->plainTextToken : '' }}'
-            },
-            success: function(res) {
-                let rows = '';
-                let no = (res.current_page - 1) * res.per_page + 1;
-                res.data.forEach(function(nasabah) {
-                    rows += `<tr>
-                        <td>${no++}</td>
-                        <td>
-                            <a href='/petugas/data-rekanan/${nasabah.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
-                            <a href='/petugas/data-rekanan/${nasabah.id}/edit' class='btn btn-warning btn-sm mb-1'>Edit</a>
-                            <a href='/petugas/data-rekanan/${nasabah.id}/setor-sampah' class='btn btn-success btn-sm mb-1'>Setor Sampah</a>
-                        </td>
-                        <td>${nasabah.nama_badan}</td>
-                        <td>${nasabah.nib ?? '-'}</td>
-                        <td>${nasabah.no_telp ?? '-'}</td>
-                        <td>${nasabah.jenis_badan ? nasabah.jenis_badan.nama : '-'}</td>
-                        <td>${nasabah.status}</td>
-                    </tr>`;
+            const nasabah = document.getElementById('nasabah').value;
+            const cabang = document.getElementById('cabang').value;
+            const type = 'badan';
+
+            return {
+                nasabah: nasabah,
+                cabang: cabang,
+                type: type,
+            };
+        }
+
+
+        /* ===============================
+           FETCH DATA API
+        ================================ */
+        function fetchPetugasData(page = 1) {
+            const spinner = document.getElementById('loading-spinner');
+            const table = document.getElementById('petugas-table');
+            const pagination = document.getElementById('pagination-wrapper');
+
+            spinner.style.display = 'block';
+            table.style.display = 'none';
+            pagination.style.display = 'none';
+
+            const filters = getFilterParams();
+            const params = new URLSearchParams({
+                page,
+                per_page: perPage,
+
+                ...(filters.nasabah && {
+                    search: filters.nasabah,
+                }),
+                ...(filters.cabang && {
+                    cabang: filters.cabang,
+                }),
+                ...(filters.type && {
+                    type: filters.type,
+                }),
+            });
+
+
+
+
+
+            fetch(`/api/nasabah?${params.toString()}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        current_page = res.pagination.current_page;
+                        totalPages = res.pagination.last_page;
+                        renderTable(res.data, res.pagination);
+                        renderPagination(res.pagination);
+
+                        spinner.style.display = 'none';
+                        table.style.display = 'table';
+                        pagination.style.display = 'flex';
+                    }
+                })
+                .catch(() => {
+                    spinner.innerHTML = '<div class="alert alert-danger">Gagal memuat data</div>';
                 });
-                if (rows === '') rows = '<tr><td colspan="7" class="text-center">Tidak ada data</td></tr>';
-                $(".table tbody").html(rows);
-                // Pagination
-                let pagination = '';
-                if (res.last_page > 1) {
-                    pagination += '<ul class="pagination mb-0">';
-                    
-                    // Previous button
-                    pagination += `<li class="page-item${res.current_page === 1 ? ' disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${res.current_page - 1}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>`;
-                    
-                    // Page numbers with smart pagination
-                    let startPage = Math.max(1, res.current_page - 2);
-                    let endPage = Math.min(res.last_page, res.current_page + 2);
-                    
-                    // First page
-                    if (startPage > 1) {
-                        pagination += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
-                        if (startPage > 2) {
-                            pagination += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                        }
-                    }
-                    
-                    // Page numbers
-                    for (let i = startPage; i <= endPage; i++) {
-                        pagination += `<li class="page-item${i === res.current_page ? ' active' : ''}">
-                            <a class="page-link" href="#" data-page="${i}">${i}</a>
-                        </li>`;
-                    }
-                    
-                    // Last page
-                    if (endPage < res.last_page) {
-                        if (endPage < res.last_page - 1) {
-                            pagination += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-                        }
-                        pagination += `<li class="page-item"><a class="page-link" href="#" data-page="${res.last_page}">${res.last_page}</a></li>`;
-                    }
-                    
-                    // Next button
-                    pagination += `<li class="page-item${res.current_page === res.last_page ? ' disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${res.current_page + 1}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>`;
-                    
-                    pagination += '</ul>';
-                }
-                // Inject to the dedicated pagination container
-                $("#nasabah-pagination").html(pagination);
-                // Update summary text
-                const from = res.data.length ? ((res.current_page - 1) * res.per_page) + 1 : 0;
-                const to = ((res.current_page - 1) * res.per_page) + res.data.length;
-                const total = (typeof res.total !== 'undefined') ? res.total : to;
-                $("#nasabah-summary").text(`Showing ${from} to ${to} of ${total} entries`);
-            },
-            error: function(xhr) {
-                $(".table tbody").html('<tr><td colspan="7" class="text-center text-danger">Gagal memuat data</td></tr>');
-                $("#nasabah-pagination").empty();
-                $("#nasabah-summary").text('');
-            },
-            complete: function() {
-                // Hide loading overlay after request finishes
-                $('#loading-overlay').addClass('d-none');
+        }
+
+        /* ===============================
+           RENDER TABLE
+        ================================ */
+        function renderTable(data, pagination) {
+            const tbody = document.getElementById('petugas-tbody');
+            tbody.innerHTML = '';
+
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center">Tidak ada data</td></tr>`;
+                return;
             }
+
+            const detailRoute = "{{ route('admin.nasabah.show', ':kode') }}";
+            const detailEdit = "{{ route('admin.nasabah.edit', ':kode') }}";
+
+            data.forEach((item, index) => {
+                const no = pagination.from + index;
+                const url = detailRoute.replace(':kode', item?.kode_pengiriman);
+                const urlEdit = detailEdit.replace(':kode', item?.kode_pengiriman);
+
+                tbody.innerHTML += `
+            <tr>
+                <td>${no}</td>
+                 <td>
+                                <a href='/petugas/data-nasabah/${item?.id}' class='btn btn-info btn-sm mb-1'>Detail</a>
+                                <a href='/petugas/transaksi/create?no_registrasi=${item?.no_registrasi}' class='btn btn-warning btn-sm mb-1'>Setoran</a>
+                            </td>
+                <td>${item?.nama_lengkap}</td> 
+                <td>${item?.username}</td> 
+                <td>${item?.no_registrasi}</td>
+                <td>${item?.nama_cabang}</td>
+                <td>${item?.no_hp}</td>
+                <td>${formatRupiah(item?.saldo?.saldo)}</td>
+                <td>${item?.status}</td>
+            </tr>
+        `;
+            });
+        }
+
+        // Fungsi format rupiah
+        function formatRupiah(angka) {
+            if (angka == null) return '-';
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+
+
+        /* ===============================
+           EVENT
+        ================================ */
+        document.getElementById('filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchPetugasData(1);
         });
-    }
 
-    // Initial fetch
-    fetchNasabah();
-
-    // Pagination click
-    $(document).on('click', '.pagination .page-link', function(e) {
-        e.preventDefault();
-        let page = $(this).data('page');
-        currentPage = page;
-        fetchNasabah(page, currentSearch);
-    });
-
-    // Search
-    $(document).on('submit', 'form', function(e) {
-        e.preventDefault();
-        let search = $(this).find('input[name="nama_nasabah"]').val();
-        currentSearch = search;
-        fetchNasabah(1, search);
-    });
-});
-</script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPetugasData(1);
+        });
+    </script>
 @endpush
