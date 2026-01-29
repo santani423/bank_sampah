@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
 use App\Models\JenisBadan;
+use App\Models\Nasabah;
 use App\Models\NasabahBadan;
 use App\Models\SaldoPetugas;
+use App\Models\User;
+use App\Models\UserNasabah;
+use App\Models\UserNasabahBadan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -80,14 +84,15 @@ class NasabahUserBadanController extends Controller
                 'unique:users,username',
             ],
             'password' => 'required|string|min:6',
-            'no_telp' => 'nullable|string|max:20',
+            'no_telp' => 'nullable|string|max:20|unique:nasabah_badan,no_telp',
             'alamat_lengkap' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
         ]);
 
         $data = $request->all();
-        $data['password'] = Hash::make($request->password);
+        // dd($data);
+        $password = Hash::make($request->password);
 
         // Handle file upload
         if ($request->hasFile('foto')) {
@@ -99,26 +104,39 @@ class NasabahUserBadanController extends Controller
             $data['foto'] = 'profil.png';
         }
 
+        $nasabah = new Nasabah();
+        $nasabah->no_registrasi = 'REG-' . strtoupper(uniqid());
+        $nasabah->status = 'aktif';
+        $nasabah->type = 'badan';
+        $nasabah->fill($data);
+        $nasabah->save();
+
         // 1. Buat user di tabel users
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $data['nama_badan'],
             'email' => $data['email'],
             'username' => $data['username'],
-            'password' => $data['password'],
+            'password' => $password,
             'role' => 'nasabah_badan',
         ]);
 
-        // 2. Buat nasabah badan
-        $nasabahBadan = NasabahBadan::create($data);
+        // Create UserNasabah
+        $userNasabah = new UserNasabah();
+        $userNasabah->user_id = $user->id;
+        $userNasabah->nasabah_id = $nasabah->id;
+        $userNasabah->save();
 
-        // 3. Simpan relasi ke tabel user_nasabah_badan
-        \App\Models\UserNasabahBadan::create([
-            'user_id' => $user->id,
-            'nasabah_badan_id' => $nasabahBadan->id,
-        ]);
+        // // 2. Buat nasabah badan
+        // $nasabahBadan = NasabahBadan::create($data);
+
+        // // 3. Simpan relasi ke tabel user_nasabah_badan
+        // UserNasabahBadan::create([
+        //     'user_id' => $user->id,
+        //     'nasabah_badan_id' => $nasabahBadan->id,
+        // ]);
 
         return redirect()
-            ->route('petugas.rekanan.index')
+            ->route('petugas.data-rekanan.index')
             ->with('success', 'Nasabah Badan berhasil ditambahkan!');
     }
 
@@ -128,7 +146,7 @@ class NasabahUserBadanController extends Controller
     public function show($id)
     {
         $nasabahBadan = NasabahBadan::findOrFail($id);
- 
+
         $nasabahBadan->load('jenisBadan');
         return view('pages.petugas.nasabah-badan.show', compact('nasabahBadan'));
     }
@@ -139,7 +157,7 @@ class NasabahUserBadanController extends Controller
     public function apiShow($id)
     {
         $nasabahBadan = NasabahBadan::with('jenisBadan', 'userNasabahBadan.user', 'saldo')->findOrFail($id);
-        
+
         return response()->json([
             'success' => true,
             'data' => $nasabahBadan
@@ -163,7 +181,7 @@ class NasabahUserBadanController extends Controller
     public function update(Request $request,  $id)
     {
         $nasabahBadan = NasabahBadan::findOrFail($id);
- 
+
         // Get user related to this nasabah badan
         $userNasabahBadan = \App\Models\UserNasabahBadan::where('nasabah_badan_id', $nasabahBadan->id)->first();
         $userId = $userNasabahBadan ? $userNasabahBadan->user_id : null;
@@ -340,7 +358,7 @@ class NasabahUserBadanController extends Controller
             ['nasabah_badan_id' => $nasabahBadan->id],
             ['saldo' => 0]
         );
-        
+
         // Tambah saldo nasabah badan
         $saldoNasabahBadan->saldo += $totalTransaksi;
         $saldoNasabahBadan->save();
@@ -366,16 +384,16 @@ class NasabahUserBadanController extends Controller
             // Hitung jumlah transaksi hari ini + 1 untuk nomor urut
             $count = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', 'like', $prefix . '%')
                 ->count();
-            
+
             $nextNumber = $count + 1;
-            
+
             // Format nomor urut dengan leading zeros (minimal 3 digit)
             $formattedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
             $kodeTransaksi = $prefix . $formattedNumber;
 
             // Cek apakah kode sudah ada (double check untuk race condition)
             $exists = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', $kodeTransaksi)->exists();
-            
+
             if (!$exists) {
                 return $kodeTransaksi;
             }
@@ -387,7 +405,7 @@ class NasabahUserBadanController extends Controller
                 $randomNum = str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT);
                 $kodeTransaksi = $prefix . $randomNum . '-' . strtoupper(substr(uniqid(), -4));
                 $exists = \App\Models\TransaksiNasabahBadan::where('kode_transaksi', $kodeTransaksi)->exists();
-                
+
                 if (!$exists) {
                     return $kodeTransaksi;
                 }
@@ -413,8 +431,8 @@ class NasabahUserBadanController extends Controller
             'petugas',
             'detailTransaksi.sampah'
         ])->where('nasabah_badan_id', $nasabahBadanId)
-          ->findOrFail($transaksiId);
-            // dd($transaksi);
+            ->findOrFail($transaksiId);
+        // dd($transaksi);
         return view('pages.petugas.nasabah-badan.transaksi-detail', compact('nasabahBadan', 'transaksi'));
     }
 
@@ -424,10 +442,10 @@ class NasabahUserBadanController extends Controller
     public function printTransaksi($nasabahBadanId, $transaksiId)
     {
         $nasabahBadan = NasabahBadan::findOrFail($nasabahBadanId);
-        $transaksi = \App\Models\TransaksiNasabahBadan::with(['nasabahBadan','petugas','detailTransaksi.sampah'])
+        $transaksi = \App\Models\TransaksiNasabahBadan::with(['nasabahBadan', 'petugas', 'detailTransaksi.sampah'])
             ->where('nasabah_badan_id', $nasabahBadanId)
             ->findOrFail($transaksiId);
 
-        return view('pages.petugas.nasabah-badan.transaksi-print', compact('nasabahBadan','transaksi'));
+        return view('pages.petugas.nasabah-badan.transaksi-print', compact('nasabahBadan', 'transaksi'));
     }
 }

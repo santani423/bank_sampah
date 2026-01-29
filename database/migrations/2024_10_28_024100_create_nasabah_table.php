@@ -27,6 +27,7 @@ return new class extends Migration
             $table->text('alamat_lengkap');
             $table->string('foto', 100)->default('profil.png');
             $table->enum('status', ['aktif', 'tidak_aktif'])->default('aktif');
+            $table->enum('type', ['badan', 'umum'])->default('umum');
             $table->longText('temp_before_data')->nullable();  
             $table->timestamps();
         });
