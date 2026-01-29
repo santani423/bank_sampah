@@ -73,9 +73,9 @@ class NasabahController extends Controller
             });
 
 
-            // $query->when($request->filled('type'), function ($q) use ($request) {
-            //     $q->where('nasabah.type', $request->type);
-            // });
+            $query->when($request->filled('type'), function ($q) use ($request) {
+                $q->where('nasabah.type', $request->type);
+            });
 
        
             $perPage = (int) $request->get('per_page', 10);
