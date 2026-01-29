@@ -127,13 +127,13 @@ class NasabahUserBadanController extends Controller
         $userNasabah->save();
 
         // // 2. Buat nasabah badan
-        // $nasabahBadan = NasabahBadan::create($data);
+        $nasabahBadan = NasabahBadan::create($data);
 
         // // 3. Simpan relasi ke tabel user_nasabah_badan
-        // UserNasabahBadan::create([
-        //     'user_id' => $user->id,
-        //     'nasabah_badan_id' => $nasabahBadan->id,
-        // ]);
+        UserNasabahBadan::create([
+            'user_id' => $user->id,
+            'nasabah_badan_id' => $nasabahBadan->id,
+        ]);
 
         return redirect()
             ->route('petugas.data-rekanan.index')
