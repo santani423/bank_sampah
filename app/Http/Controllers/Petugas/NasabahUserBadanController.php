@@ -66,26 +66,32 @@ class NasabahUserBadanController extends Controller
     {
         $request->validate([
             'jenis_badan_id' => 'required|exists:jenis_badans,id',
-            'nama_badan' => 'required|string|max:150',
-            'npwp' => 'nullable|string|max:50|unique:nasabah_badan,npwp',
-            'nib' => 'nullable|string|max:50|unique:nasabah_badan,nib',
+            'cabang_id' => 'required|exists:cabangs,id',
+            'nama_badan' => 'required|string|max:150', 
             'email' => [
                 'required',
                 'email',
                 'max:100',
-                'unique:nasabah_badan,email',
+                'unique:nasabah,email',
                 'unique:users,email',
             ],
             'username' => [
                 'required',
                 'string',
                 'max:50',
-                'unique:nasabah_badan,username',
+                'unique:nasabah,username',
+                'unique:nasabah,username',
                 'unique:users,username',
             ],
             'password' => 'required|string|min:6',
-            'no_telp' => 'nullable|string|max:20|unique:nasabah_badan,no_telp',
-            'alamat_lengkap' => 'nullable|string',
+            'no_hp' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:nasabah,no_hp',
+                'regex:/^62[0-9]{8,15}$/'
+            ],
+            'alamat_lengkap' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:aktif,tidak_aktif',
         ]);
@@ -104,10 +110,17 @@ class NasabahUserBadanController extends Controller
             $data['foto'] = 'profil.png';
         }
 
+        // dd($data);
+
         $nasabah = new Nasabah();
         $nasabah->no_registrasi = 'REG-' . strtoupper(uniqid());
         $nasabah->status = 'aktif';
         $nasabah->type = 'badan';
+        $nasabah->nama_lengkap = $data['nama_badan'];
+        $nasabah->no_hp = $data['no_hp'];
+        $nasabah->cabang_id = $data['cabang_id'];
+        $nasabah->jenis_badan_id = $data['jenis_badan_id']; 
+        $nasabah->alamat_lengkap = $data['alamat_lengkap'];  
         $nasabah->fill($data);
         $nasabah->save();
 
@@ -127,16 +140,28 @@ class NasabahUserBadanController extends Controller
         $userNasabah->save();
 
         // // 2. Buat nasabah badan
-        $nasabahBadan = NasabahBadan::create($data);
+        // $nasabahBadan = NasabahBadan::create([
+           
+        //     'nama_badan' => $data['nama_badan'],
+        //     'npwp' => $data['npwp'] ?? null,
+        //     'nib' => $data['nib'] ?? null,
+        //     'email' => $data['email'],
+        //     'username' => $data['username'],
+        //     'password' => $password,
+        //     'no_telp' => $data['no_telp'] ?? null,
+        //     'alamat_lengkap' => $data['alamat_lengkap'] ?? null,
+        //     'foto' => $data['foto'],
+        //     'status' => $data['status'],
+        // ]);
 
-        // // 3. Simpan relasi ke tabel user_nasabah_badan
-        UserNasabahBadan::create([
-            'user_id' => $user->id,
-            'nasabah_badan_id' => $nasabahBadan->id,
-        ]);
+        // // // 3. Simpan relasi ke tabel user_nasabah_badan
+        // UserNasabahBadan::create([
+        //     'user_id' => $user->id,
+        //     'nasabah_badan_id' => $nasabahBadan->id,
+        // ]);
 
         return redirect()
-            ->route('petugas.data-rekanan.index')
+            ->route('petugas.rekanan.index')
             ->with('success', 'Nasabah Badan berhasil ditambahkan!');
     }
 
