@@ -114,7 +114,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="alamat_lengkap">Alamat Lengkap <span class="text-danger">*</span></label>
-                                    <textarea class="form-control @error('alamat_lengkap') is-invalid @enderror" id="alamat_lengkap" name="alamat_lengkap"
+                                    <textarea class="form-control @error('alamat_lengkap') is-invalid @enderror" id="alamat_lengkap" required name="alamat_lengkap"
                                         rows="3">{{ old('alamat_lengkap') }}</textarea>
                                     @error('alamat_lengkap')
                                         <div class="invalid-feedback">{{ $message }}</div>

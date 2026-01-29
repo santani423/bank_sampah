@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('no_hp', 20);
             $table->string('email', 100)->unique();
             $table->string('username', 50)->unique();
-            $table->string('password', 255);
+            $table->string('password', 255)->nullable();
             $table->text('alamat_lengkap');
             $table->string('foto', 100)->default('profil.png');
             $table->enum('status', ['aktif', 'tidak_aktif'])->default('aktif');
