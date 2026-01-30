@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Sistem Informasi Manajemen Bank Sampah Desa Rendole Pati</title>
+    <title>Sistem Informasi Manajemen Bank Sampah Desa  </title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -46,7 +46,7 @@
                 <div class="col-lg-6">
                     <!-- Mashead text and app badges-->
                     <div class="mb-5 mb-lg-0 text-center text-lg-start">
-                        <h1 class="display-1 lh-1 mb-3">Bank Sampah Rendole Pati.</h1>
+                        <h1 class="display-1 lh-1 mb-3">Bank Sampah Desa.</h1>
                         <p class="lead fw-normal text-muted mb-5">Sampah Bukan Akhir, Tapi Awal Perubahan: Mari Kelola
                             Bersama untuk Masa Depan yang Lebih Baik!</p>
                         <div class="d-flex flex-column flex-lg-row align-items-center">
@@ -83,7 +83,7 @@
             <div class="row gx-5 align-items-center justify-content-center justify-content-lg-between">
                 <div class="col-12 col-lg-5">
                     <h2 class="display-4 lh-1 mb-4" id="#tentangKami">Siapa Kami?</h2>
-                    <p class="small text-muted  mb-5 mb-lg-0">Bank Sampah Rendole Pati adalah lembaga yang berkomitmen
+                    <p class="small text-muted  mb-5 mb-lg-0">Bank Sampah Desa adalah lembaga yang berkomitmen
                         untuk meningkatkan kesadaran masyarakat tentang pentingnya pengelolaan sampah yang baik dan
                         berkelanjutan. Kami berfokus pada program pengumpulan, pengolahan, dan pemanfaatan sampah,
                         dengan tujuan mengurangi dampak lingkungan sekaligus memberikan manfaat ekonomi bagi masyarakat.
@@ -117,7 +117,7 @@
                 <div class="col-sm-8 col-md-6">
                     <div class="px-5 px-sm-0">
                         <h2 class="display-4 lh-1 mb-4" id="#lokasiKami">Lokasi Kami</h2>
-                        <p class="small text-muted  mb-5 mb-lg-0">Bank Sampah Rendole Pati berlokasi di Desa [Nama
+                        <p class="small text-muted  mb-5 mb-lg-0">Bank Sampah Desa berlokasi di Desa [Nama
                             Desa], Pati, Jawa Tengah. Alamat lengkap kami adalah:
                         </p>
                         <br>
@@ -138,7 +138,7 @@
     <footer class="bg-black text-center py-5">
         <div class="container px-5">
             <div class="text-white-50 small">
-                <div class="mb-2">&copy; Sistem Informasi Manajemen Bank Sampah Desa Rendole Pati 2024. All Rights
+                <div class="mb-2">&copy; Sistem Informasi Manajemen Bank Sampah Desa   2024. All Rights
                     Reserved. Repost by <a href='https://stokcoding.com/' title='StokCoding.com' target='_blank'>StokCoding.com</a></div>
             </div>
         </div>

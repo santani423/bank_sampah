@@ -25,8 +25,8 @@
                         <div class="form-group">
                             <label for="nama_file">Nama APK</label>
                             <input type="text" id="nama_file" class="form-control" name="nama_file"
-                                value="Bank Sampah Rendole Pati" disabled>
-                            <input type="hidden" name="nama_file" value="Bank Sampah Rendole Pati">
+                                value="Bank Sampah " disabled>
+                            <input type="hidden" name="nama_file" value="Bank Sampah ">
                         </div>
                         <div class="form-group">
                             <label for="apk_file">File APK</label> <br>

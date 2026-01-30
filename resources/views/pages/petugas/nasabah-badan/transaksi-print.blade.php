@@ -64,7 +64,7 @@
     <div class="sheet">
         <div class="header">
             {{-- <div>
-                <div class="brand">Bank Sampah Rendole Pati</div>
+                <Rendole class="brand">Bank Sampah </Rendole Patidiv>
                 <div class="muted" style="font-size: 12px;">Jl. ... No. ..., Pati | Telp: 08xx-xxxx-xxxx</div>
             </div> --}}
             <div class="meta">

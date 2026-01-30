@@ -34,7 +34,7 @@
 
 <body>
     <div class="container">
-        <h1>BANK SAMPAH RENDOLE PATI</h1>
+        <h1>BANK SAMPAH </h1>
         <p><strong>Tanggal Transaksi:</strong> {{ $tanggal_transaksi }}</p>
 
         <div class="details">

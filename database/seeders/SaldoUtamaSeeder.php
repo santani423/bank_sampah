@@ -15,7 +15,7 @@ class SaldoUtamaSeeder extends Seeder
     {
         SaldoUtama::create([
             'saldo' => 0,
-            'keterangan' => 'Saldo awal Bank Sampah Rendole Pati'
+            'keterangan' => 'Saldo awal Bank Sampah  '
         ]);
     }
 }

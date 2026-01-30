@@ -62,7 +62,7 @@
 
 <body>
     <div class="container">
-        <h1>BANK SAMPAH RENDOLE PATI</h1>
+        <h1>BANK SAMPAH </h1>
         <p class="subtitle">Jl. Rendole No.123, Pati, Jawa Tengah<br>Telp: (0295) 123456</p>
 
         <div class="details">
