@@ -14,9 +14,16 @@ class TesController extends Controller
     {
 
         $external_id = $request->transaction['external_id'] ?? '';
-
+        $data = new Tess();
+        $data->name = 'disbursementSend';
+        $data->description = json_encode($request->all());
+        $data->save();
         $pencairanLapak = PencairanLapak::with('lapak.jenisMetodePenarikan')->where('kode_pencairan', $external_id)->first();
 
+        $data = new Tess();
+        $data->name = 'disbursementSend';
+        $data->description = json_encode($pencairanLapak);
+        $data->save();
         if ($pencairanLapak) {
             if ($pencairanLapak->sumber_dana == 'saldo_admin') {
 
@@ -24,10 +31,6 @@ class TesController extends Controller
                 if ($saldoUtama && $saldoUtama->saldo >= $pencairanLapak->jumlah_pencairan) {
                     $saldoUtama->saldo -= $pencairanLapak->jumlah_pencairan;
                     $saldoUtama->save();
-                    $data = new Tess();
-                    $data->name = 'disbursementSend';
-                    $data->description = json_encode($request->all());
-                    $data->save();
                 }
             }
         }
