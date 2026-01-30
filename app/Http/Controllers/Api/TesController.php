@@ -25,7 +25,7 @@ class TesController extends Controller
 
         return response()->json([
             'message' => 'Tes API works!',
-            // 'data' => $transak,
+            'data' => $request->transaction->external_id,
         ]);
     }
 }
