@@ -36,4 +36,14 @@ class PencairanLapak extends Model
             'id'          // kolom di pengiriman_lapaks
         );
     }
+
+
+    public function lapak()
+    {
+        return $this->belongsTo(
+            Lapak::class,
+            'lapak_id',     // kolom di pencairan_lapaks
+            'id'          // kolom di lapaks
+        );
+    }
 }
