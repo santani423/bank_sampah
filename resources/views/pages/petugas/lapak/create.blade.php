@@ -180,15 +180,14 @@
                         </div>
 
                         <div class="form-group">
-                             
+
                             <label for="jenis_metode_penarikan_id">
                                 Collation Center
                                 <span class="text-danger">*</span>
 
                             </label>
-                            <select id="jenis_metode_penarikan_id"
-                                class="form-control @error($name) is-invalid @enderror" name="jenis_metode_penarikan_id"
-                                required>
+                            <select id="jenis_metode_penarikan_id" class="form-control  is-invalid @enderror"
+                                name="jenis_metode_penarikan_id" required>
                                 <option value="" disabled selected>Pilih Collation Center</option>
                                 @php
                                     $selected = old($name, $value ?? '');
