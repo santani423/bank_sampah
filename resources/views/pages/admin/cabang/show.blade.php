@@ -71,7 +71,7 @@
 @section('main')
     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-2">
         <div>
-            <h3 class="fw-bold mb-1">Detail Cabang</h3>
+            <h3 class="fw-bold mb-1">Detail Collation Center</h3>
             <p class="text-gray-600 mb-0">{{ $cabang->nama_cabang }} ({{ $cabang->kode_cabang }})</p>
         </div>
     </div>
@@ -84,11 +84,11 @@
                     <table class="table table-sm mb-0">
                         <tbody>
                             <tr>
-                                <th style="width: 160px;">Kode Cabang</th>
+                                <th style="width: 160px;">Kode  Collation Center</th>
                                 <td>{{ $cabang->kode_cabang }}</td>
                             </tr>
                             <tr>
-                                <th>Nama Cabang</th>
+                                <th>Nama  Collation Center</th>
                                 <td>{{ $cabang->nama_cabang }}</td>
                             </tr>
                             <tr>
