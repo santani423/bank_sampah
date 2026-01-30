@@ -192,9 +192,9 @@
                                 @php
                                     $selected = old('jenis_metode_penarikan_id', '');
                                 @endphp
-                                @foreach ($cabang as $cabang)
-                                    <option value="{{ $cabang->id }}" {{ $selected == $cabang->id ? 'selected' : '' }}>
-                                        {{ $cabang->nama_cabang }} - {{ $cabang->kode_cabang }}
+                                @foreach ($jenisMetodePenarikan as $jenis)
+                                    <option value="{{ $jenis->id }}" {{ $selected == $jenis->id ? 'selected' : '' }}>
+                                        {{ $jenis->nama }}
                                     </option>
                                 @endforeach
                             </select>
