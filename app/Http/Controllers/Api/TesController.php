@@ -18,9 +18,11 @@ class TesController extends Controller
         $external_id = $request->transaction['external_id'] ?? '';
 
         $pencairanLapak = PencairanLapak::where('kode_pencairan', $external_id)->first();
+
         return response()->json([
             'message' => 'Tes API works!',
             'data' => $pencairanLapak,
+            'transaction' => $request->transaction ?? 'No transaction data',
         ]);
     }
 }
