@@ -180,7 +180,28 @@
                         </div>
 
                         <div class="form-group">
-                            <x-select.select-metode-bayar name="jenis_metode_penarikan_id" />
+                            {{-- <x-select.select-metode-bayar name="jenis_metode_penarikan_id" /> --}}
+                            <label for="jenis_metode_penarikan_id">
+                                Collation Center
+                                <span class="text-danger">*</span>
+
+                            </label>
+                            <select id="jenis_metode_penarikan_id"
+                                class="form-control @error($name) is-invalid @enderror" name="jenis_metode_penarikan_id"
+                                required>
+                                <option value="" disabled selected>Pilih Collation Center</option>
+                                @php
+                                    $selected = old($name, $value ?? '');
+                                @endphp
+                                @foreach ($cabang as $cabang)
+                                    <option value="{{ $cabang->id }}" {{ $selected == $cabang->id ? 'selected' : '' }}>
+                                        {{ $cabang->nama_cabang }} - {{ $cabang->kode_cabang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error($name)
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
 
                         </div>
                         <div class="form-group">
