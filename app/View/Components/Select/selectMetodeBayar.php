@@ -13,10 +13,10 @@ class selectMetodeBayar extends Component
      * Create a new component instance.
      */
 
-    public $jenisMetodePenarikan;
+    public $metodeBayar;
     public function __construct()
     {
-        $this->jenisMetodePenarikan = JenisMetodePenarikan::all();
+        $this->metodeBayar = JenisMetodePenarikan::all();
     }
 
     /**

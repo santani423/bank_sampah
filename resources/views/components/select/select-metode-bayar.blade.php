@@ -2,7 +2,7 @@
 <select name="jenis_metode_penarikan_id" id="jenis_metode_penarikan_id"
     class="form-select @error('jenis_metode_penarikan_id') is-invalid @enderror" required>
     <option value="">Pilih Jenis Metode</option>
-    @foreach ($jenisMetodePenarikan as $jenis)
+    @foreach ($metodeBayar as $jenis)
         <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>
     @endforeach
 </select>
