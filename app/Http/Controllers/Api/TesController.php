@@ -16,7 +16,7 @@ class TesController extends Controller
         $data->description = json_encode($request->all());
         // $data->save();
 
-        $transak = PencairanLapak::where('kode_pencairan', $request->transaction->external_id)->first();
+        // $transak = PencairanLapak::where('kode_pencairan', $request->transaction->external_id)->first();
         // if ($transak) {
         //     $transak->status = $request->transaction->status;
         //     $transak->save();
