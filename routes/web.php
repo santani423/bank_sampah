@@ -165,6 +165,10 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->group(function 
 
 
     Route::get('/lapak/transaksi/{id}/download', [LapakController::class, 'downloadTransaksi'])->name('admin.lapak.transaksi.download');
+
+
+
+     Route::get('/invoic/pencairan-lapak/{kode}', [PetugasDashboardController::class, 'invoicPencairanLapak'])->name('admin.invoic.pencairan-lapak');
 });
 
 Route::get('/invoic/kirim-sampah-lapak/{kode}', [PDFController::class, 'invoiceKirimSampahLapak'])->name('pdf.invoic.kirim-sampah-lapak');

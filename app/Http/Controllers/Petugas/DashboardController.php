@@ -105,7 +105,7 @@ class DashboardController extends Controller
             ->where('kode_pengiriman', $kode)
             ->first();
         // dd($invoice);
-        // return view('pages.petugas.invoic.pencairan-lapak', compact('invoice','kode'));
+        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice', 'kode'));
     }
 
     public function invoicKirimSampahLapak($kode = null)
