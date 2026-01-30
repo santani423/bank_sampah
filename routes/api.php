@@ -44,6 +44,8 @@ use App\Models\Tess;
 
 // Public Routes - Authentication
 Route::post('/disbursementSend', [TesController::class, 'disbursementSend']);
+Route::post('/batchDisbursementSend', [TesController::class, 'batchDisbursementSend']);
+Route::post('/payouts', [TesController::class, 'payouts']);
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/cabang', [RegisterController::class, 'getCabang']);
 Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
