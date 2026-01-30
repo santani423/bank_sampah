@@ -48,7 +48,7 @@
                 {{-- No HP --}}
                 <div class="mb-24">
                     <label class="form-label h6">No WhatsApp</label>
-                    <input type="text" id="no_hp" name="no_hp" class="form-control" placeholder="Contoh: 628123456789" pattern="62[0-9]*" title="No HP harus diawali dengan 62 dan hanya berisi angka">
+                    <input type="number" id="no_hp" name="no_hp" class="form-control" placeholder="Contoh: 628123456789" pattern="62[0-9]*" title="No HP harus diawali dengan 62 dan hanya berisi angka">
                     <small class="text-muted">Nomor harus diawali dengan 62</small>
                     <div class="alert alert-danger mt-2 d-none" id="error-no_hp"></div>
                 </div>
