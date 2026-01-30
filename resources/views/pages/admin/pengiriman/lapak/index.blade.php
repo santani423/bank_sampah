@@ -192,7 +192,7 @@
             });
 
 
-            const alldata = "{{ route('api.lapak.pengiriman.index', ':kode') }}";
+            const alldata = "{{ route('api.lapak.pengiriman.index', '') }}";
 
             fetch(`${alldata}?${params.toString()}`)
                 .then(res => res.json())

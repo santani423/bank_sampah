@@ -223,8 +223,7 @@ class PengirimanLapakController extends Controller
             // =========================
             // 1. VALIDASI PARAMETER
             // =========================
-            $perPage = (int) $request->get('per_page', 10);
-            $perPage = $perPage > 0 ? $perPage : 10;
+
 
             $tanggalMulai   = $request->get('tanggal_mulai');
             $tanggalSelesai = $request->get('tanggal_selesai');
@@ -291,6 +290,8 @@ class PengirimanLapakController extends Controller
             // =========================
             // 4. SORT & PAGINATION
             // =========================
+            $perPage = (int) $request->get('per_page', 10);
+            $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 10;
             $pengiriman = $query
                 ->latest('tanggal_pengiriman')
                 ->paginate($perPage);
@@ -356,7 +357,7 @@ class PengirimanLapakController extends Controller
             $fee = 0;
             $fee_gross = $request->subtotal;
             $amount = (int) $request->subtotal;
-           
+
             $kode_pencairan = 'PCR-LPK' . time() . '-' . Str::upper(Str::random(6));
 
 
@@ -412,7 +413,7 @@ class PengirimanLapakController extends Controller
             }
 
 
-            
+
 
 
             $pencairan = new PencairanLapak();
