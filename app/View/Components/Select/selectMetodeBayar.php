@@ -1,27 +1,22 @@
 <?php
 
-namespace App\View\Components\select;
+namespace App\View\Components\Select;
 
 use App\Models\JenisMetodePenarikan;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class selectMetodeBayar extends Component
+class SelectMetodeBayar extends Component
 {
-    /**
-     * Create a new component instance.
-     */
+    public $metodeBayar,$required;
 
-    public $metodeBayar;
-    public function __construct()
+    public function __construct($metodeBayar = null, $required = true)
     {
-        $this->metodeBayar = JenisMetodePenarikan::all();
+        $this->metodeBayar = $metodeBayar ?? JenisMetodePenarikan::all();
+        $this->required = $required;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View|Closure|string
     {
         return view('components.select.select-metode-bayar');
