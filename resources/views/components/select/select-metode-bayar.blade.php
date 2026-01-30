@@ -12,7 +12,7 @@
         $selected = old($name, $value ?? '');
     @endphp
     @foreach ($metodeBayar as $jenis)
-        <option value="{{ $jenis->id }}" {{ old($name, $selected ?? null) == $jenis->id ? 'selected' : '' }}>
+        <option value="{{ $jenis->id }}" {{ $selected == $jenis->id ? 'selected' : '' }}>
             {{ $jenis->nama }}
         </option>
     @endforeach
