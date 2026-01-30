@@ -9,13 +9,14 @@ use Illuminate\View\Component;
 
 class SelectMetodeBayar extends Component
 {
-    public $metodeBayar,$required,$name;
+    public $metodeBayar,$required,$name,$value;
 
-    public function __construct($metodeBayar = null, $required = true, $name = 'jenis_metode_penarikan_id')
+    public function __construct($metodeBayar = null, $required = true, $name = 'jenis_metode_penarikan_id', $value = null)
     {
         $this->metodeBayar = $metodeBayar ?? JenisMetodePenarikan::all();
         $this->required = $required;
         $this->name = $name;
+        $this->value = $value;
     }
 
     public function render(): View|Closure|string

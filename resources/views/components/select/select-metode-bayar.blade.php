@@ -5,19 +5,14 @@
     @endif
 </label>
 
-<select
-    name="{{ $name }}"
-    id="{{ $name }}"
-    class="form-select @error($name) is-invalid @enderror"
-    @if ($required) required @endif
->
+<select name="{{ $name }}" id="{{ $name }}" class="form-select @error($name) is-invalid @enderror"
+    @if ($required) required @endif>
     <option value="">Pilih Jenis Metode</option>
-
+    @php
+        $selected = old($name, $value ?? '');
+    @endphp
     @foreach ($metodeBayar as $jenis)
-        <option
-            value="{{ $jenis->id }}"
-            {{ old($name, $selected ?? null) == $jenis->id ? 'selected' : '' }}
-        >
+        <option value="{{ $jenis->id }}" {{ old($name, $selected ?? null) == $jenis->id ? 'selected' : '' }}>
             {{ $jenis->nama }}
         </option>
     @endforeach
