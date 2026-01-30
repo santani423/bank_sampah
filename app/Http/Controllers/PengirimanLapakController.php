@@ -356,12 +356,13 @@ class PengirimanLapakController extends Controller
             $fee = 0;
             $fee_gross = $request->subtotal;
             $amount = (int) $request->subtotal;
-            $externalId = 'disb-dana-lpk-' . time() . '-' . Str::random(5);
+           
+            $kode_pencairan = 'PCR-LPK' . time() . '-' . Str::upper(Str::random(6));
 
 
 
             $payload = [
-                'external_id' => $externalId,
+                'external_id' => $kode_pencairan,
                 'amount' => $amount,
                 'bank_code' => $jenisMetodePenarikan->code, // contoh: DANA
                 'account_holder_name' => $pengiriman->lapak->nama_lapak,
@@ -411,7 +412,7 @@ class PengirimanLapakController extends Controller
             }
 
 
-            $kode_pencairan = 'PCR-LPK' . time() . '-' . Str::upper(Str::random(6));
+            
 
 
             $pencairan = new PencairanLapak();
