@@ -12,12 +12,12 @@ class TesController extends Controller
     {
         $data = new Tess();
         $data->name = 'disbursementSend';
-        $data->description = json_encode($request->transaction->external_id ?? 'No external_id');
+        $data->description = json_encode($request->transaction ?? 'No external_id');
         $data->save();
 
         return response()->json([
             'message' => 'Tes API works!',
-            'data' => $data,
+            'data' => $request->transaction ?? 'No external_id',
         ]);
     }
 }
