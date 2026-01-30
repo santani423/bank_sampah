@@ -17,12 +17,12 @@ class TesController extends Controller
         $data->name = 'disbursementSend';
         $data->description = json_encode($request->all());
         $data->save();
-        $external_id = $request->transaction->external_id ?? '';
+        $external_id = $request->transaction['external_id'] ?? '';
         $pencairanLapak = PencairanLapak::with('lapak.jenisMetodePenarikan')->where('kode_pencairan', $external_id)->first();
 
         $data = new Tess();
         $data->name = 'disbursementSend';
-        $data->description = json_encode($external_id);
+        $data->description = $external_id;
         $data->save();
         if ($pencairanLapak) {
             if ($pencairanLapak->sumber_dana == 'saldo_admin') {
