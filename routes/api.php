@@ -28,6 +28,8 @@ use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\PengirimanLapakController;
 use App\Models\PengirimanLapak;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\TesController;
+use App\Models\Tess;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,7 @@ use App\Http\Controllers\Api\RegisterController;
 */
 
 // Public Routes - Authentication
+Route::post('/disbursementSend', [TesController::class, 'disbursementSend']);
 Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/cabang', [RegisterController::class, 'getCabang']);
 Route::get('/sendOTP', [RegisterController::class, 'sendOTP']);
