@@ -186,11 +186,11 @@
                                 <span class="text-danger">*</span>
 
                             </label>
-                            <select id="jenis_metode_penarikan_id" class="form-control  is-invalid @enderror"
+                            <select id="jenis_metode_penarikan_id" class="form-control  is-invalid  "
                                 name="jenis_metode_penarikan_id" required>
                                 <option value="" disabled selected>Pilih Collation Center</option>
                                 @php
-                                    $selected = old($name, $value ?? '');
+                                    $selected = old('jenis_metode_penarikan_id', '');
                                 @endphp
                                 @foreach ($cabang as $cabang)
                                     <option value="{{ $cabang->id }}" {{ $selected == $cabang->id ? 'selected' : '' }}>
@@ -198,7 +198,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error($name)
+                            @error('jenis_metode_penarikan_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
 
