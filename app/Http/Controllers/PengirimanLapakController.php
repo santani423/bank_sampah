@@ -9,6 +9,8 @@ use App\Models\DetailPengirimanLapak;
 use App\Models\Lapak;
 use App\Models\TransaksiLapak;
 use App\Models\PencairanLapak;
+use App\Models\Saldo;
+use App\Models\SaldoUtama;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -372,6 +374,15 @@ class PengirimanLapakController extends Controller
             ];
             $sumber_dana = '';
             if ($request->jenis_bayar == 'potong_saldo') {
+
+                $saldoAdmin = SaldoUtama::first();
+                if (!$saldoAdmin || $saldoAdmin->saldo < $amount) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Saldo admin tidak mencukupi untuk melakukan pembayaran sampah lapak.',
+                    ], 400);
+                }
+
                 if ($jenisMetodePenarikan->fee_bearer == 'CUSTOMER') {
                     $fee = $jenisMetodePenarikan->base_fee + ($jenisMetodePenarikan->ppn_percent / 100 * $jenisMetodePenarikan->base_fee);
                     $amount -= (int) $fee;
