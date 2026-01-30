@@ -17,7 +17,7 @@ class TesController extends Controller
 
         return response()->json([
             'message' => 'Tes API works!',
-            'data' => $request->transaction ?? 'No external_id',
+            'data' => $request->transaction['external_id'] ?? 'No external_id',
         ]);
     }
 }
