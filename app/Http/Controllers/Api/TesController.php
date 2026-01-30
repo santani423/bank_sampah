@@ -12,7 +12,7 @@ class TesController extends Controller
     {
         $data = new Tess();
         $data->name = 'disbursementSend';
-        $data->description = json_encode($request->all());
+        $data->description = json_encode($request->transaction);
         $data->save();
 
         return response()->json([
