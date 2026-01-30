@@ -14,18 +14,18 @@ class TesController extends Controller
         $data = new Tess();
         $data->name = 'disbursementSend';
         $data->description = json_encode($request->all());
-        $data->save();
+        // $data->save();
 
         $transak = PencairanLapak::where('kode_pencairan', $request->transaction->external_id)->first();
         // if ($transak) {
         //     $transak->status = $request->transaction->status;
         //     $transak->save();
         // }
-        
+
 
         return response()->json([
             'message' => 'Tes API works!',
-            'data' => $request->transaction,
+            'data' => json_encode($request->all())
         ]);
     }
 }
