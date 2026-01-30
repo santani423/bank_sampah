@@ -188,7 +188,7 @@
                             </label>
                             <select id="jenis_metode_penarikan_id" class="form-control  is-invalid  "
                                 name="jenis_metode_penarikan_id" required>
-                                <option value="" disabled selected>Pilih Collation Center</option>
+                                <option value="" disabled selected>Pilih Jenis Metode</option>
                                 @php
                                     $selected = old('jenis_metode_penarikan_id', '');
                                 @endphp
