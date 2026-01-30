@@ -180,7 +180,7 @@
                         </div>
 
                         <div class="form-group">
-                            {{-- <x-select.select-metode-bayar name="jenis_metode_penarikan_id" /> --}}
+                             
                             <label for="jenis_metode_penarikan_id">
                                 Collation Center
                                 <span class="text-danger">*</span>
