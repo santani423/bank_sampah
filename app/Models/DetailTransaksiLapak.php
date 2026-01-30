@@ -11,6 +11,8 @@ class DetailTransaksiLapak extends Model
 
     protected $table = 'detail_transaksi_lapak';
 
+    protected $guarded = ['id'];
+
     /**
      * Relasi ke model Sampah
      */

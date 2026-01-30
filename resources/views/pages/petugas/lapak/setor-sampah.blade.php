@@ -41,7 +41,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="#">
+            <form method="POST" action="{{ route('petugas.lapak.setor-sampah.store', $lapak->kode_lapak) }}">
                 @csrf
                 <div class="mb-3">
                     <label for="kode_transaksi" class="form-label">Kode Transaksi</label>

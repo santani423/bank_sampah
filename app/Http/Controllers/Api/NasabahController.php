@@ -60,6 +60,7 @@ class NasabahController extends Controller
             // =========================
             $query->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
+                
 
                 $q->where(function ($sub) use ($search) {
                     $sub->where('nasabah.nama_lengkap', 'like', "%{$search}%")
