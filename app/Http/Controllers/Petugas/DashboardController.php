@@ -94,17 +94,29 @@ class DashboardController extends Controller
 
 
         // dd($invoice);
-        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice','kode'));
+        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice', 'kode'));
     }
 
 
 
     public function invoicPencairanLapak($kode = null)
     {
-        $invoice = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak.sampah', 'gudang', 'petugas','lapak'])
+        $invoice = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak.sampah', 'gudang', 'petugas', 'lapak'])
             ->where('kode_pengiriman', $kode)
             ->first();
         // dd($invoice);
         // return view('pages.petugas.invoic.pencairan-lapak', compact('invoice','kode'));
+    }
+
+    public function invoicKirimSampahLapak($kode = null)
+    {
+        $invoice = PengirimanLapak::with(['detailPengirimanLapaks.transaksiLapak.detailTransaksiLapak.sampah', 'gudang', 'petugas'])
+            ->where('kode_pengiriman', $kode)
+            ->first();
+
+
+
+        // dd($invoice);
+        return view('pages.petugas.invoic.kirim-sampah-lapak', compact('invoice', 'kode'));
     }
 }
