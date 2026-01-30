@@ -7,89 +7,37 @@ use App\Models\PencairanLapak;
 use App\Models\SaldoUtama;
 use App\Models\Tess;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class TesController extends Controller
 {
     public function disbursementSend(Request $request)
     {
-        try {
-            // 1️⃣ Simpan payload mentah (audit webhook)
-            Tess::create([
-                'name' => 'disbursementSend',
-                'description' => json_encode($request->all()),
-            ]);
 
-            // 2️⃣ Ambil data sesuai payload Xendit
-            $externalId = data_get($request->all(), 'external_id');
-            $status     = data_get($request->all(), 'status');
+        $external_id = $request->transaction['external_id'] ?? '';
 
-            if (empty($externalId) || empty($status)) {
-                return response()->json([
-                    'message' => 'Invalid Xendit payload'
-                ], 200); // tetap 200 agar Xendit tidak retry
+        $pencairanLapak = PencairanLapak::with('lapak.jenisMetodePenarikan')->where('kode_pencairan', $external_id)->first();
+
+        if ($pencairanLapak) {
+            if ($pencairanLapak->sumber_dana == 'saldo_admin') {
+
+                $saldoUtama = SaldoUtama::first();
+                if ($saldoUtama && $saldoUtama->saldo >= $pencairanLapak->jumlah_pencairan) {
+                    $saldoUtama->saldo -= $pencairanLapak->jumlah_pencairan;
+                    $saldoUtama->save();
+                    $data = new Tess();
+                    $data->name = 'disbursementSend';
+                    $data->description = json_encode($request->all());
+                    $data->save();
+                }
             }
-
-            // 3️⃣ Transaction DB (WAJIB untuk transaksi uang)
-            DB::transaction(function () use ($externalId, $status) {
-
-                $pencairanLapak = PencairanLapak::where('kode_pencairan', $externalId)
-                    ->lockForUpdate()
-                    ->first();
-
-                if (!$pencairanLapak) {
-                    throw new \Exception('Pencairan tidak ditemukan');
-                }
-
-                // ❗ Idempotent (hindari double webhook)
-                if ($pencairanLapak->status === 'COMPLETED') {
-                    return;
-                }
-
-                // 4️⃣ Mapping status Xendit → internal
-                switch ($status) {
-                    case 'COMPLETED':
-                        $pencairanLapak->status = 'COMPLETED';
-
-                        // Potong saldo admin jika sumber dana admin
-                        if ($pencairanLapak->sumber_dana === 'saldo_admin') {
-
-                            $saldoUtama = SaldoUtama::lockForUpdate()->first();
-
-                            if (!$saldoUtama || $saldoUtama->saldo < $pencairanLapak->jumlah_pencairan) {
-                                throw new \Exception('Saldo admin tidak mencukupi');
-                            }
-
-                            $saldoUtama->saldo -= $pencairanLapak->jumlah_pencairan;
-                            $saldoUtama->save();
-                        }
-                        break;
-
-                    case 'FAILED':
-                        $pencairanLapak->status = 'FAILED';
-                        break;
-                }
-
-                $pencairanLapak->save();
-            });
-
-            // 5️⃣ Xendit SUCCESS RESPONSE
-            return response()->json([
-                'message' => 'Webhook processed successfully'
-            ], 200);
-        } catch (Throwable $e) {
-
-            Log::error('Xendit Disbursement Webhook Error', [
-                'error' => $e->getMessage(),
-                'payload' => $request->all(),
-            ]);
-
-            // ⚠️ WAJIB 200 agar Xendit tidak retry
-            return response()->json([
-                'message' => 'Webhook received'
-            ], 200);
         }
+
+
+
+        return response()->json([
+            'message' => 'Tes API works!',
+            'data' => $pencairanLapak,
+            'transaction' => $request->transaction ?? 'No transaction data',
+        ]);
     }
 }
