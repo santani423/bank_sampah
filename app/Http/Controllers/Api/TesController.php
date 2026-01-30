@@ -28,8 +28,8 @@ class TesController extends Controller
             if ($pencairanLapak->sumber_dana == 'saldo_admin') {
 
                 $saldoUtama = SaldoUtama::first();
-                if ($saldoUtama && $saldoUtama->saldo >= $pencairanLapak->jumlah_pencairan) {
-                    $saldoUtama->saldo -= $pencairanLapak->jumlah_pencairan;
+                if ($saldoUtama && $saldoUtama->saldo >= $pencairanLapak->total_pencairan) {
+                    $saldoUtama->saldo -= $pencairanLapak->total_pencairan;
                     $saldoUtama->save();
                 }
             }
